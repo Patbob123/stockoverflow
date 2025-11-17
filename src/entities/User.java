@@ -47,7 +47,7 @@ public class User {
         return UUID.randomUUID().toString();
     }
 
-    // add search history
+    // add history
     public void addToSearchHistory(String query) {
         searchHistory.add(0, query); // 添加到开头
         // Limit the length of search history
