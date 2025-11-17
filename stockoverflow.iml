@@ -19,5 +19,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="squareup.okhttp3.okhttp" level="project" />
+    <orderEntry type="library" name="google.code.gson" level="project" />
   </component>
 </module>
