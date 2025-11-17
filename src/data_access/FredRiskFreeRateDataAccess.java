@@ -50,6 +50,7 @@ public class FredRiskFreeRateDataAccess implements RiskFreeRateDataAccessInterfa
             }
 
             String body = response.body().string();
+            System.out.println(body);
             JsonObject root = JsonParser.parseString(body).getAsJsonObject();
 
             JsonArray observations = root.getAsJsonArray("observations");
