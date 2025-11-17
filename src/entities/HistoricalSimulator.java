@@ -127,4 +127,4 @@ public class HistoricalSimulator {
         return a[lo]*(1-w) + a[hi]*w;
     }
 }
-}
+

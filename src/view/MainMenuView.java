@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import view.portfolio.PortfolioAnalyzerFrame;
+import javax.swing.SwingUtilities;
 
 public class MainMenuView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -49,7 +51,7 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
                 evt -> {
                     if (evt.getSource().equals(analyzePortfolioButton)) {
                         //MainMenuController.execute(noteInputField.getText());
-
+                        SwingUtilities.invokeLater(() -> new PortfolioAnalyzerFrame().setVisible(true));
                     }
                 }
         );
