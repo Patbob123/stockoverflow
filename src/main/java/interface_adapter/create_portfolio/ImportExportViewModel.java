@@ -2,7 +2,7 @@ package interface_adapter.create_portfolio;
 
 import interface_adapter.ViewModel;
 
-public class CreatePortfolioViewModel extends ViewModel<CreatePortfolioState> {
+public class ImportExportViewModel extends ViewModel<ImportExportState> {
 
     public static final String TITLE_LABEL = "Import/Export Portfolio";
     public static final String IMPORT_TITLE_LABEL = "Import";
@@ -16,8 +16,8 @@ public class CreatePortfolioViewModel extends ViewModel<CreatePortfolioState> {
 
     public static final int EXPORT_VERTICAL_STRUT = 10;
 
-    public CreatePortfolioViewModel() {
+    public ImportExportViewModel() {
         super("create portfolio");
-        setState(new CreatePortfolioState());
+        setState(new ImportExportState());
     }
 }

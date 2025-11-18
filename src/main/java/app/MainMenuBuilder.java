@@ -3,7 +3,7 @@ package app;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.change_view.ChangeViewPresenter;
-import interface_adapter.create_portfolio.CreatePortfolioViewModel;
+import interface_adapter.create_portfolio.ImportExportViewModel;
 import interface_adapter.mainmenu.MainMenuController;
 import interface_adapter.mainmenu.MainMenuPresenter;
 import interface_adapter.mainmenu.MainMenuViewModel;
@@ -14,7 +14,7 @@ import use_case.change_view.ChangeViewOutputBoundary;
 import use_case.mainmenu.MainMenuInputBoundary;
 import use_case.mainmenu.MainMenuInteractor;
 import use_case.mainmenu.MainMenuOutputBoundary;
-import view.CreatePortfolioView;
+import view.ImportExportView;
 import view.MainMenuView;
 import view.PortfolioMenuView;
 import view.ViewManager;
@@ -34,8 +34,8 @@ public class MainMenuBuilder {
     // private NoteDataAccessInterface noteDAO;
     private MainMenuViewModel mainMenuViewModel;
     private MainMenuView mainMenuView;
-    private CreatePortfolioViewModel createPortfolioViewModel;
-    private CreatePortfolioView createPortfolioView;
+    private ImportExportViewModel importExportViewModel;
+    private ImportExportView importExportView;
     private PortfolioMenuViewModel portfolioMenuViewModel;
     private PortfolioMenuView portfolioMenuView;
 
@@ -52,11 +52,11 @@ public class MainMenuBuilder {
         return this;
     }
 
-    public MainMenuBuilder addCreatePortfolioView() {
-        createPortfolioViewModel = new CreatePortfolioViewModel();
-        createPortfolioView = new CreatePortfolioView(createPortfolioViewModel);
-        cardPanel.add(createPortfolioView, createPortfolioView.getViewName());
-        viewManager.addView(createPortfolioView.getViewName(), createPortfolioView);
+    public MainMenuBuilder addImportExportView() {
+        importExportViewModel = new ImportExportViewModel();
+        importExportView = new ImportExportView(importExportViewModel);
+        cardPanel.add(importExportView, importExportView.getViewName());
+        viewManager.addView(importExportView.getViewName(), importExportView);
 
         return this;
     }
@@ -86,7 +86,7 @@ public class MainMenuBuilder {
         final ChangeViewController changeViewController = new ChangeViewController(changeViewInteractor);
 
         mainMenuView.setChangeViewController(changeViewController);
-        createPortfolioView.setChangeViewController(changeViewController);
+        importExportView.setChangeViewController(changeViewController);
 
         return this;
     }

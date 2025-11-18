@@ -10,7 +10,7 @@ public class MainMenu {
 //        System.out.println(s.getTicker());
         final JFrame application = builder
                 .addMainView()
-                .addCreatePortfolioView()
+                .addImportExportView()
                 .addPortfolioMenuView()
                 .addChangeViewUseCase()
                 .addMainViewUseCase()

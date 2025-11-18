@@ -36,8 +36,12 @@ public class ViewManager implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
             final String viewModelName = (String) evt.getNewValue();
-            System.out.println("A"+viewModelName);
-            cardLayout.show(mainPanel, viewModelName);
+            if(views.containsKey(viewModelName)){
+                cardLayout.show(mainPanel, viewModelName);
+            }else{
+                System.out.println("view doesnt exist"); // TODO: probably make an exception here?
+            }
+
         }
     }
 }
