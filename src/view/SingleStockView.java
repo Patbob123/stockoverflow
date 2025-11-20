@@ -95,8 +95,9 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
         analyzeBtn.addActionListener(this::onAnalyzeClicked);
         backBtn.addActionListener(e ->
                 JOptionPane.showMessageDialog(this, "Back to main menu (hook up in MainMenuBuilder)."));
-        //connecting fred api to the button
+        //connecting fred api to the button compare is added
         FredApiBtn.addActionListener(this::onFredApiClicked);
+        CompareBtn.addActionListener(this::onCompareClicked);
     }
     public void setController(SingleStockController controller) {
         this.controller = controller;
@@ -130,7 +131,57 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
         showError(ex.getMessage());
         infoArea.setText("");  // clear the "Analyzing ..." text
     }
-}//fredbuttom
+}
+    private void onCompareClicked(ActionEvent e) {
+        String baseTicker = tickerField.getText().trim().toUpperCase(Locale.ROOT);
+        if (!baseTicker.matches("[A-Z0-9.]{1,10}")) {
+            showError("Invalid base ticker format.");
+            return;
+        }
+
+        String other = JOptionPane.showInputDialog(
+                this,
+                "Enter ticker to compare with " + baseTicker + ":",
+                "Compare",
+                JOptionPane.QUESTION_MESSAGE
+        );
+        if (other == null) {
+            // user cancelled
+            return;
+        }
+
+        other = other.trim().toUpperCase(Locale.ROOT);
+        if (other.isEmpty()) {
+            showError("Second ticker cannot be empty.");
+            return;
+        }
+        if (!other.matches("[A-Z0-9.]{1,10}")) {
+            showError("Invalid format for second ticker.");
+            return;
+        }
+
+        double rf;
+        try {
+            rf = Double.parseDouble(rfField.getText().trim());
+        } catch (NumberFormatException ex) {
+            showError("Invalid risk-free rate.");
+            return;
+        }
+
+        infoArea.setText("Comparing " + baseTicker + " vs " + other + "...");
+
+        try {
+            controller.compare(baseTicker, other, rf);
+        } catch (RuntimeException ex) {
+            showError(ex.getMessage());
+            infoArea.setText("");
+        }
+    }
+
+
+
+//fredbuttom
+
     private void onFredApiClicked(ActionEvent e) {
         String key = FredAPI.getText().trim();
         if (key.isEmpty()) {
