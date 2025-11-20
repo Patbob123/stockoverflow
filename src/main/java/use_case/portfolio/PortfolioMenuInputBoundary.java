@@ -3,6 +3,7 @@ package use_case.portfolio;
 import entities.Portfolio.Portfolio;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface PortfolioMenuInputBoundary {
 
@@ -10,7 +11,9 @@ public interface PortfolioMenuInputBoundary {
 
     void executeRemoveStock(ArrayList<String> stocks);
 
-    void executeSimulation();
+    void executeGraph(List<String> selectedTickers);
+
+    void executeHistoricalAnalysis(int daysAgo);
 
     void executeCompare(Portfolio comparePortfolio);
 

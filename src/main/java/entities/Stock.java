@@ -1,6 +1,8 @@
 package entities;
 
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Stock {
 
@@ -19,10 +21,12 @@ public class Stock {
     // highest prise during period
     private Double low;
     // lowest
+    private Map<LocalDate, Double> historicalPrices;
 
     public Stock(String ticker, String name) {
         this.ticker = ticker;
         this.name = name;
+        this.historicalPrices = new TreeMap<>();
     }
     // normal getters setters not  that lombok
 
@@ -56,6 +60,14 @@ public class Stock {
 
     public Double getLow() {
         return low;
+    }
+
+    public Map<LocalDate, Double> getHistoricalPrices() {
+        return historicalPrices;
+    }
+
+    public void setHistoricalPrices(Map<LocalDate, Double> historicalPrices) {
+        this.historicalPrices = historicalPrices;
     }
 
     public void updateQuote(LocalDate date, double open, double close, double high, double low) {

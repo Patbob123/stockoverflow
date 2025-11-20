@@ -1,23 +1,24 @@
 package app;
-import javax.swing.*;
 
+import javax.swing.*;
 
 public class MainMenu {
     public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            final MainMenuBuilder builder = new MainMenuBuilder();
 
-        final MainMenuBuilder builder = new MainMenuBuilder();
-//        Stock s = new Stock("ASDB", "asdasdasd");
-//        System.out.println(s.getTicker());
-        final JFrame application = builder
-                .addMainView()
-                .addCreatePortfolioView()
-                .addPortfolioMenuView()
-                .addChangeViewUseCase()
-                .addMainViewUseCase()
-                .build();
+            final JFrame application = builder
+                    .addMainView()
+                    .addCreatePortfolioView()
+                    .addPortfolioMenuView()
+                    .addChangeViewUseCase()
+                    .addMainViewUseCase()
+                    .addPortfolioMenuUseCase()
+                    .build();
 
-        application.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        application.setLocationRelativeTo(null);
-        application.setVisible(true);
+            application.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            application.setLocationRelativeTo(null);
+            application.setVisible(true);
+        });
     }
 }
