@@ -23,7 +23,10 @@ public class StooqStockDataAccess implements StockPriceDataAccessInterface {
     @Override
     public List<PriceBar> getDailySeries(String ticker, int maxDays) {
         // Stooq uses suffixes, e.g. AAPL.US; you can adjust this if needed
-        String stooqSymbol = ticker.toUpperCase() + ".US";
+        String stooqSymbol = ticker.trim().toLowerCase();
+        if (!stooqSymbol.contains(".")) {//now if you write appl-> appl.us as a format,but handles appl.to
+            stooqSymbol += ".us";
+        }
 
         HttpUrl url = HttpUrl.parse(BASE_URL).newBuilder()
                 .addQueryParameter("s", stooqSymbol)

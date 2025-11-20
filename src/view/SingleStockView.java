@@ -102,24 +102,35 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
         this.controller = controller;
     }
 //when analyze button
-    private void onAnalyzeClicked(ActionEvent e) {
-        String tkr = tickerField.getText().trim().toUpperCase(Locale.ROOT);
-        if (!tkr.matches("[A-Z0-9.]{1,10}")) {
-            showError("Invalid ticker format.");
+private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
+    String tkr = tickerField.getText().trim().toUpperCase(Locale.ROOT);
+    if (!tkr.matches("[A-Z0-9.]{1,10}")) {
+        showError("Invalid ticker format.");
+        return;
+    }
+
+    double rf;
+    try {
+        rf = Double.parseDouble(rfField.getText().trim());
+    } catch (NumberFormatException ex) {
+        showError("Invalid risk-free rate.");
+        return;
+    }
+
+    infoArea.setText("Analyzing " + tkr + "...");
+
+    try {
+        if (controller == null) {
+            showError("Controller not set.");
             return;
         }
-
-        double rf;
-        try {
-            rf = Double.parseDouble(rfField.getText().trim());
-        } catch (NumberFormatException ex) {
-            showError("Invalid risk-free rate.");
-            return;
-        }
-
-        infoArea.setText("Analyzing " + tkr + "...");
         controller.analyze(tkr, rf);
-    }//fredbuttom
+    } catch (RuntimeException ex) {
+        // show what went wrong (Stooq error, not enough data, etc.)
+        showError(ex.getMessage());
+        infoArea.setText("");  // clear the "Analyzing ..." text
+    }
+}//fredbuttom
     private void onFredApiClicked(ActionEvent e) {
         String key = FredAPI.getText().trim();
         if (key.isEmpty()) {

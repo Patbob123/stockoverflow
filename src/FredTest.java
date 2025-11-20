@@ -3,7 +3,7 @@ import use_case.singlestock.RiskFreeRateDataAccessInterface;
 
 public class FredTest {
     public static void main(String[] args) {
-        String apiKey = "7d3793701beaa71a8263c3ae2d4a508b"; // get your own fred key at the website
+        String apiKey = "---"; // get your own fred key at the website
         RiskFreeRateDataAccessInterface fred =
                 new FredRiskFreeRateDataAccess(apiKey);
 
