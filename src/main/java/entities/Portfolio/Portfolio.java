@@ -18,6 +18,10 @@ public class Portfolio {
     private final Map<String, Stock> stocks = new HashMap<>();
     private LocalTime time;
 
+    public Portfolio(String name){
+        this.name = name; // TODO: REMOVE LATER THIS WAS JUST FOR TESTING
+    }
+
     public void comparePortfolio(Portfolio portfolio, Simulation simulation) {
 
     }
@@ -60,4 +64,11 @@ public class Portfolio {
     public void importFromExcel(){
 
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+
 }

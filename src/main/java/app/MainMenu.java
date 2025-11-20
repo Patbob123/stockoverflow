@@ -1,9 +1,15 @@
 package app;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+
 import javax.swing.*;
 
 
 public class MainMenu {
     public static void main(String[] args) {
+
+        FlatDarkLaf.setup();
 
         final MainMenuBuilder builder = new MainMenuBuilder();
 //        Stock s = new Stock("ASDB", "asdasdasd");
@@ -14,6 +20,7 @@ public class MainMenu {
                 .addPortfolioMenuView()
                 .addChangeViewUseCase()
                 .addMainViewUseCase()
+                .addImportExportUseCase()
                 .build();
 
         application.setExtendedState(JFrame.MAXIMIZED_BOTH);

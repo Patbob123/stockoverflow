@@ -1,12 +1,14 @@
 package interface_adapter.create_portfolio;
 
+import entities.Portfolio.Portfolio;
+import entities.Simulation;
 import use_case.import_export.ImportExportInputBoundary;
 
 public class ImportExportController {
-    private final ImportExportInputBoundary createPortfolioInteractor;
+    private final ImportExportInputBoundary importExportInputBoundary;
 
-    public ImportExportController(ImportExportInputBoundary createPortfolioInteractor) {
-        this.createPortfolioInteractor = createPortfolioInteractor;
+    public ImportExportController(ImportExportInputBoundary importExportInputBoundary) {
+        this.importExportInputBoundary = importExportInputBoundary;
     }
 
     /**
@@ -14,6 +16,19 @@ public class ImportExportController {
      * @param note the note to be recorded
      */
     public void importPortfolio(String filepath) {
-        createPortfolioInteractor.executeImport(filepath);
+        importExportInputBoundary.executeImport(filepath);
     }
+
+    public void exportCurrentSession(String filepath) {
+        importExportInputBoundary.executeExportCurrentSession(filepath);
+    }
+
+    public void exportPortfolio(Portfolio portfolio, String filepath) {
+        importExportInputBoundary.executeExportPortfolio(portfolio, filepath);
+    }
+
+    public void exportSimData(Simulation simulation, String filepath) {
+        importExportInputBoundary.executeExportSimData(simulation, filepath);
+    }
+
 }

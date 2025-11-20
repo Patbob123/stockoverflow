@@ -3,6 +3,8 @@ package app;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.change_view.ChangeViewPresenter;
+import interface_adapter.create_portfolio.ImportExportController;
+import interface_adapter.create_portfolio.ImportExportPresenter;
 import interface_adapter.create_portfolio.ImportExportViewModel;
 import interface_adapter.mainmenu.MainMenuController;
 import interface_adapter.mainmenu.MainMenuPresenter;
@@ -11,6 +13,9 @@ import interface_adapter.portfolio.PortfolioMenuViewModel;
 import use_case.change_view.ChangeViewInputBoundary;
 import use_case.change_view.ChangeViewInteractor;
 import use_case.change_view.ChangeViewOutputBoundary;
+import use_case.import_export.ImportExportInputBoundary;
+import use_case.import_export.ImportExportInteractor;
+import use_case.import_export.ImportExportOutputBoundary;
 import use_case.mainmenu.MainMenuInputBoundary;
 import use_case.mainmenu.MainMenuInteractor;
 import use_case.mainmenu.MainMenuOutputBoundary;
@@ -87,6 +92,16 @@ public class MainMenuBuilder {
 
         mainMenuView.setChangeViewController(changeViewController);
         importExportView.setChangeViewController(changeViewController);
+
+        return this;
+    }
+
+    public MainMenuBuilder addImportExportUseCase() {
+        final ImportExportOutputBoundary importExportOutputBoundary = new ImportExportPresenter(importExportViewModel);
+        final ImportExportInputBoundary importExportInteractor = new ImportExportInteractor(importExportOutputBoundary);
+
+        final ImportExportController importExportController = new ImportExportController(importExportInteractor);
+        importExportView.setImportExportController(importExportController);
 
         return this;
     }
