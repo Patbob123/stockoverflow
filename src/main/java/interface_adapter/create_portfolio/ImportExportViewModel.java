@@ -55,7 +55,7 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
     public static final int DROPDOWN_HEIGHT = 25;
 
     // Labels
-    public static final String TITLE_LABEL = "Import/Export Portfolio";
+    public static final String TITLE_LABEL = "Import & Export";
     public static final String IMPORT_TITLE_LABEL = "Import";
     public static final String EXPORT_TITLE_LABEL = "Export";
     public static final String CURRENT_SESSION_BUTTON_LABEL = "Export Current Session";

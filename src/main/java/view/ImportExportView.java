@@ -65,7 +65,7 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
 
         topPanel.add(backButton, BorderLayout.WEST);
 
-        final JLabel title = new JLabel("Import & Export", SwingConstants.CENTER);
+        final JLabel title = new JLabel(ImportExportViewModel.TITLE_LABEL, SwingConstants.CENTER);
         title.setFont(ImportExportViewModel.TITLE_FONT);
         title.setForeground(ImportExportViewModel.TEXT_PRIMARY);
         topPanel.add(title, BorderLayout.CENTER);
@@ -296,17 +296,17 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
     private JButton createTextButton(String text) {
         final JButton button = new JButton(text);
         button.setFont(ImportExportViewModel.BUTTON_SECONDARY_FONT);
-        button.setForeground(ImportExportViewModel.TEXT_SECONDARY);
+        button.setForeground(ImportExportViewModel.TEXT_PRIMARY);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        final Color originalColor = button.getBackground();
+        final Color originalColor = button.getForeground();
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setForeground(ImportExportViewModel.TEXT_PRIMARY);
+                button.setForeground(ImportExportViewModel.TEXT_SECONDARY);
             }
 
             public void mouseExited(java.awt.event.MouseEvent evt) {
