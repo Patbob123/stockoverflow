@@ -14,7 +14,7 @@ public class MainMenuViewModel extends ViewModel<MainMenuState> {
     public static final String EXIT_BUTTON_LABEL = "QUIT";
 
     public MainMenuViewModel() {
-        super("note");
+        super("MainMenu");
         setState(new MainMenuState());
     }
 }
