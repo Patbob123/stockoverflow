@@ -58,6 +58,9 @@ public class Stock {
         return low;
     }
 
+    /**
+    * Gdasdasd.
+    */
     public void updateQuote(LocalDate date, double open, double close, double high, double low) {
         this.lastUpdated = date;
         this.open = open;
