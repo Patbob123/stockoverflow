@@ -1,5 +1,15 @@
 package view;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import entities.Portfolio.Portfolio;
 import entities.PortfolioList;
 import entities.Simulation;
@@ -9,18 +19,6 @@ import interface_adapter.import_export.ImportExportViewModel;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-/**
- * Improved ImportExportView with modern styling.
- */
 public class ImportExportView extends PaddedView implements ActionListener, PropertyChangeListener {
 
     @Getter

@@ -14,7 +14,6 @@ import javax.swing.border.EmptyBorder;
 import interface_adapter.add_portfolio.AddPortfolioController;
 import interface_adapter.add_portfolio.AddPortfolioViewModel;
 import interface_adapter.change_view.ChangeViewController;
-import interface_adapter.import_export.ImportExportViewModel;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,12 +1,5 @@
 package view;
 
-import entities.Portfolio.Portfolio;
-import interface_adapter.portfolio.PortfolioMenuController;
-import interface_adapter.portfolio.PortfolioMenuViewModel;
-import jdk.internal.joptsimple.internal.Strings;
-import lombok.Getter;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -15,10 +8,21 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PortfolioMenuView extends JPanel implements ActionListener, PropertyChangeListener {
+import javax.swing.*;
 
+import entities.Portfolio.Portfolio;
+import interface_adapter.portfolio.PortfolioMenuController;
+import interface_adapter.portfolio.PortfolioMenuViewModel;
+import interface_adapter.change_view.ChangeViewController;
+import lombok.Getter;
+import lombok.Setter;
+
+public class PortfolioMenuView extends JPanel implements ActionListener, PropertyChangeListener {
     @Getter
     private final String viewName = "PortfolioMenu";
+
+    @Setter
+    private ChangeViewController changeViewController;
 
     private final String[] sortmethod = {"by name", "by price","by amount of stock"};
     private final Map<String, Comparator> portfolioSort = new HashMap<>();
@@ -77,6 +81,7 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
                     if (evt.getSource().equals(addButton)) {
                         //MainMenuController.execute(noteInputField.getText());
                         this.portfolioMenuController.getPortfolioMenuInputBoundary().executeAddStock();
+                        changeViewController.changeView("CreatePortfolioMenu");
                     }
                 }
         );
@@ -137,7 +142,7 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
                     if(evt.getSource().equals(sortbyComboBox)){
                         String method = (String) sortbyComboBox.getSelectedItem();
                         Portfolio portfolio = this.portfolioMenuViewModel.getState().getPortfolio();
-                        portfolio.sortStockBy();
+                        // portfolio.sortStockBy();
                     }
                 }
         );

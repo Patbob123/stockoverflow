@@ -116,6 +116,7 @@ public class MainMenuBuilder {
         mainMenuView.setChangeViewController(changeViewController);
         importExportView.setChangeViewController(changeViewController);
         addPortfolioView.setChangeViewController(changeViewController);
+        portfolioMenuView.setChangeViewController(changeViewController);
 
         return this;
     }

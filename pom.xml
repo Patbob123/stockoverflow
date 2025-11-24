@@ -28,10 +28,18 @@
             <artifactId>flatlaf</artifactId>
             <version>3.6.2</version>
         </dependency>
+
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf-extras</artifactId>
             <version>3.6.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.sf.jopt-simple/jopt-simple -->
+        <dependency>
+            <groupId>net.sf.jopt-simple</groupId>
+            <artifactId>jopt-simple</artifactId>
+            <version>6.0-alpha-3</version>
         </dependency>
     </dependencies>
     <build>
