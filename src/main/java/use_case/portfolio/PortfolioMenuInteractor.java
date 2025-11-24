@@ -2,24 +2,44 @@ package use_case.portfolio;
 
 
 import entities.Portfolio.Portfolio;
-import entities.StatisticsCalculator;
-import use_case.simulation.StockDataAccessInterface;
-
+import entities.Stock;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class PortfolioMenuInteractor implements PortfolioMenuInputBoundary {
 
     private final PortfolioMenuOutputBoundary portfolioMenuOutputBoundary;
+
     private final Portfolio portfolio;
-    private final StockDataAccessInterface stockDataAccessObject;
 
     public static final String STOCK_NOT_IN_PORTFOLIO = "Stock/stocks not found:";
 
-    public PortfolioMenuInteractor(PortfolioMenuOutputBoundary output, Portfolio portfolio, StockDataAccessInterface stockDataAccessObject) {
+    public PortfolioMenuInteractor(PortfolioMenuOutputBoundary output, Portfolio portfolio) {
         this.portfolioMenuOutputBoundary = output;
         this.portfolio = portfolio;
-        this.stockDataAccessObject = stockDataAccessObject;
+    }
+
+    // --- Helper: Mock Data Generator (Since no API is connected yet) ---
+    private void ensureHistoricalData(Stock stock) {
+        if (stock.getHistoricalPrices() == null || stock.getHistoricalPrices().isEmpty()) {
+            Map<LocalDate, Double> history = new TreeMap<>();
+            LocalDate today = LocalDate.now();
+            // Start with a base price based on the ticker hash to be consistent but different
+            double price = 100.0 + (stock.getTicker().hashCode() % 50);
+
+            // Generate 30 days of dummy data
+            for (int i = 30; i >= 0; i--) {
+                // Random fluctuation between -2% and +2%
+                price = price * (1 + (Math.random() * 0.04 - 0.02));
+                history.put(today.minusDays(i), price);
+            }
+            stock.setHistoricalPrices(history);
+            // Update current price for consistency
+            stock.updateQuote(today, price, price, price + 1, price - 1);
+        }
     }
 
     @Override
@@ -29,24 +49,93 @@ public class PortfolioMenuInteractor implements PortfolioMenuInputBoundary {
 
     @Override
     public void executeRemoveStock(ArrayList<String> stocks) {
-        if (this.portfolio == null) return;
-
-        for (String stock :  stocks) {
-            try {this.portfolio.removeStock(stock);
-                stocks.remove(stock);
-            }catch(NullPointerException npe) {
-                this.portfolioMenuOutputBoundary.prepareRemoveStockView(this.portfolio);
-                this.portfolioMenuOutputBoundary.prepareFailView(this.STOCK_NOT_IN_PORTFOLIO + stocks);
-                return;
+        for (String stockTicker : stocks) {
+            try {
+                this.portfolio.removeStock(stockTicker);
+            } catch (Exception e) {
+                this.portfolioMenuOutputBoundary.prepareFailView(STOCK_NOT_IN_PORTFOLIO + stockTicker);
             }
+        }
+        // After removal, simply refresh the view (State update is handled by View's refresh logic in this architecture)
+        this.portfolioMenuOutputBoundary.prepareRemoveStockView(this.portfolio);
+    }
+
+    // Implementation of User Story 5: Graph multiple stocks
+    @Override
+    public void executeGraph(List<String> selectedTickers) {
+        if (selectedTickers == null || selectedTickers.isEmpty()) {
+            portfolioMenuOutputBoundary.prepareFailView("Please select at least one stock to graph.");
+            return;
+        }
+
+        List<Stock> stocksToGraph = new ArrayList<>();
+
+        for (String ticker : selectedTickers) {
+            Stock stock = portfolio.getStock(ticker);
+            if (stock != null) {
+                // IMPORTANT: Ensure data exists (using mock data if API is missing)
+                ensureHistoricalData(stock);
+                stocksToGraph.add(stock);
+            }
+        }
+
+        if (stocksToGraph.isEmpty()) {
+            portfolioMenuOutputBoundary.prepareFailView("No valid stocks found for graphing.");
+        } else {
+            portfolioMenuOutputBoundary.prepareGraphView(stocksToGraph);
         }
     }
 
+    // Implementation of User Story 9: Historical portfolio return analysis
     @Override
-    public void executeSimulation() {
-        //TODO:
-        this.portfolioMenuOutputBoundary.prepareSimulationView(this.portfolio);
+    public void executeHistoricalAnalysis(int daysAgo) {
+        double totalInitialValue = 0.0;
+        double totalFinalValue = 0.0;
+        boolean hasData = false;
+
+        // Calculate portfolio return assuming equal weight (1 share each) for simplicity
+        for (Stock stock : portfolio.getStocks().values()) {
+            ensureHistoricalData(stock); // Ensure data exists
+
+            Map<LocalDate, Double> history = stock.getHistoricalPrices();
+            if (history.isEmpty()) continue;
+
+            // Get the most recent price (Close price)
+            Double endPrice = stock.getClose();
+            if (endPrice == null) {
+                // Fallback to last entry in history
+                endPrice = new ArrayList<>(history.values()).get(history.size() - 1);
+            }
+
+            // Find price 'daysAgo'
+            LocalDate targetDate = LocalDate.now().minusDays(daysAgo);
+            Double startPrice = endPrice; // Default to no change if data missing
+
+            // Find the first available date after or on targetDate
+            for (Map.Entry<LocalDate, Double> entry : history.entrySet()) {
+                if (!entry.getKey().isBefore(targetDate)) {
+                    startPrice = entry.getValue();
+                    break;
+                }
+            }
+
+            totalInitialValue += startPrice;
+            totalFinalValue += endPrice;
+            hasData = true;
+        }
+
+        if (!hasData || totalInitialValue == 0) {
+            portfolioMenuOutputBoundary.prepareFailView("Insufficient historical data to analyze returns.");
+            return;
+        }
+
+        // Calculate Return ROI = (Final - Initial) / Initial
+        double returnRate = (totalFinalValue - totalInitialValue) / totalInitialValue;
+
+        // Send percentage to presenter
+        portfolioMenuOutputBoundary.prepareAnalysisView(returnRate * 100);
     }
+
 
     @Override
     public void executeCompare(Portfolio comparePortfolio) {
@@ -72,76 +161,5 @@ public class PortfolioMenuInteractor implements PortfolioMenuInputBoundary {
     @Override
     public void executeExit() {
         this.portfolioMenuOutputBoundary.prepareExitView();
-    }
-
-    @Override
-    public void executeLoadMarketData() {
-        if (stockDataAccessObject == null) {
-            this.portfolioMenuOutputBoundary.prepareFailView("Data Access Object not initialized.");
-            return;
-        }
-        List<String> tickers = stockDataAccessObject.getAllAvailableTickers();
-        this.portfolioMenuOutputBoundary.prepareMarketData(tickers);
-    }
-
-    @Override
-    public void executeAnalyze(List<String> tickers) {
-        if (stockDataAccessObject == null) return;
-
-        if (tickers == null || tickers.isEmpty()) {
-            this.portfolioMenuOutputBoundary.prepareFailView("No stocks selected for analysis.");
-            return;
-        }
-
-        try {
-            Map<String, Double> results = new HashMap<>();
-
-            // We will plot the normalized price history for comparison
-            // To simplify plotting, we'll find the common date range or just take the shortest one.
-            // For this implementation, let's assume all stocks have aligned data from Mock DAO.
-
-            List<double[]> allPaths = new ArrayList<>();
-            int minLength = Integer.MAX_VALUE;
-
-            for (String ticker : tickers) {
-                Map<LocalDate, Double> prices = stockDataAccessObject.getHistoricalPrices(ticker);
-                if (prices.isEmpty()) continue;
-
-                Collection<Double> values = prices.values();
-                double[] priceArray = values.stream().mapToDouble(Double::doubleValue).toArray();
-
-                if (priceArray.length < minLength) minLength = priceArray.length;
-
-                // Calculate basic stats
-                StatisticsCalculator stats = new StatisticsCalculator();
-                // returns
-                double[] returns = new double[priceArray.length - 1];
-                for (int i = 0; i < priceArray.length - 1; i++) {
-                    returns[i] = (priceArray[i+1] - priceArray[i]) / priceArray[i];
-                }
-
-                double vol = stats.calculateVolatility(returns) * Math.sqrt(252); // Annualized
-                results.put(ticker + " Volatility", vol);
-
-                double mean = stats.mean(returns) * 252; // Annualized
-                results.put(ticker + " Mean Return", mean);
-
-                allPaths.add(priceArray);
-            }
-
-            // Truncate paths to minLength for plotting together
-            double[][] plotData = new double[allPaths.size()][minLength];
-            for (int i = 0; i < allPaths.size(); i++) {
-                double[] src = allPaths.get(i);
-                // Copy last minLength elements to align by latest date
-                System.arraycopy(src, src.length - minLength, plotData[i], 0, minLength);
-            }
-
-            this.portfolioMenuOutputBoundary.prepareAnalysisResult("Analysis Complete", results, plotData);
-
-        } catch (Exception e) {
-            this.portfolioMenuOutputBoundary.prepareFailView("Analysis Failed: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 }

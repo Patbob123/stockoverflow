@@ -2,6 +2,7 @@ package interface_adapter.portfolio;
 
 import lombok.Getter;
 import use_case.portfolio.PortfolioMenuInputBoundary;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PortfolioMenuController {
@@ -12,11 +13,17 @@ public class PortfolioMenuController {
         this.portfolioMenuInputBoundary = portfolioMenuInputBoundary;
     }
 
-    public void executeLoadMarketData() {
-        portfolioMenuInputBoundary.executeLoadMarketData();
+    public void executeGraph(List<String> tickers) {
+        portfolioMenuInputBoundary.executeGraph(tickers);
     }
 
-    public void executeAnalyze(List<String> tickers) {
-        portfolioMenuInputBoundary.executeAnalyze(tickers);
+    public void executeAnalysis(int days) {
+        portfolioMenuInputBoundary.executeHistoricalAnalysis(days);
     }
 }
+
+    /**
+     * Executes the Note related Use Cases.
+     * @param note the note to be recorded
+     */
+

@@ -5,7 +5,6 @@ import interface_adapter.mainmenu.MainMenuController;
 import interface_adapter.mainmenu.MainMenuViewModel;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -15,7 +14,6 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
 
     private final String viewName = "MainMenu";
     private final MainMenuViewModel mainMenuViewModel;
-
     private MainMenuController mainMenuController;
     private ChangeViewController changeViewController;
 
@@ -23,11 +21,9 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
     private final JButton analyzePortfolioButton = new JButton(MainMenuViewModel.PORTFOLIO_BUTTON_LABEL);
     private final JButton createPortfolioButton = new JButton(MainMenuViewModel.CREATE_PORTFOLIO_BUTTON_LABEL);
     private final JButton historyStockButton = new JButton(MainMenuViewModel.HISTORY_BUTTON_LABEL);
-    private final JButton simulationButton = new JButton("Simulation"); // Label could be in ViewModel
     private final JButton exitButton = new JButton(MainMenuViewModel.EXIT_BUTTON_LABEL);
 
     public MainMenuView(MainMenuViewModel mainMenuViewModel) {
-        //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
         this.mainMenuViewModel = mainMenuViewModel;
         this.mainMenuViewModel.addPropertyChangeListener(this);
         this.mainMenuController = null;
@@ -38,88 +34,43 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
         buttons.add(analyzePortfolioButton);
         buttons.add(createPortfolioButton);
         buttons.add(historyStockButton);
-        buttons.add(simulationButton);
         buttons.add(exitButton);
 
-        stockButton.addActionListener(
-                evt -> {
-                    if (evt.getSource().equals(stockButton)) {
-                        //MainMenuController.execute(noteInputField.getText());
+        stockButton.addActionListener(evt -> {}); // Single stock logic (User Story 1)
 
-                    }
-                }
-        );
-
-        analyzePortfolioButton.addActionListener(
-                evt -> {
-                    if (evt.getSource().equals(analyzePortfolioButton)) {
-                        changeViewController.changeView("PortfolioMenu");
-                    }
-                }
-        );
-
-        createPortfolioButton.addActionListener(
-                evt -> {
-                    if (evt.getSource().equals(createPortfolioButton)) {
-                        changeViewController.changeView("CreatePortfolioMenu");
-
-                    }
-                }
-        );
-
-        historyStockButton.addActionListener(
-                evt -> {
-                    if (evt.getSource().equals(historyStockButton)) {
-                        //MainMenuController.execute(noteInputField.getText());
-
-                    }
-                }
-        );
-
-        simulationButton.addActionListener(
-            evt -> {
-                if (evt.getSource().equals(simulationButton)) {
-                    if (changeViewController != null) {
-                        changeViewController.changeView("simulation");
-                    }
-                }
+        // Navigation to Portfolio Menu
+        analyzePortfolioButton.addActionListener(evt -> {
+            if (changeViewController != null) {
+                changeViewController.changeView("PortfolioMenu");
             }
-        );
+        });
 
-        exitButton.addActionListener(
-                evt -> {
-                    if (evt.getSource().equals(exitButton)) {
-                        mainMenuController.execute("exit"); //fix this later
+        // Navigation to Create Portfolio
+        createPortfolioButton.addActionListener(evt -> {
+            if (changeViewController != null) {
+                changeViewController.changeView("CreatePortfolioMenu");
+            }
+        });
 
-                    }
-                }
-        );
+        historyStockButton.addActionListener(evt -> {});
+
+        exitButton.addActionListener(evt -> {
+            if (mainMenuController != null) {
+                mainMenuController.execute("exit");
+            }
+        });
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        //this.add(noteName);
         this.add(buttons);
     }
 
-    public String getViewName() {
-        return viewName;
-    }
-
-    public void setMainMenuController(MainMenuController mainMenuController) {
-        this.mainMenuController = mainMenuController;
-    }
-
-    public void setChangeViewController(ChangeViewController changeViewController) {
-        this.changeViewController = changeViewController;
-    }
+    public String getViewName() { return viewName; }
+    public void setMainMenuController(MainMenuController controller) { this.mainMenuController = controller; }
+    public void setChangeViewController(ChangeViewController controller) { this.changeViewController = controller; }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        System.out.println("Click " + e.getActionCommand());
-    }
+    public void actionPerformed(ActionEvent e) {}
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-
-    }
+    public void propertyChange(PropertyChangeEvent evt) {}
 }

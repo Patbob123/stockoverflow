@@ -1,15 +1,18 @@
 package use_case.portfolio;
 
 import entities.Portfolio.Portfolio;
+import entities.Stock;
+
 import java.util.List;
-import java.util.Map;
 
 public interface PortfolioMenuOutputBoundary {
     void prepareAddStockView(Portfolio portfolio);
 
     void prepareRemoveStockView(Portfolio portfolio);
 
-    void prepareSimulationView(Portfolio portfolio);
+    void prepareGraphView(List<Stock> stocks);
+
+    void prepareAnalysisView(double returnPercentage);
 
     void prepareCompareView(Portfolio portfolio, Portfolio comparePortfolio);
 
@@ -18,8 +21,4 @@ public interface PortfolioMenuOutputBoundary {
     void prepareFailView(String message);
 
     void prepareExitView();
-
-    // New methods for Market Analysis
-    void prepareMarketData(List<String> tickers);
-    void prepareAnalysisResult(String resultMessage, Map<String, Double> stats, double[][] plotData);
 }

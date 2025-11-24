@@ -11,7 +11,9 @@ public interface PortfolioMenuInputBoundary {
 
     void executeRemoveStock(ArrayList<String> stocks);
 
-    void executeSimulation();
+    void executeGraph(List<String> selectedTickers);
+
+    void executeHistoricalAnalysis(int daysAgo);
 
     void executeCompare(Portfolio comparePortfolio);
 
@@ -22,9 +24,5 @@ public interface PortfolioMenuInputBoundary {
     void executeSavePortfolio();
 
     void executeExit();
-
-    // New methods for Market Analysis
-    void executeLoadMarketData();
-    void executeAnalyze(List<String> tickers);
 
 }
