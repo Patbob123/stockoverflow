@@ -23,6 +23,7 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
     private final JButton analyzePortfolioButton = new JButton(MainMenuViewModel.PORTFOLIO_BUTTON_LABEL);
     private final JButton createPortfolioButton = new JButton(MainMenuViewModel.CREATE_PORTFOLIO_BUTTON_LABEL);
     private final JButton historyStockButton = new JButton(MainMenuViewModel.HISTORY_BUTTON_LABEL);
+    private final JButton simulationButton = new JButton("Simulation"); // Label could be in ViewModel
     private final JButton exitButton = new JButton(MainMenuViewModel.EXIT_BUTTON_LABEL);
 
     public MainMenuView(MainMenuViewModel mainMenuViewModel) {
@@ -37,6 +38,7 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
         buttons.add(analyzePortfolioButton);
         buttons.add(createPortfolioButton);
         buttons.add(historyStockButton);
+        buttons.add(simulationButton);
         buttons.add(exitButton);
 
         stockButton.addActionListener(
@@ -72,6 +74,16 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
 
                     }
                 }
+        );
+
+        simulationButton.addActionListener(
+            evt -> {
+                if (evt.getSource().equals(simulationButton)) {
+                    if (changeViewController != null) {
+                        changeViewController.changeView("simulation");
+                    }
+                }
+            }
         );
 
         exitButton.addActionListener(
