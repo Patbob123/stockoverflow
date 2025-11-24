@@ -12,21 +12,11 @@ public class ChangeViewController {
 
     public void changeView(String viewName) {
         System.out.println(viewName);
-        switch (viewName) {
-            case "MainMenu":
-                changeViewInteractor.changeToMainMenu();
-                break;
-            case "CreatePortfolioMenu":
-                changeViewInteractor.changeToCreatePortfolio();
-                break;
-            case "PortfolioMenu":
-                changeViewInteractor.changeToPortfolio();
-                break;
-            default:
-                System.out.println(viewName + " view dont exist");
-                break;
-        }
+        changeViewInteractor.changeTo(viewName);
+    }
 
+    public void backView() {
+        changeViewInteractor.goBack();
     }
 
 }
