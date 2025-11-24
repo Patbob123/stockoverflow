@@ -3,7 +3,6 @@ package use_case.portfolio;
 import entities.Portfolio.Portfolio;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface PortfolioMenuInputBoundary {
 
@@ -22,9 +21,5 @@ public interface PortfolioMenuInputBoundary {
     void executeSavePortfolio();
 
     void executeExit();
-
-    // New methods for Market Analysis
-    void executeLoadMarketData();
-    void executeAnalyze(List<String> tickers);
 
 }
