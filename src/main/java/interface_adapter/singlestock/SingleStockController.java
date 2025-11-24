@@ -1,9 +1,9 @@
-package interface_adapter.singlestock;
+package main.java.interface_adapter.singlestock;
 
-import use_case.singlestock.AnalyzeSingleStockInputBoundary;
-import use_case.singlestock.AnalyzeSingleStockInputData;
-import use_case.singlestock.CompareTwoStocksInputBoundary;
-import use_case.singlestock.CompareTwoStocksInputData;
+import main.java.use_case.singlestock.AnalyzeSingleStockInputBoundary;
+import main.java.use_case.singlestock.AnalyzeSingleStockInputData;
+import main.java.use_case.singlestock.CompareTwoStocksInputBoundary;
+import main.java.use_case.singlestock.CompareTwoStocksInputData;
 
 public class SingleStockController {
 

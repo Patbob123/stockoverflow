@@ -1,13 +1,13 @@
-import data_access.AlphaVantageStockPriceDataAccess;
-import data_access.CombinedStockPriceDataAccess;
-import data_access.FredRiskFreeRateDataAccess;
-import data_access.StooqStockDataAccess;
-import interface_adapter.singlestock.SingleStockController;
-import interface_adapter.singlestock.SingleStockPresenter;
-import use_case.singlestock.AnalyzeSingleStockInteractor;
-import use_case.singlestock.CompareTwoStocksInteractor;
-import use_case.singlestock.RiskFreeRateDataAccessInterface;
-import use_case.singlestock.StockPriceDataAccessInterface;
+import main.java.data_access.AlphaVantageStockPriceDataAccess;
+import main.java.data_access.CombinedStockPriceDataAccess;
+import main.java.data_access.FredRiskFreeRateDataAccess;
+import main.java.data_access.StooqStockDataAccess;
+import main.java.interface_adapter.singlestock.SingleStockController;
+import main.java.interface_adapter.singlestock.SingleStockPresenter;
+import main.java.use_case.singlestock.AnalyzeSingleStockInteractor;
+import main.java.use_case.singlestock.CompareTwoStocksInteractor;
+import main.java.use_case.singlestock.RiskFreeRateDataAccessInterface;
+import main.java.use_case.singlestock.StockPriceDataAccessInterface;
 import view.SingleStockView;
 
 import javax.swing.*;

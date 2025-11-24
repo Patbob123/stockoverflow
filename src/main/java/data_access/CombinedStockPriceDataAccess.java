@@ -1,7 +1,7 @@
-package data_access;
+package main.java.data_access;
 
 import entities.PriceBar;
-import use_case.singlestock.StockPriceDataAccessInterface;
+import main.java.use_case.singlestock.StockPriceDataAccessInterface;
 
 import java.util.ArrayList;
 import java.util.List;

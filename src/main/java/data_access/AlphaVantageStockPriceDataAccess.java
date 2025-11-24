@@ -1,4 +1,4 @@
-package data_access;
+package main.java.data_access;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -7,7 +7,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import use_case.singlestock.StockPriceDataAccessInterface;
+import main.java.use_case.singlestock.StockPriceDataAccessInterface;
 
 import java.io.IOException;
 import java.time.LocalDate;

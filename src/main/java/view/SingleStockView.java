@@ -1,8 +1,8 @@
 package view;
 
-import interface_adapter.singlestock.SingleStockController;
-import interface_adapter.singlestock.SingleStockViewInterface;
-import use_case.singlestock.AnalyzeSingleStockOutputData;
+import main.java.interface_adapter.singlestock.SingleStockController;
+import main.java.interface_adapter.singlestock.SingleStockViewInterface;
+import main.java.use_case.singlestock.AnalyzeSingleStockOutputData;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -190,8 +190,8 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
         }
 
         try {
-            data_access.FredRiskFreeRateDataAccess fred =
-                    new data_access.FredRiskFreeRateDataAccess(key);
+            main.java.data_access.FredRiskFreeRateDataAccess fred =
+                    new main.java.data_access.FredRiskFreeRateDataAccess(key);
 
             double rf = fred.getCurrentRiskFreeRate();
             rfField.setText(String.format(Locale.US, "%.4f", rf));

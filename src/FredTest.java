@@ -1,5 +1,5 @@
-import data_access.FredRiskFreeRateDataAccess;
-import use_case.singlestock.RiskFreeRateDataAccessInterface;
+import main.java.data_access.FredRiskFreeRateDataAccess;
+import main.java.use_case.singlestock.RiskFreeRateDataAccessInterface;
 
 public class FredTest {
     public static void main(String[] args) {

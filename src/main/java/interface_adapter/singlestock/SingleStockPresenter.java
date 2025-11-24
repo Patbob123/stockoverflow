@@ -1,9 +1,9 @@
-package interface_adapter.singlestock;
+package main.java.interface_adapter.singlestock;
 
-import use_case.singlestock.AnalyzeSingleStockOutputBoundary;
-import use_case.singlestock.AnalyzeSingleStockOutputData;
-import use_case.singlestock.CompareTwoStocksOutputBoundary;
-import use_case.singlestock.CompareTwoStocksOutputData;
+import main.java.use_case.singlestock.AnalyzeSingleStockOutputBoundary;
+import main.java.use_case.singlestock.AnalyzeSingleStockOutputData;
+import main.java.use_case.singlestock.CompareTwoStocksOutputBoundary;
+import main.java.use_case.singlestock.CompareTwoStocksOutputData;
 
 public class SingleStockPresenter
         implements AnalyzeSingleStockOutputBoundary, CompareTwoStocksOutputBoundary {

@@ -1,12 +1,12 @@
 
-package data_access;
+package main.java.data_access;
 
 import entities.PriceBar;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import use_case.singlestock.StockPriceDataAccessInterface;
+import main.java.use_case.singlestock.StockPriceDataAccessInterface;
 
 import java.io.IOException;
 import java.time.LocalDate;

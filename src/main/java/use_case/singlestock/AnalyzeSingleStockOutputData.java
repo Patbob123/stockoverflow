@@ -1,4 +1,4 @@
-package use_case.singlestock;
+package main.java.use_case.singlestock;
 
 public class AnalyzeSingleStockOutputData {
 
