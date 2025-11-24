@@ -8,7 +8,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="stockoverflowoverflow" />
-        <module name="stockoverflow" />
       </profile>
     </annotationProcessing>
   </component>
