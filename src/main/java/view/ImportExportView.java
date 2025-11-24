@@ -1,6 +1,7 @@
 package view;
 
 import entities.Portfolio.Portfolio;
+import entities.PortfolioList;
 import entities.Simulation;
 import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.import_export.ImportExportController;
@@ -349,6 +350,8 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
 
         exportPortfolioButton.addActionListener(e -> {
             final Portfolio selected = (Portfolio) portfolioDropdown.getSelectedItem();
+            PortfolioList portfolioList = new PortfolioList();
+            portfolioList.addPortfolio(selected);
             final String path = getDirectoryPath();
             if (path == null) {
                 errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
@@ -358,7 +361,7 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
                 errorLabel.setText(ImportExportViewModel.ERROR_NO_PORTFOLIO);
                 return;
             }
-            importExportController.exportPortfolio(selected, path);
+            importExportController.exportPortfolio(portfolioList, path);
         });
 
         selectSimDataButton.addActionListener(e -> {

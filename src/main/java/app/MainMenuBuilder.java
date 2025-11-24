@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import use_case.import_export.ImportExportDataAccessInterface;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
 import interface_adapter.add_portfolio.AddPortfolioPresenter;
@@ -53,6 +54,8 @@ public class MainMenuBuilder {
     private PortfolioMenuView portfolioMenuView;
     private AddPortfolioViewModel addPortfolioViewModel;
     private AddPortfolioView addPortfolioView;
+
+    private ImportExportDataAccessInterface importExportDAO;
 
     public MainMenuBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -119,7 +122,7 @@ public class MainMenuBuilder {
 
     public MainMenuBuilder addImportExportUseCase() {
         final ImportExportOutputBoundary importExportOutputBoundary = new ImportExportPresenter(importExportViewModel);
-        final ImportExportInputBoundary importExportInteractor = new ImportExportInteractor(importExportOutputBoundary);
+        final ImportExportInputBoundary importExportInteractor = new ImportExportInteractor(importExportOutputBoundary, importExportDAO);
 
         final ImportExportController importExportController = new ImportExportController(importExportInteractor);
         importExportView.setImportExportController(importExportController);

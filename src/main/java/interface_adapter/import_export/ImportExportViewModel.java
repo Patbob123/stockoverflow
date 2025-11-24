@@ -1,9 +1,14 @@
 package interface_adapter.import_export;
 
-import interface_adapter.ViewModel;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
-import java.awt.*;
+
+import entities.PortfolioList;
+import entities.Simulation;
+import interface_adapter.ViewModel;
 
 public class ImportExportViewModel extends ViewModel<ImportExportState> {
 
@@ -90,8 +95,19 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
     public static final Font ERROR_FONT = BASE_FONT.deriveFont(Font.PLAIN, 24f);
     public static final Font DROPDOWN_FONT = BASE_FONT.deriveFont(Font.PLAIN, 13f);
 
+    private PortfolioList portfolioList = new PortfolioList();
+    private List<Simulation> simulations = new ArrayList<>();
+
     public ImportExportViewModel() {
         super("ImportExportMenu");
         setState(new ImportExportState());
+    }
+
+    public void setPortfolios(PortfolioList portfolioList){
+        this.portfolioList = portfolioList;
+    }
+
+    public void setSimulation(List<Simulation> simulations) {
+        this.simulations = simulations;
     }
 }
