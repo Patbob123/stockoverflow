@@ -3,8 +3,8 @@ package view;
 import entities.Portfolio.Portfolio;
 import entities.Simulation;
 import interface_adapter.change_view.ChangeViewController;
-import interface_adapter.create_portfolio.ImportExportController;
-import interface_adapter.create_portfolio.ImportExportViewModel;
+import interface_adapter.import_export.ImportExportController;
+import interface_adapter.import_export.ImportExportViewModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,7 +35,7 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
     private final JButton exportPortfolioButton = createSecondaryButton(ImportExportViewModel.EXPORT_PORTFOLIO_BUTTON_LABEL);
     private final JButton selectSimDataButton = createSecondaryButton(ImportExportViewModel.SELECT_SIMDATA_BUTTON_LABEL);
     private final JButton importPortfolioButton = createSuccessButton(ImportExportViewModel.IMPORT_PORTFOLIO_BUTTON_LABEL);
-    private final JButton backButton = createTextButton("← Back");
+    private final JButton backButton = createTextButton(ImportExportViewModel.BACK_BUTTON_LABEL);
     private final JLabel errorLabel = new JLabel();
 
     private final JComboBox<Portfolio> portfolioDropdown = new JComboBox<>();
@@ -54,8 +54,6 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
 
         setLayout(new BorderLayout());
 
-
-        // top stuff
         final JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(ImportExportViewModel.CARD_COLOUR);
         topPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -92,16 +90,7 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
         exportPanel.setLayout(new BoxLayout(exportPanel, BoxLayout.Y_AXIS));
 
         // the text + the icons, also no more settings who needs that
-        final JPanel exportHeader = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        exportHeader.setOpaque(false);
-        final JLabel exportIcon = new JLabel("⬇");
-        exportIcon.setFont(ImportExportViewModel.ICON_FONT);
-        exportIcon.setForeground(ImportExportViewModel.PRIMARY_COLOUR);
-        final JLabel exportTitle = new JLabel(ImportExportViewModel.EXPORT_TITLE_LABEL);
-        exportTitle.setFont(ImportExportViewModel.HEADER_FONT);
-        exportTitle.setForeground(ImportExportViewModel.TEXT_PRIMARY);
-        exportHeader.add(exportIcon);
-        exportHeader.add(exportTitle);
+        final JPanel exportHeader = getJpanel();
         exportPanel.add(exportHeader);
         exportPanel.add(Box.createVerticalStrut(20));
 
@@ -192,6 +181,20 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
         add(errorPanel, BorderLayout.SOUTH);
 
         setupListeners();
+    }
+
+    private static JPanel getJpanel() {
+        final JPanel exportHeader = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        exportHeader.setOpaque(false);
+        final JLabel exportIcon = new JLabel("⬇");
+        exportIcon.setFont(ImportExportViewModel.ICON_FONT);
+        exportIcon.setForeground(ImportExportViewModel.PRIMARY_COLOUR);
+        final JLabel exportTitle = new JLabel(ImportExportViewModel.EXPORT_TITLE_LABEL);
+        exportTitle.setFont(ImportExportViewModel.HEADER_FONT);
+        exportTitle.setForeground(ImportExportViewModel.TEXT_PRIMARY);
+        exportHeader.add(exportIcon);
+        exportHeader.add(exportTitle);
+        return exportHeader;
     }
 
     private JPanel createModernCard() {
@@ -373,7 +376,7 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
         });
 
         backButton.addActionListener(evt -> {
-            changeViewController.changeView("MainMenu");
+            changeViewController.backView();
         });
     }
 

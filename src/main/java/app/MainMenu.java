@@ -37,8 +37,10 @@ public class MainMenu {
                 .addMainView()
                 .addImportExportView()
                 .addPortfolioMenuView()
+                .addAddPortfolioView()
                 .addChangeViewUseCase()
                 .addMainViewUseCase()
+                .addAddPortfolioUseCase()
                 .addImportExportUseCase()
                 .build();
 

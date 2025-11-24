@@ -13,7 +13,10 @@ public class ChangeViewController {
     public void changeView(String viewName) {
         System.out.println(viewName);
         changeViewInteractor.changeTo(viewName);
+    }
 
+    public void backView() {
+        changeViewInteractor.goBack();
     }
 
 }

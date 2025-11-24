@@ -1,4 +1,4 @@
-package interface_adapter.create_portfolio;
+package interface_adapter.import_export;
 
 import use_case.import_export.ImportExportOutputBoundary;
 

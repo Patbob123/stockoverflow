@@ -1,4 +1,4 @@
-package interface_adapter.create_portfolio;
+package interface_adapter.import_export;
 
 import interface_adapter.ViewModel;
 
@@ -7,27 +7,18 @@ import java.awt.*;
 
 public class ImportExportViewModel extends ViewModel<ImportExportState> {
 
-
-
     // Colours
     public static final Color BG_COLOUR = new Color(248, 250, 252);
     public static final Color CARD_COLOUR = new Color(68, 72, 74);
-    public static final Color PRIMARY_COLOUR = new Color(37, 99, 235);
-    public static final Color PRIMARY_HOVER = new Color(29, 78, 216);
+    public static final Color PRIMARY_COLOUR = new Color(236, 122, 73);
+    public static final Color PRIMARY_HOVER = new Color(209, 77, 37);
+    public static final Color SECONDARY_COLOUR = new Color(45, 55, 72);
     public static final Color SECONDARY_HOVER = new Color(57, 69, 110);
-    public static final Color SUCCESS_COLOUR = new Color(22, 163, 74);
-    public static final Color SUCCESS_HOVER = new Color(21, 128, 61);
+    public static final Color SUCCESS_COLOUR = new Color(85, 193, 106);
+    public static final Color SUCCESS_HOVER = new Color(29, 131, 80);
     public static final Color BORDER_COLOUR = new Color(38, 42, 44);
     public static final Color TEXT_PRIMARY = new Color(224, 244, 255);
     public static final Color TEXT_SECONDARY = new Color(150, 166, 189);
-
-    // Sizing
-    public static final int TOP_BAR_HEIGHT = 60;
-    public static final int PANEL_WIDTH = 360;
-    public static final int FLOW_PADDING = 5;
-    public static final int SPACER_WIDTH = 80;
-    public static final int BLOCK_HEIGHT = 120;
-    public static final int SECTION_ICON_SIZE = 20;
 
     // Font sizes
     public static final int TITLE_FONT_SIZE = 24;
