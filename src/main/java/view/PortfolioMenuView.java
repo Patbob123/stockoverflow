@@ -1,176 +1,131 @@
 package view;
 
-import entities.Portfolio.Portfolio;
-import interface_adapter.portfolio.PortfolioMenuController;
-import interface_adapter.portfolio.PortfolioMenuState;
-import interface_adapter.portfolio.PortfolioMenuViewModel;
-import lombok.Getter;
-import lombok.Setter;
+import interface_adapter.create_portfolio.CreatePortfolioController;
+import interface_adapter.create_portfolio.CreatePortfolioState;
+import interface_adapter.create_portfolio.CreatePortfolioViewModel;
+import interface_adapter.mainmenu.MainMenuController;
+import interface_adapter.ViewManagerModel;
+import use_case.UserDataAccessInterface;
+import entities.User;
+import entities.Portfolio;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PortfolioMenuView extends JPanel implements ActionListener, PropertyChangeListener {
+    public final String viewName = "create portfolio";
 
-    private final String viewName = "PortfolioMenu";
+    private final CreatePortfolioViewModel viewModel;
+    private final CreatePortfolioController controller;
+    private final UserDataAccessInterface userDataAccess;
+    private final ViewManagerModel viewManagerModel;
+    private final MainMenuController mainMenuController; // 新增：用于跳转
 
-    private final PortfolioMenuViewModel portfolioMenuViewModel;
+    private final JTextField nameInputField = new JTextField(15);
+    private final JButton createButton;
+    private final JButton backButton;
+    private final JPanel portfolioListPanel;
 
-    @Setter
-    private PortfolioMenuController portfolioMenuController;
+    public PortfolioMenuView(CreatePortfolioViewModel viewModel,
+                             CreatePortfolioController controller,
+                             UserDataAccessInterface userDataAccess,
+                             ViewManagerModel viewManagerModel,
+                             MainMenuController mainMenuController) {
 
-    private final JButton addButton = new JButton(PortfolioMenuViewModel.ADD_BUTTON_LABEL);
-    private final JButton removeButton = new JButton(PortfolioMenuViewModel.REMOVE_BUTTON_LABEL);
-    private final JButton simulationButton = new JButton(PortfolioMenuViewModel.SIMULATION_BUTTON_LABEL);
-    private final JButton selectAllButton = new JButton(PortfolioMenuViewModel.SELECT_ALL_BUTTON_LABEL);
-    private final JButton clearSelectionButton = new JButton(PortfolioMenuViewModel.CLEAR_SELECTION_BUTTON_LABEL);
-    private final JButton savePortfolioButton =  new JButton(PortfolioMenuViewModel.SAVE_PORTFOLIO_BUTTON_LABEL);
-    private final JButton exitButton = new JButton(PortfolioMenuViewModel.EXIT_BUTTON_LABEL);
+        this.viewModel = viewModel;
+        this.controller = controller;
+        this.userDataAccess = userDataAccess;
+        this.viewManagerModel = viewManagerModel;
+        this.mainMenuController = mainMenuController;
 
-    @Getter
-    private final JPanel checkBoxPanel = new JPanel();
-    private final Map<String, JButton> buttonMap = new HashMap<>();
-    private final Map<JCheckBox, String> checkBoxTranslator = new HashMap<>();
-    private final Map<JCheckBox, JPanel> jPanelMap = new HashMap<>();
+        this.viewModel.addPropertyChangeListener(this);
 
-    public PortfolioMenuView(PortfolioMenuViewModel portfolioMenuViewModel) {
-        this.portfolioMenuViewModel = portfolioMenuViewModel;
-        this.portfolioMenuViewModel.addPropertyChangeListener(this);
-        this.portfolioMenuController = null;
+        JLabel title = new JLabel(CreatePortfolioViewModel.TITLE_LABEL);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final JPanel buttons = new JPanel();
-        buttons.add(addButton);
-        buttons.add(removeButton);
-        buttons.add(simulationButton);
-        buttons.add(selectAllButton);
-        buttons.add(clearSelectionButton);
-        buttons.add(savePortfolioButton);
-        buttons.add(exitButton);
+        LabelTextPanel nameInfo = new LabelTextPanel(
+                new JLabel(CreatePortfolioViewModel.INPUT_LABEL), nameInputField);
 
-        // User Story 9: Historical Analysis Button
-        JButton analysisButton = new JButton("Historical Analysis");
-        buttons.add(analysisButton);
+        createButton = new JButton(CreatePortfolioViewModel.CREATE_BUTTON_LABEL);
+        backButton = new JButton(CreatePortfolioViewModel.BACK_LABEL);
 
-        checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
+        JPanel inputPanel = new JPanel();
+        inputPanel.add(nameInfo);
+        inputPanel.add(createButton);
+        inputPanel.add(backButton);
 
-        // Add Stock
-        addButton.addActionListener(evt -> {
-            if (evt.getSource().equals(addButton) && portfolioMenuController != null) {
-                portfolioMenuController.getPortfolioMenuInputBoundary().executeAddStock();
-            }
-        });
+        portfolioListPanel = new JPanel();
+        portfolioListPanel.setLayout(new BoxLayout(portfolioListPanel, BoxLayout.Y_AXIS));
+        JScrollPane scrollPane = new JScrollPane(portfolioListPanel);
+        scrollPane.setPreferredSize(new Dimension(300, 200));
 
-        // Remove Stock
-        removeButton.addActionListener(evt -> {
-            if (evt.getSource().equals(removeButton) && portfolioMenuController != null) {
-                ArrayList<String> stocksToRemove = new ArrayList<>();
-                for (JCheckBox checkBox : checkBoxTranslator.keySet()) {
-                    if (checkBox.isSelected()) {
-                        stocksToRemove.add(checkBoxTranslator.get(checkBox));
+        // Create Button Logic
+        createButton.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(createButton)) {
+                            CreatePortfolioState currentState = viewModel.getState();
+                            String currentUser = currentState.getUsername();
+
+                            if (currentUser != null && !currentUser.isEmpty()) {
+                                controller.execute(currentUser, currentState.getPortfolioName());
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Error: No user logged in.");
+                            }
+                        }
                     }
                 }
-                if (!stocksToRemove.isEmpty()) {
-                    portfolioMenuController.getPortfolioMenuInputBoundary().executeRemoveStock(stocksToRemove);
-                }
+        );
+
+        backButton.addActionListener(e -> {
+            viewManagerModel.setActiveView("main menu");
+            viewManagerModel.firePropertyChanged();
+        });
+
+        nameInputField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                CreatePortfolioState currentState = viewModel.getState();
+                currentState.setPortfolioName(nameInputField.getText() + e.getKeyChar());
+                viewModel.setState(currentState);
             }
+            @Override public void keyPressed(KeyEvent e) {}
+            @Override public void keyReleased(KeyEvent e) {}
         });
 
-        // User Story 5: Graph
-        simulationButton.setText("Generate Graph");
-        simulationButton.addActionListener(evt -> {
-            if (evt.getSource().equals(simulationButton) && portfolioMenuController != null) {
-                java.util.List<String> selectedTickers = new java.util.ArrayList<>();
-                for (JCheckBox cb : checkBoxTranslator.keySet()) {
-                    if (cb.isSelected()) {
-                        selectedTickers.add(checkBoxTranslator.get(cb));
-                    }
-                }
-                portfolioMenuController.executeGraph(selectedTickers);
-            }
-        });
-
-        // Select All
-        selectAllButton.addActionListener(evt -> {
-            if (evt.getSource().equals(selectAllButton)) checkBoxConfigure(true);
-        });
-
-        // Clear Selection
-        clearSelectionButton.addActionListener(evt -> {
-            if (evt.getSource().equals(clearSelectionButton)) checkBoxConfigure(false);
-        });
-
-        // User Story 9: Analysis
-        analysisButton.addActionListener(evt -> {
-            if (portfolioMenuController != null) {
-                portfolioMenuController.executeAnalysis(30); // Analyze last 30 days
-            }
-        });
-
-        // Save
-        savePortfolioButton.addActionListener(evt -> {
-            if (evt.getSource().equals(savePortfolioButton) && portfolioMenuController != null) {
-                portfolioMenuController.getPortfolioMenuInputBoundary().executeSavePortfolio();
-            }
-        });
-
-        // Exit
-        exitButton.addActionListener(evt -> {
-            if (evt.getSource().equals(exitButton) && portfolioMenuController != null) {
-                portfolioMenuController.getPortfolioMenuInputBoundary().executeExit();
-            }
-        });
-
-        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        this.add(new JScrollPane(checkBoxPanel)); // Scrollable
-        this.add(buttons);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.add(title);
+        this.add(inputPanel);
+        this.add(new JLabel("Your Portfolios (Click to Add Stocks):"));
+        this.add(scrollPane);
     }
 
+    private void refreshPortfolioList() {
+        portfolioListPanel.removeAll();
+        String currentUsername = viewModel.getState().getUsername();
 
-    public String getViewName() {
-        return viewName;
-    }
+        if (currentUsername != null && !currentUsername.isEmpty()) {
+            User user = userDataAccess.get(currentUsername);
+            if (user != null && user.getPortfolioList() != null) {
+                for (Portfolio p : user.getPortfolioList()) {
+                    JButton pButton = new JButton(p.getName());
 
+                    pButton.addActionListener(e -> {
+                        mainMenuController.goToAddStock(p.getName(), currentUsername);
+                    });
 
-    private void checkBoxConfigure(Boolean bool){
-        for(JCheckBox checkBox : checkBoxTranslator.keySet()) {
-            checkBox.setSelected(bool);
-        }
-    }
-
-    public void refreshCheckBoxPanel(){
-        checkBoxPanel.removeAll();
-        buttonMap.clear();
-        checkBoxTranslator.clear();
-        jPanelMap.clear();
-
-        PortfolioMenuState state = portfolioMenuViewModel.getState();
-        if (state == null || state.getPortfolio() == null) return;
-
-        Portfolio portfolio = state.getPortfolio();
-
-        if (portfolio.getStocks() != null) {
-            for (String ticker : portfolio.getStocks().keySet()) {
-                JPanel tickerPanel = new JPanel();
-                JCheckBox checkBox = new JCheckBox();
-                if (portfolio.getStock(ticker) != null) {
-                    JButton button = new JButton(portfolio.getStock(ticker).getName());
-                    buttonMap.put(ticker, button);
-                    checkBoxTranslator.put(checkBox, ticker);
-                    tickerPanel.add(button);
-                    tickerPanel.add(checkBox);
-                    checkBoxPanel.add(tickerPanel);
-                    jPanelMap.put(checkBox, tickerPanel);
+                    portfolioListPanel.add(pButton);
                 }
             }
         }
-        checkBoxPanel.revalidate();
-        checkBoxPanel.repaint();
+        portfolioListPanel.revalidate();
+        portfolioListPanel.repaint();
     }
 
     @Override
@@ -178,20 +133,12 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if ("state".equals(evt.getPropertyName()) || evt.getPropertyName() == null) {
-            refreshCheckBoxPanel();
-        }
-        if ("graph".equals(evt.getPropertyName())) {
-            PortfolioMenuState state = (PortfolioMenuState) evt.getNewValue();
-            new StockGraphPanel(state.getStocksToGraph());
-        }
-        if ("analysis".equals(evt.getPropertyName())) {
-            PortfolioMenuState state = (PortfolioMenuState) evt.getNewValue();
-            JOptionPane.showMessageDialog(this, state.getAnalysisResult(), "Analysis Result", JOptionPane.INFORMATION_MESSAGE);
-        }
-        if ("error".equals(evt.getPropertyName())) {
-            PortfolioMenuState state = (PortfolioMenuState) evt.getNewValue();
-            JOptionPane.showMessageDialog(this, state.getError(), "Error", JOptionPane.ERROR_MESSAGE);
+        CreatePortfolioState state = (CreatePortfolioState) evt.getNewValue();
+        if (state.getError() != null) {
+            JOptionPane.showMessageDialog(this, state.getError());
+        } else {
+            nameInputField.setText("");
+            refreshPortfolioList();
         }
     }
 }

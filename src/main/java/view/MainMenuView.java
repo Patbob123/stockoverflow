@@ -1,10 +1,11 @@
 package view;
 
-import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.mainmenu.MainMenuController;
+import interface_adapter.mainmenu.MainMenuState;
 import interface_adapter.mainmenu.MainMenuViewModel;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -12,65 +13,117 @@ import java.beans.PropertyChangeListener;
 
 public class MainMenuView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private final String viewName = "MainMenu";
+    public final String viewName = "main menu";
+
     private final MainMenuViewModel mainMenuViewModel;
-    private MainMenuController mainMenuController;
-    private ChangeViewController changeViewController;
+    private final MainMenuController mainMenuController;
 
-    private final JButton stockButton = new JButton(MainMenuViewModel.STOCK_BUTTON_LABEL);
-    private final JButton analyzePortfolioButton = new JButton(MainMenuViewModel.PORTFOLIO_BUTTON_LABEL);
-    private final JButton createPortfolioButton = new JButton(MainMenuViewModel.CREATE_PORTFOLIO_BUTTON_LABEL);
-    private final JButton historyStockButton = new JButton(MainMenuViewModel.HISTORY_BUTTON_LABEL);
-    private final JButton exitButton = new JButton(MainMenuViewModel.EXIT_BUTTON_LABEL);
+    private final JLabel username;
+    private final JButton portfolio;
+    private final JButton search;
+    private final JButton logout;
 
-    public MainMenuView(MainMenuViewModel mainMenuViewModel) {
+    public MainMenuView(MainMenuViewModel mainMenuViewModel, MainMenuController controller) {
         this.mainMenuViewModel = mainMenuViewModel;
+        this.mainMenuController = controller;
+
         this.mainMenuViewModel.addPropertyChangeListener(this);
-        this.mainMenuController = null;
-        this.changeViewController = null;
 
-        final JPanel buttons = new JPanel();
-        buttons.add(stockButton);
-        buttons.add(analyzePortfolioButton);
-        buttons.add(createPortfolioButton);
-        buttons.add(historyStockButton);
-        buttons.add(exitButton);
+        JLabel title = new JLabel(mainMenuViewModel.TITLE_LABEL);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        stockButton.addActionListener(evt -> {}); // Single stock logic (User Story 1)
+        JLabel usernameInfo = new JLabel(mainMenuViewModel.LOGGED_IN_USER_LABEL);
+        username = new JLabel();
 
-        // Navigation to Portfolio Menu
-        analyzePortfolioButton.addActionListener(evt -> {
-            if (changeViewController != null) {
-                changeViewController.changeView("PortfolioMenu");
-            }
-        });
+        JPanel userInfoPanel = new JPanel();
+        userInfoPanel.add(usernameInfo);
+        userInfoPanel.add(username);
 
-        // Navigation to Create Portfolio
-        createPortfolioButton.addActionListener(evt -> {
-            if (changeViewController != null) {
-                changeViewController.changeView("CreatePortfolioMenu");
-            }
-        });
+        JPanel buttons = new JPanel();
+        portfolio = new JButton(mainMenuViewModel.PORTFOLIO_BUTTON_LABEL);
+        buttons.add(portfolio);
 
-        historyStockButton.addActionListener(evt -> {});
+        search = new JButton(mainMenuViewModel.SEARCH_BUTTON_LABEL);
+        buttons.add(search);
 
-        exitButton.addActionListener(evt -> {
-            if (mainMenuController != null) {
-                mainMenuController.execute("exit");
-            }
-        });
+        logout = new JButton(mainMenuViewModel.LOGOUT_BUTTON_LABEL);
+        buttons.add(logout);
+
+        portfolio.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(portfolio)) {
+                            System.out.println("Go to Portfolio clicked");
+                        }
+                    }
+                }
+        );
+
+        search.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(search)) {
+                            System.out.println("Go to Search clicked");
+                        }
+                    }
+                }
+        );
+
+        logout.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(logout)) {
+                            mainMenuController.executeLogout();
+                        }
+                    }
+                }
+        );
+
+        search.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(search)) {
+                            mainMenuController.goToSearch(); // <--- 调用这个
+                        }
+                    }
+                }
+        );
+
+        portfolio.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(portfolio)) {
+                            String currentUser = username.getText();
+                            System.out.println("MainMenuView: Clicking Portfolio for user: [" + currentUser + "]"); // 调试打印
+
+                            if (currentUser == null || currentUser.trim().isEmpty()) {
+                                JOptionPane.showMessageDialog(null, "Error: No user logged in (Label is empty).");
+                            } else {
+                                mainMenuController.goToPortfolio(currentUser);
+                            }
+                        }
+                    }
+                }
+        );
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        this.add(title);
+        this.add(userInfoPanel);
         this.add(buttons);
     }
 
-    public String getViewName() { return viewName; }
-    public void setMainMenuController(MainMenuController controller) { this.mainMenuController = controller; }
-    public void setChangeViewController(ChangeViewController controller) { this.changeViewController = controller; }
+    /**
+     * React to a button click that results in evt.
+     */
+    public void actionPerformed(ActionEvent evt) {
+        System.out.println("Click " + evt.getActionCommand());
+    }
 
     @Override
-    public void actionPerformed(ActionEvent e) {}
+    public void propertyChange(PropertyChangeEvent evt) {
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {}
+        MainMenuState state = (MainMenuState) evt.getNewValue();
+        username.setText(state.getUsername());
+    }
 }

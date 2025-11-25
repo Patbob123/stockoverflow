@@ -17,7 +17,6 @@ public class StockGraphPanel extends JFrame {
         this.stocks = stocks;
         this.setTitle("Stock Price History - User Story 5");
         this.setSize(800, 600);
-        // Dispose on close so it doesn't kill the main app
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLocationRelativeTo(null); // Center on screen
 

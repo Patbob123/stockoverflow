@@ -2,19 +2,38 @@ package interface_adapter.mainmenu;
 
 import interface_adapter.ViewModel;
 
-public class MainMenuViewModel extends ViewModel<MainMenuState> {
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
-    public static final String TITLE_LABEL = "Stockoverflow Dashboard";
+public class MainMenuViewModel extends ViewModel {
 
-    public static final String STOCK_BUTTON_LABEL = "Analyze Single Stock";
-    public static final String PORTFOLIO_BUTTON_LABEL = "Analyze Portfolios";
-    public static final String CREATE_PORTFOLIO_BUTTON_LABEL = "Create/Import Portfolio";
-    public static final String HISTORY_BUTTON_LABEL = "History";
+    public final String TITLE_LABEL = "interface_adapter.mainmenu.Main Menu";
+    public final String PORTFOLIO_BUTTON_LABEL = "My Portfolios";
+    public final String SEARCH_BUTTON_LABEL = "Search Stock";
+    public final String LOGOUT_BUTTON_LABEL = "Log out";
+    public final String LOGGED_IN_USER_LABEL = "Current User: ";
 
-    public static final String EXIT_BUTTON_LABEL = "QUIT";
+    private MainMenuState state = new MainMenuState();
 
     public MainMenuViewModel() {
-        super("note");
-        setState(new MainMenuState());
+        super("main menu");
+    }
+
+    public void setState(MainMenuState state) {
+        this.state = state;
+    }
+
+    public MainMenuState getState() {
+        return state;
+    }
+
+    private final PropertyChangeSupport support = new PropertyChangeSupport(this);
+
+    public void firePropertyChanged() {
+        support.firePropertyChange("state", null, this.state);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        support.addPropertyChangeListener(listener);
     }
 }

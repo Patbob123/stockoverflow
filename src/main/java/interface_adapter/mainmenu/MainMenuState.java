@@ -1,22 +1,21 @@
 package interface_adapter.mainmenu;
 
-import java.util.Date;
-
-/**
- * The State for a note.
- *
- * <p>For this example, a note is simplay a string.</p>
- */
 public class MainMenuState {
-    private String username = "your name";
-    private Date date;
+    private String username = "";
+    private String errorMessage = null;
 
-    public String getUsername() {
-        return username;
+    public MainMenuState(MainMenuState copy) {
+        this.username = copy.username;
+        this.errorMessage = copy.errorMessage;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public MainMenuState() {}
 
+    // Getters
+    public String getUsername() { return username; }
+    public String getErrorMessage() { return errorMessage; }
+
+    // Setters
+    public void setUsername(String username) { this.username = username; }
+    public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
 }
