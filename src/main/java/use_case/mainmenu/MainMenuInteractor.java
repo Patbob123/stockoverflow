@@ -6,7 +6,7 @@ public class MainMenuInteractor implements MainMenuInputBoundary{
     //private final NoteDataAccessInterface noteDataAccessInterface;
     private final MainMenuOutputBoundary mainMenuOutputBoundary;
 
-    private final User user = new User("123", "guy");
+    private final User user = new User("123", "guy", password);
 
     public MainMenuInteractor(MainMenuOutputBoundary mainMenuOutputBoundary) {
         this.mainMenuOutputBoundary = mainMenuOutputBoundary;
