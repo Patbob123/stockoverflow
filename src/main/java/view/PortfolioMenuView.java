@@ -11,13 +11,15 @@ import java.util.Map;
 import javax.swing.*;
 
 import entities.Portfolio.Portfolio;
+import interface_adapter.ViewModel;
 import interface_adapter.portfolio.PortfolioMenuController;
+import interface_adapter.portfolio.PortfolioMenuState;
 import interface_adapter.portfolio.PortfolioMenuViewModel;
 import interface_adapter.change_view.ChangeViewController;
 import lombok.Getter;
 import lombok.Setter;
 
-public class PortfolioMenuView extends JPanel implements ActionListener, PropertyChangeListener {
+public class PortfolioMenuView extends PaddedView implements ActionListener, PropertyChangeListener {
     @Getter
     private final String viewName = "PortfolioMenu";
 
@@ -44,6 +46,7 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
     private final Map<JCheckBox, JPanel> jPanelMap = new HashMap<JCheckBox, JPanel>();
 
     public PortfolioMenuView(PortfolioMenuViewModel portfolioMenuViewModel) {
+        super();
         //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
         this.portfolioMenuViewModel = portfolioMenuViewModel;
         this.portfolioMenuViewModel.addPropertyChangeListener(this);
@@ -185,6 +188,10 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
             checkBoxPanel.add(tickerPanel);
             jPanelMap.put(checkBox, tickerPanel);
         }
+    }
+
+    public ViewModel<PortfolioMenuState> getViewModel() {
+        return portfolioMenuViewModel;
     }
 
     @Override

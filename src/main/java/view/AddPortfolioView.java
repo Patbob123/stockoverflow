@@ -11,6 +11,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import interface_adapter.ViewModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
 import interface_adapter.add_portfolio.AddPortfolioViewModel;
 import interface_adapter.change_view.ChangeViewController;
@@ -109,6 +110,9 @@ public class AddPortfolioView extends PaddedView implements ActionListener, Prop
 
     }
 
+    public ViewModel getViewModel() {
+        return addPortfolioViewModel;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {

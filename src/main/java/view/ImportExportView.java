@@ -13,8 +13,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import entities.Portfolio.Portfolio;
 import entities.PortfolioList;
 import entities.Simulation;
+import interface_adapter.ViewModel;
 import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.import_export.ImportExportController;
+import interface_adapter.import_export.ImportExportState;
 import interface_adapter.import_export.ImportExportViewModel;
 import lombok.Getter;
 import lombok.Setter;
@@ -379,6 +381,10 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
         backButton.addActionListener(evt -> {
             changeViewController.backView();
         });
+    }
+
+    public ViewModel<ImportExportState> getViewModel() {
+        return importExportViewModel;
     }
 
     @Override

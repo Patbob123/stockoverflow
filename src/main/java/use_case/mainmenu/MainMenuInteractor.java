@@ -2,7 +2,7 @@ package use_case.mainmenu;
 
 import entities.User;
 
-public class MainMenuInteractor implements MainMenuInputBoundary{
+public class MainMenuInteractor implements MainMenuInputBoundary {
     //private final NoteDataAccessInterface noteDataAccessInterface;
     private final MainMenuOutputBoundary mainMenuOutputBoundary;
 
