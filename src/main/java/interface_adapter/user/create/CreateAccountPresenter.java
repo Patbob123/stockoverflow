@@ -1,5 +1,6 @@
 package interface_adapter.user.create;
 
+import interface_adapter.user.login.LoginViewModel;
 import use_case.user.create.CreateAccountOutputBoundary;
 import use_case.user.create.CreateAccountOutputData;
 import view.CreateAccountView;
