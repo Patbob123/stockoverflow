@@ -1,6 +1,6 @@
 package app;
 
-import entities.montecarlo.MonteCarloSimulator;
+import entities.monte_carlo.MonteCarloSimulator;
 import view.monte_carlo.MonteCarloChartView;
 
 public class TestMonteCarlo {

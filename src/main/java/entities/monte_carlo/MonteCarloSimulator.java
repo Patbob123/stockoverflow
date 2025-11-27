@@ -1,4 +1,4 @@
-package entities.montecarlo;
+package entities.monte_carlo;
 
 import java.util.*;
 

@@ -1,7 +1,7 @@
 package use_case.monte_carlo;
 
 import entities.StockMetrics;
-import entities.montecarlo.MonteCarloSimulator;
+import entities.monte_carlo.MonteCarloSimulator;
 import data_access.StooqStockDataAccess;
 import entities.PriceBar;
 import entities.StatisticsCalculator;
