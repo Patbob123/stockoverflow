@@ -1,8 +1,8 @@
 package view;
 
-import main.java.interface_adapter.singlestock.SingleStockController;
-import main.java.interface_adapter.singlestock.SingleStockViewInterface;
-import main.java.use_case.singlestock.AnalyzeSingleStockOutputData;
+import interface_adapter.singlestock.SingleStockController;
+import interface_adapter.singlestock.SingleStockViewInterface;
+import use_case.singlestock.AnalyzeSingleStockOutputData;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

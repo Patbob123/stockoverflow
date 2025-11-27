@@ -26,7 +26,7 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
     @Setter
     private ChangeViewController changeViewController;
 
-    private final String[] sortmethod = {"by name", "by price","by amount of stock"};
+    private final String[] sortmethod = {"by name", "by price", "by amount of stock"};
     private final Map<String, Comparator> portfolioSort = new HashMap<>();
 
     private final PortfolioMenuViewModel portfolioMenuViewModel;
@@ -174,10 +174,10 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
             JCheckBox checkBox = new JCheckBox();
             JButton button = new JButton(portfolio.getStock(ticker).getName());
             button.addActionListener(
-                    evt ->{
+                    evt -> {
                         if (evt.getSource().equals(button)) {
                             //TODO: redirect to stock
-
+                            changeViewController.changeView("");
                         }
                     }
             );
@@ -201,6 +201,6 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-
+        this.refreshCheckBoxPanel();
     }
 }

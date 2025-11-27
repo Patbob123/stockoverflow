@@ -1,4 +1,4 @@
-package main.java.use_case.singlestock;
+package use_case.singlestock;
 
 public class CompareTwoStocksOutputData {
 

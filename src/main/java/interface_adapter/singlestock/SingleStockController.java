@@ -1,4 +1,4 @@
-package main.java.interface_adapter.singlestock;
+package interface_adapter.singlestock;
 
 import main.java.use_case.singlestock.AnalyzeSingleStockInputBoundary;
 import main.java.use_case.singlestock.AnalyzeSingleStockInputData;

@@ -1,6 +1,6 @@
-package main.java.interface_adapter.singlestock;
+package interface_adapter.singlestock;
 
-import main.java.use_case.singlestock.AnalyzeSingleStockOutputData;
+import use_case.singlestock.AnalyzeSingleStockOutputData;
 
 public interface SingleStockViewInterface {
     void showAnalysis(AnalyzeSingleStockOutputData outputData);
