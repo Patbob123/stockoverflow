@@ -14,6 +14,9 @@ public class MainMenu {
                     .addChangeViewUseCase()
                     .addMainViewUseCase()
                     .addPortfolioMenuUseCase()
+                    .addUserAuthenticationViews()  // bz
+                    .addUserAuthenticationUseCases()  // bz
+                    .addRefreshDataUseCase()  //bz
                     .build();
 
             application.setExtendedState(JFrame.MAXIMIZED_BOTH);
