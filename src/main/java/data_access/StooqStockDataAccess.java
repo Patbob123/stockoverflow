@@ -1,5 +1,4 @@
-
-package main.java.data_access;
+package data_access;
 
 import entities.PriceBar;
 import okhttp3.HttpUrl;

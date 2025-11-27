@@ -1,4 +1,4 @@
-package view;
+package view.monte_carlo;
 
 import org.jfree.chart.*;
 import org.jfree.chart.plot.*;
@@ -11,7 +11,6 @@ import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class MonteCarloChartView {
 
