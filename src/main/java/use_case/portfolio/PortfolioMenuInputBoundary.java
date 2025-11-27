@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 public interface PortfolioMenuInputBoundary {
 
+    void executeUpdatePortfolio(Portfolio portfolio);
+
     void executeAddStock();
 
     void executeRemoveStock(ArrayList<String> stocks);

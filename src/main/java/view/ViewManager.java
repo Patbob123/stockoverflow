@@ -33,7 +33,7 @@ public class ViewManager implements PropertyChangeListener {
         mainPanel.add(panel, name);
     }
 
-    public ViewModel<?> getViewModel(String viewName) {
+    private ViewModel<?> getViewModel(String viewName) {
         return views.get(viewName).getViewModel();
     }
 
@@ -47,6 +47,14 @@ public class ViewManager implements PropertyChangeListener {
                 System.out.println("view doesnt exist"); // TODO: probably make an exception here?
             }
 
+        }
+        else if (evt.getPropertyName().equals("getViewModel")) {
+            final String viewModelName = (String) evt.getNewValue();
+            if(views.containsKey(viewModelName)){
+                this.viewManagerModel.setFormativeViewModel(getViewModel(viewModelName));
+            }else{
+                System.out.println("view doesnt exist"); // TODO: probably make an exception here?
+            }
         }
     }
 }

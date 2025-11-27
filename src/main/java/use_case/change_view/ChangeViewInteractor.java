@@ -1,5 +1,6 @@
 package use_case.change_view;
 
+import interface_adapter.ViewModel;
 import interface_adapter.change_view.ChangeViewState;
 
 public class ChangeViewInteractor implements ChangeViewInputBoundary {
@@ -26,5 +27,10 @@ public class ChangeViewInteractor implements ChangeViewInputBoundary {
             final ChangeViewOutputData outputData = new ChangeViewOutputData(previousView);
             changeScreenPresenter.prepareView(outputData);
         }
+    }
+
+    @Override
+    public ViewModel<?> getViewModel(String viewName) {
+        return changeScreenPresenter.getViewModel(viewName);
     }
 }

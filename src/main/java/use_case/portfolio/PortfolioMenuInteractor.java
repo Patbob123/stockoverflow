@@ -9,12 +9,17 @@ public class PortfolioMenuInteractor implements PortfolioMenuInputBoundary {
 
     private final PortfolioMenuOutputBoundary portfolioMenuOutputBoundary;
 
-    private final Portfolio portfolio;
+    private Portfolio portfolio;
 
     public static final String STOCK_NOT_IN_PORTFOLIO = "Stock/stocks not found:";
 
     public PortfolioMenuInteractor(PortfolioMenuOutputBoundary output, Portfolio portfolio) {
         this.portfolioMenuOutputBoundary = output;
+        this.portfolio = portfolio;
+    }
+
+    @Override
+    public void executeUpdatePortfolio(Portfolio portfolio) {
         this.portfolio = portfolio;
     }
 

@@ -55,6 +55,7 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
 
 
         final JPanel buttons = new JPanel();
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
         buttons.add(addButton);
         buttons.add(removeButton);
         buttons.add(simulationButton);
@@ -84,7 +85,7 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
                     if (evt.getSource().equals(addButton)) {
                         //MainMenuController.execute(noteInputField.getText());
                         this.portfolioMenuController.getPortfolioMenuInputBoundary().executeAddStock();
-                        changeViewController.changeView("CreatePortfolioMenu");
+                        changeViewController.changeView("");
                     }
                 }
         );
@@ -163,11 +164,10 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
         }
     }
 
-    public void refreshCheckBoxPanel(){
+    public void refreshCheckBoxPanel(Portfolio portfolio){
         buttonMap.clear();
         checkBoxTranslator.clear();
         jPanelMap.clear();
-        Portfolio portfolio = portfolioMenuViewModel.getState().getPortfolio();
 
         for (String ticker : portfolio.getVisualStocks()) {
             JPanel tickerPanel = new JPanel();
@@ -201,6 +201,8 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        this.refreshCheckBoxPanel();
+        Portfolio portfolio = portfolioMenuViewModel.getState().getPortfolio();
+        this.portfolioMenuController.getPortfolioMenuInputBoundary().executeUpdatePortfolio(portfolio);
+        this.refreshCheckBoxPanel(portfolio);
     }
 }

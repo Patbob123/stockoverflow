@@ -1,6 +1,7 @@
 package interface_adapter.change_view;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.ViewModel;
 import use_case.change_view.ChangeViewOutputBoundary;
 import use_case.change_view.ChangeViewOutputData;
 
@@ -16,5 +17,10 @@ public class ChangeViewPresenter implements ChangeViewOutputBoundary {
     public void prepareView(ChangeViewOutputData data) {
         viewManagerModel.setActiveView(data.getViewName());
         System.out.println("VIEW MODEL SET VIEW TO: " + data.getViewName());
+    }
+
+    @Override
+    public ViewModel<?> getViewModel(String viewName) {
+        return this.viewManagerModel.getViewModel(viewName);
     }
 }
