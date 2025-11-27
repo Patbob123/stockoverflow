@@ -1,21 +1,33 @@
 package view;
 
-import entities.Portfolio.Portfolio;
-import interface_adapter.portfolio.PortfolioMenuController;
-import interface_adapter.portfolio.PortfolioMenuViewModel;
-import lombok.Getter;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PortfolioMenuView extends JPanel implements ActionListener, PropertyChangeListener {
+import javax.swing.*;
 
+import entities.Portfolio.Portfolio;
+import interface_adapter.ViewModel;
+import interface_adapter.portfolio.PortfolioMenuController;
+import interface_adapter.portfolio.PortfolioMenuState;
+import interface_adapter.portfolio.PortfolioMenuViewModel;
+import interface_adapter.change_view.ChangeViewController;
+import lombok.Getter;
+import lombok.Setter;
+
+public class PortfolioMenuView extends PaddedView implements ActionListener, PropertyChangeListener {
+    @Getter
     private final String viewName = "PortfolioMenu";
+
+    @Setter
+    private ChangeViewController changeViewController;
+
+    private final String[] sortmethod = {"by name", "by price","by amount of stock"};
+    private final Map<String, Comparator> portfolioSort = new HashMap<>();
 
     private final PortfolioMenuViewModel portfolioMenuViewModel;
     private final PortfolioMenuController portfolioMenuController;
@@ -34,6 +46,7 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
     private final Map<JCheckBox, JPanel> jPanelMap = new HashMap<JCheckBox, JPanel>();
 
     public PortfolioMenuView(PortfolioMenuViewModel portfolioMenuViewModel) {
+        super();
         //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
         this.portfolioMenuViewModel = portfolioMenuViewModel;
         this.portfolioMenuViewModel.addPropertyChangeListener(this);
@@ -51,8 +64,19 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
         buttons.add(exitButton);
 
         checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
+        JScrollPane scrollPane = new JScrollPane(checkBoxPanel);
+        JPanel stocksPanel = new JPanel();
+        JPanel sortbyPanel = new JPanel();
+        JLabel sortbyLabel = new JLabel("Sort by:");
 
-        Portfolio portfolio = null;
+        JComboBox<String> sortbyComboBox = new JComboBox<>(sortmethod);
+
+        sortbyPanel.add(sortbyLabel);
+        sortbyPanel.add(sortbyComboBox);
+
+        stocksPanel.setLayout(new BoxLayout(stocksPanel, BoxLayout.Y_AXIS));
+        stocksPanel.add(scrollPane);
+        stocksPanel.add(sortbyPanel);
 
 
         addButton.addActionListener(
@@ -60,6 +84,7 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
                     if (evt.getSource().equals(addButton)) {
                         //MainMenuController.execute(noteInputField.getText());
                         this.portfolioMenuController.getPortfolioMenuInputBoundary().executeAddStock();
+                        changeViewController.changeView("CreatePortfolioMenu");
                     }
                 }
         );
@@ -69,7 +94,7 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
                     if (evt.getSource().equals(removeButton)) {
                         for (JCheckBox checkBox : checkBoxTranslator.keySet()) {
                             if (checkBox.getModel().isSelected()) {
-                                portfolio.removeStock(checkBoxTranslator.get(checkBox));
+                                portfolioMenuViewModel.getState().getPortfolio().removeStock(checkBoxTranslator.get(checkBox));
                                 buttonMap.remove(checkBoxTranslator.get(checkBox));
                                 checkBoxTranslator.remove(checkBox);
                                 checkBoxPanel.remove(jPanelMap.get(checkBox));
@@ -115,10 +140,20 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
                 }
         );
 
+        sortbyComboBox.addActionListener(
+                evt ->{
+                    if(evt.getSource().equals(sortbyComboBox)){
+                        String method = (String) sortbyComboBox.getSelectedItem();
+                        Portfolio portfolio = this.portfolioMenuViewModel.getState().getPortfolio();
+                        // portfolio.sortStockBy();
+                    }
+                }
+        );
+
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         //this.add(noteName);
-        this.add(checkBoxPanel);
+        this.add(scrollPane);
         this.add(buttons);
     }
 
@@ -134,13 +169,16 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
         jPanelMap.clear();
         Portfolio portfolio = portfolioMenuViewModel.getState().getPortfolio();
 
-        for (String ticker : portfolio.getStocks().keySet()) {
+        for (String ticker : portfolio.getVisualStocks()) {
             JPanel tickerPanel = new JPanel();
             JCheckBox checkBox = new JCheckBox();
             JButton button = new JButton(portfolio.getStock(ticker).getName());
             button.addActionListener(
                     evt ->{
-                        //TODO: transit to stock
+                        if (evt.getSource().equals(button)) {
+                            //TODO: redirect to stock
+
+                        }
                     }
             );
             buttonMap.put(ticker, button);
@@ -152,8 +190,8 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
         }
     }
 
-    public String getViewName() {
-        return viewName;
+    public ViewModel<PortfolioMenuState> getViewModel() {
+        return portfolioMenuViewModel;
     }
 
     @Override

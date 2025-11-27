@@ -1,6 +1,7 @@
 package view;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.ViewModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +19,7 @@ public class ViewManager implements PropertyChangeListener {
     private final JPanel mainPanel;
     private final ViewManagerModel viewManagerModel;
 
-    private final Map<String, JPanel> views = new HashMap<>();
+    private final Map<String, PaddedView> views = new HashMap<>();
 
     public ViewManager(JPanel mainPanel, CardLayout cardLayout, ViewManagerModel viewManagerModel) {
         this.mainPanel = mainPanel;
@@ -27,17 +28,25 @@ public class ViewManager implements PropertyChangeListener {
         this.viewManagerModel.addPropertyChangeListener(this);
     }
 
-    public void addView(String name, JPanel panel) {
+    public void addView(String name, PaddedView panel) {
         views.put(name, panel);
         mainPanel.add(panel, name);
+    }
+
+    public ViewModel<?> getViewModel(String viewName) {
+        return views.get(viewName).getViewModel();
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("state")) {
             final String viewModelName = (String) evt.getNewValue();
-            System.out.println("A"+viewModelName);
-            cardLayout.show(mainPanel, viewModelName);
+            if(views.containsKey(viewModelName)){
+                cardLayout.show(mainPanel, viewModelName);
+            }else{
+                System.out.println("view doesnt exist"); // TODO: probably make an exception here?
+            }
+
         }
     }
 }

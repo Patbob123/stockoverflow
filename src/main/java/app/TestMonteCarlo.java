@@ -1,7 +1,7 @@
 package app;
 
-import entities.montecarlo.MonteCarloSimulator;
-import view.MonteCarloChartView;
+import entities.monte_carlo.MonteCarloSimulator;
+import view.monte_carlo.MonteCarloChartView;
 
 public class TestMonteCarlo {
     public static void main(String[] args) throws Exception {

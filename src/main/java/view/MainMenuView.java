@@ -1,8 +1,13 @@
 package view;
 
+import interface_adapter.ViewModel;
 import interface_adapter.change_view.ChangeViewController;
+import interface_adapter.import_export.ImportExportViewModel;
 import interface_adapter.mainmenu.MainMenuController;
+import interface_adapter.mainmenu.MainMenuState;
 import interface_adapter.mainmenu.MainMenuViewModel;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,12 +16,15 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class MainMenuView extends JPanel implements ActionListener, PropertyChangeListener {
+public class MainMenuView extends PaddedView implements ActionListener, PropertyChangeListener {
 
+    @Getter
     private final String viewName = "MainMenu";
     private final MainMenuViewModel mainMenuViewModel;
 
+    @Setter
     private MainMenuController mainMenuController;
+    @Setter
     private ChangeViewController changeViewController;
 
     private final JButton stockButton = new JButton(MainMenuViewModel.STOCK_BUTTON_LABEL);
@@ -26,6 +34,7 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
     private final JButton exitButton = new JButton(MainMenuViewModel.EXIT_BUTTON_LABEL);
 
     public MainMenuView(MainMenuViewModel mainMenuViewModel) {
+        super(MainMenuViewModel.PADDING);
         //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
         this.mainMenuViewModel = mainMenuViewModel;
         this.mainMenuViewModel.addPropertyChangeListener(this);
@@ -59,7 +68,7 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
         createPortfolioButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(createPortfolioButton)) {
-                        changeViewController.changeView("CreatePortfolioMenu");
+                        changeViewController.changeView("AddPortfolioMenu");
 
                     }
                 }
@@ -89,16 +98,8 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
         this.add(buttons);
     }
 
-    public String getViewName() {
-        return viewName;
-    }
-
-    public void setMainMenuController(MainMenuController mainMenuController) {
-        this.mainMenuController = mainMenuController;
-    }
-
-    public void setChangeViewController(ChangeViewController changeViewController) {
-        this.changeViewController = changeViewController;
+    public ViewModel<MainMenuState> getViewModel() {
+        return mainMenuViewModel;
     }
 
     @Override
