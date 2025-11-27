@@ -74,3 +74,73 @@ public class MainMenuView extends JPanel implements ActionListener, PropertyChan
     @Override
     public void propertyChange(PropertyChangeEvent evt) {}
 }
+//
+//public class MainMenuView extends JFrame implements ActionListener {
+//    private final JButton analyzePortfolioButton = new JButton("Analyze the investment portfolio");
+//    private final JButton analyzeStockButton = new JButton("AnalyzeStock");
+//    private final JButton loadStockButton = new JButton("Load stocks");
+//    private final JButton logoutButton = new JButton("log out");
+//    private final JButton exitButton = new JButton("exit");
+//
+//    private MainMenuInputBoundary mainMenuInteractor;
+//    private LogoutController logoutController;
+//    private LoginView loginView;
+//
+//    public MainMenuView() {
+//        super("MENU");
+//        setupUI();
+//        setupListeners();
+//
+//        setSize(600, 400);
+//        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        setLocationRelativeTo(null);
+//    }
+//
+//    private void setupUI() {
+//        JPanel panel = new JPanel(new GridLayout(5, 1, 10, 10));
+//        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+//
+//        panel.add(analyzePortfolioButton);
+//        panel.add(analyzeStockButton);
+//        panel.add(loadStockButton);
+//        panel.add(logoutButton);
+//        panel.add(exitButton);
+//
+//        add(panel);
+//    }
+//
+//    private void setupListeners() {
+//        analyzePortfolioButton.addActionListener(this);
+//        analyzeStockButton.addActionListener(this);
+//        loadStockButton.addActionListener(this);
+//        logoutButton.addActionListener(this);
+//        exitButton.addActionListener(this);
+//    }
+//
+//    public void setMainMenuInteractor(MainMenuInputBoundary interactor) {
+//        this.mainMenuInteractor = interactor;
+//    }
+//
+//    public void setLogoutController(LogoutController controller) {
+//        this.logoutController = controller;
+//    }
+//
+//    public void setLoginView(LoginView view) {
+//        this.loginView = view;
+//    }
+//
+//    @Override
+//    public void actionPerformed(ActionEvent e) {
+//        if (e.getSource() == analyzePortfolioButton) {
+//            mainMenuInteractor.executeAnalyzePortfolio();
+//        } else if (e.getSource() == analyzeStockButton) {
+//            mainMenuInteractor.executeAnalyzeStock();
+//        } else if (e.getSource() == loadStockButton) {
+//            mainMenuInteractor.executeLoadStock();
+//        } else if (e.getSource() == logoutButton) {
+//            logoutController.execute();
+//        } else if (e.getSource() == exitButton) {
+//            mainMenuInteractor.executeExit();
+//        }
+//    }
+//}
