@@ -19,11 +19,7 @@ import java.beans.PropertyChangeListener;
 public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuController> implements ActionListener, PropertyChangeListener {
 
     @Setter
-    private MainMenuController controller;
-    @Setter
     private ChangeViewController changeViewController;
-
-    public static final String VIEW_NAME = "MainMenu";
 
     private final JButton stockButton = new JButton(MainMenuViewModel.STOCK_BUTTON_LABEL);
     private final JButton analyzePortfolioButton = new JButton(MainMenuViewModel.PORTFOLIO_BUTTON_LABEL);
@@ -32,11 +28,12 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
     private final JButton exitButton = new JButton(MainMenuViewModel.EXIT_BUTTON_LABEL);
     private final PortfolioFactory portfolioFactory = new PortfolioFactory();
 
+    public static final String VIEW_NAME = "MainMenu";
+
     public MainMenuView(MainMenuViewModel viewModel) {
         super(viewModel);
         //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
         this.getViewModel().addPropertyChangeListener(this);
-        this.controller = null;
         this.changeViewController = null;
 
         final JPanel buttons = new JPanel();
@@ -63,6 +60,7 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
                                 (PortfolioMenuViewModel) changeViewController
                                         .getViewModel(PortfolioMenuView.VIEW_NAME);
                         portfolioViewModel.getState().setPortfolio(portfolio);
+                        portfolioViewModel.firePropertyChange();
                         changeViewController.changeView("PortfolioMenu");
                     }
                 }
@@ -89,7 +87,7 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         exitButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(exitButton)) {
-                        controller.execute("exit"); //fix this later
+                        this.getController().execute("exit"); //fix this later
 
                     }
                 }

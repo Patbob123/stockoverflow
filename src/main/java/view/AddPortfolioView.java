@@ -17,6 +17,7 @@ import interface_adapter.ViewModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
 import interface_adapter.add_portfolio.AddPortfolioViewModel;
 import interface_adapter.change_view.ChangeViewController;
+import interface_adapter.portfolio.PortfolioMenuViewModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -93,18 +94,23 @@ public class AddPortfolioView
 
         createButton.addActionListener(evt -> {
             if (this.getController() != null) {
-                changeViewController.changeView("CreatePortfolioMenu");
+                final Portfolio portfolio = portfolioFactory.createPortfolio("Untitled");
+                final PortfolioMenuViewModel portfolioViewModel =
+                        (PortfolioMenuViewModel) changeViewController.getViewModel(PortfolioMenuView.VIEW_NAME);
+                portfolioViewModel.getState().setPortfolio(portfolio);
+                portfolioViewModel.firePropertyChange();
+                changeViewController.changeView("PortfolioMenu");
             }
         });
 
         importButton.addActionListener(evt -> {
             if (this.getController() != null) {
-                changeViewController.changeView("ImportExportMenu");
+                changeViewController.changeView(ImportExportView.VIEW_NAME);
             }
         });
 
         backButton.addActionListener(evt -> {
-            changeViewController.changeView("MainMenu");
+            changeViewController.changeView(MainMenuView.VIEW_NAME);
         });
 
     }

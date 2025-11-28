@@ -42,6 +42,7 @@ public class MainMenu {
                 .addMainViewUseCase()
                 .addAddPortfolioUseCase()
                 .addImportExportUseCase()
+                .addPortfolioMenuUseCase()
                 .build();
 
         application.setExtendedState(JFrame.MAXIMIZED_BOTH);

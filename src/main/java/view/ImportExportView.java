@@ -22,8 +22,6 @@ import lombok.Setter;
 public class ImportExportView extends PaddedView<ImportExportViewModel, ImportExportController> implements ActionListener, PropertyChangeListener {
     public static final String VIEW_NAME = "ImportExportMenu";
     @Setter
-    private ImportExportController controller;
-    @Setter
     private ChangeViewController changeViewController;
 
     private final JButton currentSessionButton = createPrimaryButton(ImportExportViewModel.CURRENT_SESSION_BUTTON_LABEL);
@@ -39,7 +37,6 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
     public ImportExportView(ImportExportViewModel importExportViewModel) {
         super(importExportViewModel);
         this.getViewModel().addPropertyChangeListener(this);
-        this.controller = null;
         this.changeViewController = null;
         createView();
     }
@@ -328,7 +325,7 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         importPortfolioButton.addActionListener(evt -> {
             final String path = getCsvFilePath();
             if (path != null) {
-                controller.importPortfolio(path);
+                this.getController().importPortfolio(path);
             }
         });
 
@@ -338,7 +335,7 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
                 errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
                 return;
             }
-            controller.exportCurrentSession(path);
+            this.getController().exportCurrentSession(path);
         });
 
         exportPortfolioButton.addActionListener(e -> {
@@ -354,7 +351,7 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
                 errorLabel.setText(ImportExportViewModel.ERROR_NO_PORTFOLIO);
                 return;
             }
-            controller.exportPortfolio(portfolioList, path);
+            this.getController().exportPortfolio(portfolioList, path);
         });
 
         selectSimDataButton.addActionListener(e -> {
@@ -368,7 +365,7 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
                 errorLabel.setText(ImportExportViewModel.ERROR_NO_SIMULATION);
                 return;
             }
-            controller.exportSimData(selected, path);
+            this.getController().exportSimData(selected, path);
         });
 
         backButton.addActionListener(evt -> {

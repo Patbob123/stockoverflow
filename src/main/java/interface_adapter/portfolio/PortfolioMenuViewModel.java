@@ -16,6 +16,7 @@ public class PortfolioMenuViewModel extends ViewModel<PortfolioMenuState> {
     public static final String CLEAR_SELECTION_BUTTON_LABEL = "Clear Selection";
     public static final String SAVE_PORTFOLIO_BUTTON_LABEL = "Save Portfolio";
     public static final String EXIT_BUTTON_LABEL = "Back to Main Menu";
+    public static final String CHANGE_NAME_LABEL = "Change Name";
 
     public PortfolioMenuViewModel() {
         super(PortfolioMenuView.VIEW_NAME);
