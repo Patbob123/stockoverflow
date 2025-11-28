@@ -15,9 +15,9 @@ public class ViewViewModelBuilderWrapper<T extends ViewModel<?>, P extends Padde
     private T viewModel;
     private P view;
 
-    public ViewViewModelBuilderWrapper(T viewModel, ViewFactory<T, P> viewFactory) {
+    public ViewViewModelBuilderWrapper(T viewModel, DirectlyCreateFactory<P, T> factory) {
         this.viewModel = viewModel;
-        this.view = viewFactory.createView(viewModel);
+        this.view = factory.create(viewModel);
     }
 
     public MainMenuBuilder addView(MainMenuBuilder builder, JPanel cardPanel, ViewManager viewManager) {

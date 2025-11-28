@@ -21,9 +21,9 @@ public class UseCaseWrapper<I extends InputBoundary,
         P extends PaddedView<T, C>> {
 
     public MainMenuBuilder useCaseWrapper(MainMenuBuilder mainMenuBuilder,
-                          ViewManager viewManager, PresenterWrapper<O, T> presenterWrapper,
-                          InteractorWrapper<I, O> interactorWrapper,
-                          ControllerWrapper<C, I> controllerWrapper, String viewName) {
+                          ViewManager viewManager, DirectlyCreateFactory<O, T> presenterWrapper,
+                          DirectlyCreateFactory<I, O> interactorWrapper,
+                          DirectlyCreateFactory<C, I> controllerWrapper, String viewName) {
         final P menuView = (P) viewManager.getViews().get(viewName);
         final O outputBoundary = presenterWrapper.create(menuView.getViewModel());
         final I inputBoundary = interactorWrapper.create(outputBoundary);
