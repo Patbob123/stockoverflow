@@ -38,11 +38,13 @@ public class MainMenu {
                 .addImportExportView()
                 .addPortfolioMenuView()
                 .addAddPortfolioView()
+                .addStockMenuView()
                 .addChangeViewUseCase()
                 .addMainViewUseCase()
                 .addAddPortfolioUseCase()
                 .addImportExportUseCase()
                 .addPortfolioMenuUseCase()
+                .addStockMenuUseCase()
                 .build();
 
         application.setExtendedState(JFrame.MAXIMIZED_BOTH);

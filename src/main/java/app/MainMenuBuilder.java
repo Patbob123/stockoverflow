@@ -7,6 +7,9 @@ import javax.swing.*;
 import interface_adapter.ViewModel;
 import interface_adapter.portfolio.PortfolioMenuController;
 import interface_adapter.portfolio.PortfolioMenuPresenter;
+import interface_adapter.portfolio.addStock.AddStockMenuController;
+import interface_adapter.portfolio.addStock.AddStockMenuPresenter;
+import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
 import use_case.import_export.ImportExportDataAccessInterface;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
@@ -35,6 +38,7 @@ import use_case.mainmenu.MainMenuInputBoundary;
 import use_case.mainmenu.MainMenuInteractor;
 import use_case.mainmenu.MainMenuOutputBoundary;
 import use_case.portfolio.PortfolioMenuInteractor;
+import use_case.portfolio.addStock.AddStockMenuInteractor;
 import view.*;
 import view.wrapper.UseCaseWrapper;
 import view.wrapper.ViewViewModelBuilderWrapper;
@@ -63,6 +67,9 @@ public class MainMenuBuilder {
     private final ViewViewModelBuilderWrapper<AddPortfolioViewModel, AddPortfolioView> addPortfolioMenu =
             new ViewViewModelBuilderWrapper<>(new AddPortfolioViewModel(), AddPortfolioView::new);
 
+    private final ViewViewModelBuilderWrapper<AddStockMenuViewModel, AddStockMenuView> addStockMenu =
+            new ViewViewModelBuilderWrapper<>(new AddStockMenuViewModel(), AddStockMenuView::new);
+
     private final UseCaseWrapper<MainMenuInteractor,
             MainMenuPresenter,
             MainMenuController,
@@ -86,6 +93,12 @@ public class MainMenuBuilder {
             PortfolioMenuController,
             PortfolioMenuViewModel,
             PortfolioMenuView> portfolioMenuUsecase = new UseCaseWrapper<>();
+
+    private final UseCaseWrapper<AddStockMenuInteractor,
+            AddStockMenuPresenter,
+            AddStockMenuController,
+            AddStockMenuViewModel,
+            AddStockMenuView> addStockMenuUsecase = new UseCaseWrapper<>();
 
     private PaddedView<?, ?> getView(String viewName) {
         return viewManager.getViews().get(viewName);
@@ -111,12 +124,8 @@ public class MainMenuBuilder {
         return addPortfolioMenu.addView(this, cardPanel, viewManager);
     }
 
-    public MainMenuBuilder addMainViewUseCase() {
-        return mainmenuUsecase.useCaseWrapper(this,
-                viewManager,
-                MainMenuPresenter::new,
-                MainMenuInteractor::new,
-                MainMenuController::new, MainMenuView.VIEW_NAME);
+    public MainMenuBuilder addStockMenuView() {
+        return addStockMenu.addView(this, cardPanel, viewManager);
     }
 
     public MainMenuBuilder addChangeViewUseCase() {
@@ -130,8 +139,16 @@ public class MainMenuBuilder {
         getView(ImportExportView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(AddPortfolioView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(PortfolioMenuView.VIEW_NAME).setChangeViewController(changeViewController);
-
+        getView(AddStockMenuView.VIEW_NAME).setChangeViewController(changeViewController);
         return this;
+    }
+
+    public MainMenuBuilder addMainViewUseCase() {
+        return mainmenuUsecase.useCaseWrapper(this,
+                viewManager,
+                MainMenuPresenter::new,
+                MainMenuInteractor::new,
+                MainMenuController::new, MainMenuView.VIEW_NAME);
     }
 
     public MainMenuBuilder addImportExportUseCase() {
@@ -156,6 +173,14 @@ public class MainMenuBuilder {
                 PortfolioMenuPresenter::new,
                 PortfolioMenuInteractor::new,
                 PortfolioMenuController::new, PortfolioMenuView.VIEW_NAME);
+    }
+
+    public MainMenuBuilder addStockMenuUseCase() {
+        return addStockMenuUsecase.useCaseWrapper(this,
+                viewManager,
+                AddStockMenuPresenter::new,
+                AddStockMenuInteractor::new,
+                AddStockMenuController::new, AddStockMenuView.VIEW_NAME);
     }
 
     public JFrame build() {
