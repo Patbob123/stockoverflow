@@ -4,8 +4,9 @@ import java.util.List;
 
 import entities.Portfolio.Portfolio;
 import entities.Simulation;
+import use_case.OutputBoundary;
 
-public interface ImportExportOutputBoundary {
+public interface ImportExportOutputBoundary extends OutputBoundary {
     void prepareSuccessView(String message);
 
 }

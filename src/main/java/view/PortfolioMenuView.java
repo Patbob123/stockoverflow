@@ -13,24 +13,22 @@ import javax.swing.*;
 import entities.Portfolio.Portfolio;
 import interface_adapter.ViewModel;
 import interface_adapter.portfolio.PortfolioMenuController;
-import interface_adapter.portfolio.PortfolioMenuState;
 import interface_adapter.portfolio.PortfolioMenuViewModel;
 import interface_adapter.change_view.ChangeViewController;
+import interface_adapter.portfolio.addStock.AddStockMenuState;
 import lombok.Getter;
 import lombok.Setter;
 
-public class PortfolioMenuView extends PaddedView implements ActionListener, PropertyChangeListener {
-    @Getter
-    private final String viewName = "PortfolioMenu";
+public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, PortfolioMenuController> implements ActionListener, PropertyChangeListener {
 
     @Setter
     private ChangeViewController changeViewController;
 
-    private final String[] sortmethod = {"by name", "by price", "by amount of stock"};
-    private final Map<String, Comparator> portfolioSort = new HashMap<>();
+    public static final String VIEW_NAME = "PortfolioMenu";
 
-    private final PortfolioMenuViewModel portfolioMenuViewModel;
-    private final PortfolioMenuController portfolioMenuController;
+    private final String[] sortmethod = {"by name", "by price", "by amount of stock"};
+    @Getter
+    private final Map<String, Comparator> portfolioSort = new HashMap<>();
 
     private final JButton addButton = new JButton(PortfolioMenuViewModel.ADD_BUTTON_LABEL);
     private final JButton removeButton = new JButton(PortfolioMenuViewModel.REMOVE_BUTTON_LABEL);
@@ -45,14 +43,11 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
     private final Map<JCheckBox, String> checkBoxTranslator = new HashMap<JCheckBox, String>();
     private final Map<JCheckBox, JPanel> jPanelMap = new HashMap<JCheckBox, JPanel>();
 
-    public PortfolioMenuView(PortfolioMenuViewModel portfolioMenuViewModel) {
-        super();
-        //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
-        this.portfolioMenuViewModel = portfolioMenuViewModel;
-        this.portfolioMenuViewModel.addPropertyChangeListener(this);
-        this.portfolioMenuController = null;
+    public PortfolioMenuView(PortfolioMenuViewModel viewModel) {
+        super(viewModel);
+        //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TO
 
-
+        this.getViewModel().addPropertyChangeListener(this);
 
         final JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
@@ -84,8 +79,14 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
                 evt -> {
                     if (evt.getSource().equals(addButton)) {
                         //MainMenuController.execute(noteInputField.getText());
-                        this.portfolioMenuController.getPortfolioMenuInputBoundary().executeAddStock();
-                        changeViewController.changeView("");
+                        final String addStockViewName = AddStockMenuView.VIEW_NAME;
+                        final ViewModel<AddStockMenuState> addStockMenuViewModel =
+                                (ViewModel<AddStockMenuState>) changeViewController.getViewModel(
+                                        addStockViewName
+                                        );
+                        this.getController().getPortfolioMenuInputBoundary().executeAddStock(addStockMenuViewModel);
+
+                        changeViewController.changeView(addStockViewName);
                     }
                 }
         );
@@ -95,7 +96,7 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
                     if (evt.getSource().equals(removeButton)) {
                         for (JCheckBox checkBox : checkBoxTranslator.keySet()) {
                             if (checkBox.getModel().isSelected()) {
-                                portfolioMenuViewModel.getState().getPortfolio().removeStock(checkBoxTranslator.get(checkBox));
+                                this.getViewModel().getState().getPortfolio().removeStock(checkBoxTranslator.get(checkBox));
                                 buttonMap.remove(checkBoxTranslator.get(checkBox));
                                 checkBoxTranslator.remove(checkBox);
                                 checkBoxPanel.remove(jPanelMap.get(checkBox));
@@ -145,7 +146,7 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
                 evt ->{
                     if(evt.getSource().equals(sortbyComboBox)){
                         String method = (String) sortbyComboBox.getSelectedItem();
-                        Portfolio portfolio = this.portfolioMenuViewModel.getState().getPortfolio();
+                        Portfolio portfolio = this.getViewModel().getState().getPortfolio();
                         // portfolio.sortStockBy();
                     }
                 }
@@ -190,10 +191,6 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
         }
     }
 
-    public ViewModel<PortfolioMenuState> getViewModel() {
-        return portfolioMenuViewModel;
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -201,8 +198,8 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        Portfolio portfolio = portfolioMenuViewModel.getState().getPortfolio();
-        this.portfolioMenuController.getPortfolioMenuInputBoundary().executeUpdatePortfolio(portfolio);
+        Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+        this.getController().getPortfolioMenuInputBoundary().executeUpdatePortfolio(portfolio);
         this.refreshCheckBoxPanel(portfolio);
     }
 }

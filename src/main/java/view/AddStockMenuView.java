@@ -1,38 +1,24 @@
 package view;
 
-import interface_adapter.ViewModel;
 import interface_adapter.change_view.ChangeViewController;
-import interface_adapter.portfolio.PortfolioMenuController;
-import interface_adapter.portfolio.PortfolioMenuViewModel;
 import interface_adapter.portfolio.addStock.AddStockMenuController;
 import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 
-public class AddStockMenuView extends PaddedView implements ActionListener, PropertyChangeListener {
-
-    @Getter
-    private final String viewName = "Add Stock";
-
+public class AddStockMenuView extends PaddedView<AddStockMenuViewModel, AddStockMenuController> implements ActionListener, PropertyChangeListener {
+    public static final String VIEW_NAME = "Add stock";
     @Setter
     private ChangeViewController changeViewController;
 
-    private final AddStockMenuViewModel addStockMenuViewModel;
-    private final AddStockMenuController addStockMenuController;
-
-    public AddStockMenuView(AddStockMenuViewModel addStockMenuViewModel) {
-        this.addStockMenuViewModel = addStockMenuViewModel;
-        this.addStockMenuViewModel.addPropertyChangeListener(this);
-        this.addStockMenuController = null;
+    public AddStockMenuView(AddStockMenuViewModel viewModel) {
+        super(viewModel);
+        this.getViewModel().addPropertyChangeListener(this);
     }
 
     @Override
@@ -43,10 +29,5 @@ public class AddStockMenuView extends PaddedView implements ActionListener, Prop
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
-    }
-
-    @Override
-    public ViewModel<?> getViewModel() {
-        return null;
     }
 }

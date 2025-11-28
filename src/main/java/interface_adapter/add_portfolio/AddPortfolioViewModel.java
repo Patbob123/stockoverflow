@@ -1,6 +1,7 @@
 package interface_adapter.add_portfolio;
 
 import interface_adapter.ViewModel;
+import view.AddPortfolioView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -65,7 +66,7 @@ public class AddPortfolioViewModel extends ViewModel<AddPortfolioState> {
     public static final Font BUTTON_SECONDARY_FONT = BASE_FONT.deriveFont(Font.PLAIN, (float) NORMAL_FONT_SIZE);
 
     public AddPortfolioViewModel() {
-        super("AddPortfolioMenu");
+        super(AddPortfolioView.VIEW_NAME);
         setState(new AddPortfolioState());
     }
 }

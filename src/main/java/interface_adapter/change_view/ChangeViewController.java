@@ -1,9 +1,10 @@
 package interface_adapter.change_view;
 
+import interface_adapter.AbsController;
 import interface_adapter.ViewModel;
 import use_case.change_view.ChangeViewInputBoundary;
 
-public class ChangeViewController {
+public class ChangeViewController extends AbsController {
 
     private final ChangeViewInputBoundary changeViewInteractor;
 

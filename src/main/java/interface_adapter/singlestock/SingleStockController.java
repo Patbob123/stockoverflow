@@ -1,11 +1,12 @@
 package interface_adapter.singlestock;
 
-import main.java.use_case.singlestock.AnalyzeSingleStockInputBoundary;
-import main.java.use_case.singlestock.AnalyzeSingleStockInputData;
-import main.java.use_case.singlestock.CompareTwoStocksInputBoundary;
-import main.java.use_case.singlestock.CompareTwoStocksInputData;
+import interface_adapter.AbsController;
+import use_case.singlestock.AnalyzeSingleStockInputBoundary;
+import use_case.singlestock.AnalyzeSingleStockInputData;
+import use_case.singlestock.CompareTwoStocksInputBoundary;
+import use_case.singlestock.CompareTwoStocksInputData;
 
-public class SingleStockController {
+public class SingleStockController extends AbsController {
 
     private final AnalyzeSingleStockInputBoundary analyzeInteractor;
     private final CompareTwoStocksInputBoundary compareInteractor;

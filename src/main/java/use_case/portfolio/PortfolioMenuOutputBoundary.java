@@ -1,9 +1,14 @@
 package use_case.portfolio;
 
 import entities.Portfolio.Portfolio;
+import interface_adapter.ViewModel;
+import interface_adapter.portfolio.addStock.AddStockMenuState;
+import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
+import use_case.InputBoundary;
+import use_case.OutputBoundary;
 
-public interface PortfolioMenuOutputBoundary {
-    void prepareAddStockView(Portfolio portfolio);
+public interface PortfolioMenuOutputBoundary extends OutputBoundary {
+    void prepareAddStockView(ViewModel<AddStockMenuState> addStockMenuViewModel);
 
     void prepareRemoveStockView(Portfolio portfolio);
 

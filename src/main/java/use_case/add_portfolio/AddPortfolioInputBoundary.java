@@ -1,4 +1,6 @@
 package use_case.add_portfolio;
 
-public interface AddPortfolioInputBoundary {
+import use_case.InputBoundary;
+
+public interface AddPortfolioInputBoundary extends InputBoundary {
 }

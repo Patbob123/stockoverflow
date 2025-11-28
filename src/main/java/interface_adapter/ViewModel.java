@@ -1,5 +1,8 @@
 package interface_adapter;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -15,7 +18,11 @@ public class ViewModel<T> {
     private final String viewName;
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
+    @Getter
+    private static final String DEFAULT_PROPERTY_NAME = "state";
 
+    @Getter
+    @Setter
     private T state;
 
     public ViewModel(String viewName) {
@@ -26,19 +33,11 @@ public class ViewModel<T> {
         return this.viewName;
     }
 
-    public T getState() {
-        return this.state;
-    }
-
-    public void setState(T state) {
-        this.state = state;
-    }
-
     /**
      * Fires a property changed event for the state of this ViewModel.
      */
     public void firePropertyChange() {
-        this.support.firePropertyChange("state", null, this.state);
+        this.support.firePropertyChange(DEFAULT_PROPERTY_NAME, null, this.state);
     }
 
     /**

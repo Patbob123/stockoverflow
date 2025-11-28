@@ -1,44 +1,42 @@
 package view;
 
+import entities.Portfolio.Portfolio;
+import entities.Portfolio.PortfolioFactory;
 import interface_adapter.ViewModel;
 import interface_adapter.change_view.ChangeViewController;
-import interface_adapter.import_export.ImportExportViewModel;
 import interface_adapter.mainmenu.MainMenuController;
-import interface_adapter.mainmenu.MainMenuState;
 import interface_adapter.mainmenu.MainMenuViewModel;
+import interface_adapter.portfolio.PortfolioMenuViewModel;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class MainMenuView extends PaddedView implements ActionListener, PropertyChangeListener {
-
-    @Getter
-    private final String viewName = "MainMenu";
-    private final MainMenuViewModel mainMenuViewModel;
+public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuController> implements ActionListener, PropertyChangeListener {
 
     @Setter
-    private MainMenuController mainMenuController;
+    private MainMenuController controller;
     @Setter
     private ChangeViewController changeViewController;
+
+    public static final String VIEW_NAME = "MainMenu";
 
     private final JButton stockButton = new JButton(MainMenuViewModel.STOCK_BUTTON_LABEL);
     private final JButton analyzePortfolioButton = new JButton(MainMenuViewModel.PORTFOLIO_BUTTON_LABEL);
     private final JButton createPortfolioButton = new JButton(MainMenuViewModel.CREATE_PORTFOLIO_BUTTON_LABEL);
     private final JButton historyStockButton = new JButton(MainMenuViewModel.HISTORY_BUTTON_LABEL);
     private final JButton exitButton = new JButton(MainMenuViewModel.EXIT_BUTTON_LABEL);
+    private final PortfolioFactory portfolioFactory = new PortfolioFactory();
 
-    public MainMenuView(MainMenuViewModel mainMenuViewModel) {
-        super(MainMenuViewModel.PADDING);
+    public MainMenuView(MainMenuViewModel viewModel) {
+        super(viewModel);
         //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
-        this.mainMenuViewModel = mainMenuViewModel;
-        this.mainMenuViewModel.addPropertyChangeListener(this);
-        this.mainMenuController = null;
+        this.getViewModel().addPropertyChangeListener(this);
+        this.controller = null;
         this.changeViewController = null;
 
         final JPanel buttons = new JPanel();
@@ -60,6 +58,11 @@ public class MainMenuView extends PaddedView implements ActionListener, Property
         analyzePortfolioButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(analyzePortfolioButton)) {
+                        final Portfolio portfolio = portfolioFactory.createPortfolio("Untitled");
+                        final PortfolioMenuViewModel portfolioViewModel =
+                                (PortfolioMenuViewModel) changeViewController
+                                        .getViewModel(PortfolioMenuView.VIEW_NAME);
+                        portfolioViewModel.getState().setPortfolio(portfolio);
                         changeViewController.changeView("PortfolioMenu");
                     }
                 }
@@ -86,7 +89,7 @@ public class MainMenuView extends PaddedView implements ActionListener, Property
         exitButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(exitButton)) {
-                        mainMenuController.execute("exit"); //fix this later
+                        controller.execute("exit"); //fix this later
 
                     }
                 }
@@ -96,10 +99,6 @@ public class MainMenuView extends PaddedView implements ActionListener, Property
 
         //this.add(noteName);
         this.add(buttons);
-    }
-
-    public ViewModel<MainMenuState> getViewModel() {
-        return mainMenuViewModel;
     }
 
     @Override

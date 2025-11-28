@@ -1,6 +1,8 @@
 package use_case.mainmenu;
 
-public interface MainMenuInputBoundary {
+import use_case.InputBoundary;
+
+public interface MainMenuInputBoundary extends InputBoundary {
 
     void executeAnaylzePortfolio();
 

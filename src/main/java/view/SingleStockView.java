@@ -1,5 +1,6 @@
 package view;
 
+import data_access.FredRiskFreeRateDataAccess;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockViewInterface;
 import use_case.singlestock.AnalyzeSingleStockOutputData;
@@ -190,8 +191,8 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
         }
 
         try {
-            main.java.data_access.FredRiskFreeRateDataAccess fred =
-                    new main.java.data_access.FredRiskFreeRateDataAccess(key);
+            FredRiskFreeRateDataAccess fred =
+                    new FredRiskFreeRateDataAccess(key);
 
             double rf = fred.getCurrentRiskFreeRate();
             rfField.setText(String.format(Locale.US, "%.4f", rf));

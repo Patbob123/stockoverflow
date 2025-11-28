@@ -1,6 +1,7 @@
 package interface_adapter.portfolio;
 
 import interface_adapter.ViewModel;
+import view.PortfolioMenuView;
 
 public class PortfolioMenuViewModel extends ViewModel<PortfolioMenuState> {
 
@@ -17,7 +18,7 @@ public class PortfolioMenuViewModel extends ViewModel<PortfolioMenuState> {
     public static final String EXIT_BUTTON_LABEL = "Back to Main Menu";
 
     public PortfolioMenuViewModel() {
-        super("portfolio");
+        super(PortfolioMenuView.VIEW_NAME);
         setState(new PortfolioMenuState());
     }
 

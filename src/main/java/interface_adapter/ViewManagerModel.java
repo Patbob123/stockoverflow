@@ -2,6 +2,7 @@ package interface_adapter;
 
 import lombok.Getter;
 import lombok.Setter;
+import view.ViewManager;
 
 /**
  * Model for the View Manager. Its state is the name of the View which
@@ -12,6 +13,8 @@ public class ViewManagerModel extends ViewModel<String> {
     @Getter
     @Setter
     private ViewModel<?> formativeViewModel;
+
+    public static final String GET_VIEW_MODEL_NAME = "getViewModel";
 
     public ViewManagerModel() {
         super("view manager");
@@ -25,7 +28,7 @@ public class ViewManagerModel extends ViewModel<String> {
 
     public ViewModel<?> getViewModel(String viewName) {
         this.setState(viewName);
-        this.firePropertyChange("getViewModel");
+        this.firePropertyChange(GET_VIEW_MODEL_NAME);
         return this.formativeViewModel;
     }
 
