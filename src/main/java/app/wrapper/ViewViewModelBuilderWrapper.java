@@ -1,4 +1,4 @@
-package view.wrapper;
+package app.wrapper;
 
 import app.MainMenuBuilder;
 import interface_adapter.ViewModel;

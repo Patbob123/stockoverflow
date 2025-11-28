@@ -41,7 +41,7 @@ public class MainMenu {
                 .addStockMenuView()
                 .addChangeViewUseCase()
                 .addMainViewUseCase()
-                .addAddPortfolioUseCase()
+                .addPortfolioUseCase()
                 .addImportExportUseCase()
                 .addPortfolioMenuUseCase()
                 .addStockMenuUseCase()
