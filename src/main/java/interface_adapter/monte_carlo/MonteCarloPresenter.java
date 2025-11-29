@@ -10,7 +10,7 @@ import java.util.Locale;
 /**
  * The Presenter implements the Output Boundary for the Monte Carlo Use Case.
  * It takes raw data from the Interactor (Output Data) and formats it into
- * presentation-ready strings and models for the View.
+ * a single presentation-ready object (the ViewModel) for the View.
  */
 public class MonteCarloPresenter implements MonteCarloOutputBoundary {
 
@@ -26,7 +26,8 @@ public class MonteCarloPresenter implements MonteCarloOutputBoundary {
     }
 
     /**
-     * Success case: Receives raw simulation results and formats them for display.
+     * Success case: Receives raw simulation results, formats them into a ViewModel,
+     * and signals the View to display the result.
      */
     @Override
     public void presentSuccess(MonteCarloOutputData outputData) {
@@ -34,12 +35,21 @@ public class MonteCarloPresenter implements MonteCarloOutputBoundary {
         String initialPriceStr = currencyFormat.format(outputData.getInitialPrice());
         String expectedTerminalPriceStr = currencyFormat.format(outputData.getMeanTerminalPrice());
 
-        // 2. Tell the View to Display Metrics
-        view.displayMetrics(initialPriceStr, expectedTerminalPriceStr);
 
-        // 3. Tell the View to Draw the Chart
-        // We decide how many paths to show here (e.g., 50 paths)
-        view.showPaths(outputData.getPaths(), 50, "Monte Carlo Simulation");
+        // We decide here how many paths to display
+        final int N_PATHS_TO_SHOW = 50;
+
+        // 2. Construct the ViewModel
+        MonteCarloViewModel viewModel = new MonteCarloViewModel(
+                outputData.getPaths(),
+                "Monte Carlo Simulation Paths" ,
+                "Initial Price: " + initialPriceStr,
+                "Expected Terminal Price: " + expectedTerminalPriceStr,
+                N_PATHS_TO_SHOW
+        );
+
+        // 3. Deliver the ViewModel to the View
+        view.showSuccessView(viewModel);
     }
 
     /**

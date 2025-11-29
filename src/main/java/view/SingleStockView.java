@@ -190,8 +190,8 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
         }
 
         try {
-            main.java.data_access.FredRiskFreeRateDataAccess fred =
-                    new main.java.data_access.FredRiskFreeRateDataAccess(key);
+            data_access.FredRiskFreeRateDataAccess fred =
+                    new data_access.FredRiskFreeRateDataAccess(key);
 
             double rf = fred.getCurrentRiskFreeRate();
             rfField.setText(String.format(Locale.US, "%.4f", rf));
