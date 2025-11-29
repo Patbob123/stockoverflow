@@ -1,4 +1,4 @@
-package main.java.data_access;
+package data_access;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -7,7 +7,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import main.java.use_case.singlestock.RiskFreeRateDataAccessInterface;
+import use_case.singlestock.RiskFreeRateDataAccessInterface;
 
 import java.io.IOException;
 
