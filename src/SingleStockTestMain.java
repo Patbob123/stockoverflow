@@ -4,6 +4,7 @@ import data_access.FredRiskFreeRateDataAccess;
 import data_access.StooqStockDataAccess;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockPresenter;
+import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.singlestock.AnalyzeSingleStockInteractor;
 import use_case.singlestock.CompareTwoStocksInteractor;
 import use_case.singlestock.RiskFreeRateDataAccessInterface;
@@ -17,7 +18,7 @@ public class SingleStockTestMain {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
 
-            String alphaKey = "YOUR_ALPHA_KEY_HERE";
+            String alphaKey = "YOUR_ALPHA_KEY_HERE"; // or System.getenv("ALPHAVANTAGE_API_KEY");
 
             StockPriceDataAccessInterface stooqGateway =
                     new StooqStockDataAccess();
@@ -30,7 +31,9 @@ public class SingleStockTestMain {
             RiskFreeRateDataAccessInterface fredGateway =
                     new FredRiskFreeRateDataAccess(fredKey);
 
-            SingleStockView view = new SingleStockView(null);
+            SingleStockViewModel viewModel = new SingleStockViewModel();
+            SingleStockView view = new SingleStockView(viewModel, null);
+
             SingleStockPresenter presenter = new SingleStockPresenter(view);
 
             AnalyzeSingleStockInteractor analyzeInteractor =
@@ -44,7 +47,8 @@ public class SingleStockTestMain {
 
             view.setController(controller);
 
-            JFrame frame = new JFrame("Stockoverflow - Single Stock (Compare mode)");
+
+            JFrame frame = new JFrame("Stockoverflow - Single Stock (Compare + History)");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setContentPane(view);
             frame.pack();
