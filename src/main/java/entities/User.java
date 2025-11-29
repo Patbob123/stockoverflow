@@ -4,13 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
+    // Getters and Setters
     private final String userID;
+    @Setter
     private String username;
+    @Setter
     private String password;
+    @Setter
     private String email;
 
     private PortfolioList portfolioList;
+    @Setter
     private List<String> searchHistory;
+    @Setter
+    private boolean isLoggedIn;
 
     public User(String userID, String username, String password, String email) {
         this.userID = userID;

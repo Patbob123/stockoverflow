@@ -74,7 +74,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         if (viewManagerModel != null) {
-                            viewManagerModel.setActiveView("sign up"); // 这里的名字必须和 SignupView.viewName 一致
+                            viewManagerModel.setActiveView("sign up"); 
                             viewManagerModel.firePropertyChanged();
                         }
                     }
