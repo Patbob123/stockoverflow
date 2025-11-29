@@ -1,112 +1,127 @@
 package view;
 
-import interface_adapter.user.login.LoginController;
-import interface_adapter.user.login.LoginViewModel;
-import lombok.Setter;
+import interface_adapter.Login.LoginController;
+import interface_adapter.Login.LoginState;
+import interface_adapter.Login.LoginViewModel;
+import interface_adapter.ViewManagerModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class LoginView extends JFrame implements ActionListener, PropertyChangeListener {
+public class LoginView extends JPanel implements ActionListener, PropertyChangeListener {
+
+    public final String viewName = "log in";
     private final LoginViewModel loginViewModel;
-    private final JTextField usernameField = new JTextField(20);
-    private final JPasswordField passwordField = new JPasswordField(20);
-    private final JButton loginButton = new JButton("log in");
-    private final JButton createAccountButton = new JButton("create an account");
-    private final JLabel messageLabel = new JLabel();
+    private final LoginController loginController;
+    private final ViewManagerModel viewManagerModel;
 
-    @Setter
-    private LoginController loginController;
-    @Setter
-    private CreateAccountView createAccountView;
-    @Setter
-    private MainMenuView mainMenuView;
+    private final JTextField usernameInputField = new JTextField(15);
+    private final JPasswordField passwordInputField = new JPasswordField(15);
 
-    public LoginView(LoginViewModel loginViewModel) {
-        super("log in");
+    private final JButton logIn;
+    private final JButton cancel;
+    private final JButton signUp;
+
+
+    public LoginView(LoginViewModel loginViewModel, LoginController controller, ViewManagerModel viewManagerModel) {
+        this.loginController = controller;
         this.loginViewModel = loginViewModel;
+        this.viewManagerModel = viewManagerModel;
         this.loginViewModel.addPropertyChangeListener(this);
 
-        setupUI();
-        setupListeners();
+        JLabel title = new JLabel(loginViewModel.TITLE_LABEL);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        setSize(400, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        LabelTextPanel usernameInfo = new LabelTextPanel(
+                new JLabel(loginViewModel.USERNAME_LABEL), usernameInputField);
+        LabelTextPanel passwordInfo = new LabelTextPanel(
+                new JLabel(loginViewModel.PASSWORD_LABEL), passwordInputField);
+
+        JPanel buttons = new JPanel();
+        logIn = new JButton(loginViewModel.LOGIN_BUTTON_LABEL);
+        buttons.add(logIn);
+
+        cancel = new JButton(loginViewModel.CANCEL_BUTTON_LABEL);
+        buttons.add(cancel);
+
+        signUp = new JButton("Sign up");
+        buttons.add(signUp);
+
+        logIn.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(logIn)) {
+                            LoginState currentState = loginViewModel.getState();
+                            loginController.execute(
+                                    currentState.getUsername(),
+                                    currentState.getPassword()
+                            );
+                        }
+                    }
+                }
+        );
+
+        cancel.addActionListener(this);
+
+        signUp.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (viewManagerModel != null) {
+                            viewManagerModel.setActiveView("sign up"); 
+                            viewManagerModel.firePropertyChanged();
+                        }
+                    }
+                }
+        );
+
+        usernameInputField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                LoginState currentState = loginViewModel.getState();
+                currentState.setUsername(usernameInputField.getText() + e.getKeyChar());
+                loginViewModel.setState(currentState);
+            }
+            @Override public void keyPressed(KeyEvent e) {}
+            @Override public void keyReleased(KeyEvent e) {}
+        });
+
+        passwordInputField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                LoginState currentState = loginViewModel.getState();
+                currentState.setPassword(passwordInputField.getText() + e.getKeyChar());
+                loginViewModel.setState(currentState);
+            }
+            @Override public void keyPressed(KeyEvent e) {}
+            @Override public void keyReleased(KeyEvent e) {}
+        });
+
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.add(title);
+        this.add(usernameInfo);
+        this.add(passwordInfo);
+        this.add(buttons);
     }
 
-    private void setupUI() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // username
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(new JLabel("username:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        panel.add(usernameField, gbc);
-
-        // password
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        panel.add(new JLabel("password:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        panel.add(passwordField, gbc);
-
-        // message
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        panel.add(messageLabel, gbc);
-
-        // button
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 1;
-        panel.add(loginButton, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        panel.add(createAccountButton, gbc);
-
-        add(panel);
-    }
-
-    private void setupListeners() {
-        loginButton.addActionListener(this);
-        createAccountButton.addActionListener(this);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == loginButton) {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
-            loginController.execute(username, password);
-        } else if (e.getSource() == createAccountButton) {
-            this.setVisible(false);
-            createAccountView.setVisible(true);
-        }
+    public void actionPerformed(ActionEvent evt) {
+        System.out.println("Click " + evt.getActionCommand());
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        LoginViewModel viewModel = (LoginViewModel) evt.getNewValue();
-        messageLabel.setText(viewModel.getMessage());
-
-        if (viewModel.isSuccess()) {
-            usernameField.setText("");
-            passwordField.setText("");
+        LoginState state = (LoginState) evt.getNewValue();
+        if (state.getUsernameError() != null) {
+            JOptionPane.showMessageDialog(this, state.getUsernameError());
+        }
+        if (evt.getPropertyName().equals("state")) {
+            usernameInputField.setText(state.getUsername());
         }
     }
 }

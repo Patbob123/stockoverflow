@@ -7,20 +7,14 @@ import java.util.TreeMap;
 public class Stock {
 
     private final String ticker;
-    // our tickers aka "APPL"
     private String name;
-    // naem aka Apple
     private LocalDate lastUpdated;
-    // just date
 
     private Double open;
-    // price when market opened
     private Double close;
-    // when closed
     private Double high;
-    // highest prise during period
     private Double low;
-    // lowest
+
     private Map<LocalDate, Double> historicalPrices;
 
     public Stock(String ticker, String name) {
@@ -28,7 +22,6 @@ public class Stock {
         this.name = name;
         this.historicalPrices = new TreeMap<>();
     }
-    // normal getters setters not  that lombok
 
     public String getTicker() {
         return ticker;
@@ -46,21 +39,10 @@ public class Stock {
         return lastUpdated;
     }
 
-    public Double getOpen() {
-        return open;
-    }
-
-    public Double getClose() {
-        return close;
-    }
-
-    public Double getHigh() {
-        return high;
-    }
-
-    public Double getLow() {
-        return low;
-    }
+    public Double getOpen() { return open; }
+    public Double getClose() { return close; }
+    public Double getHigh() { return high; }
+    public Double getLow() { return low; }
 
     public Map<LocalDate, Double> getHistoricalPrices() {
         return historicalPrices;
@@ -76,49 +58,24 @@ public class Stock {
         this.close = close;
         this.high = high;
         this.low = low;
+        if (this.historicalPrices != null) {
+            this.historicalPrices.put(date, close);
+        }
     }
-    // we can get a price range for this quote aka high - low
 
     public double getDailyRange() {
         checkQuoteLoaded();
-        return low - high;
+        return high - low;
     }
-    // get daily returns
 
     public double getDailyReturn() {
         checkQuoteLoaded();
         return (close - open) / open;
     }
-    // check if the quote exists
+
     private void checkQuoteLoaded() {
-        if (open == null
-                || close == null
-                || high == null
-                || low == null) {
-            throw new IllegalStateException("We couldnt find stcok with ticker:" + ticker);
+        if (open == null || close == null || high == null || low == null) {
+            throw new IllegalStateException("Stock data not loaded for ticker: " + ticker);
         }
     }
 }
-
-/** Im not sure about this lombok
- import lombok.AllArgsConstructor;
- import lombok.Getter;
- import lombok.Setter;
-
- import java.util.Date;
- import javax.swing.*;
-
- @Getter
- @Setter
- //@AllArgsConstructor
- public class Stock {
- private String ticker;
- private String name;
- private Date date;
- private ImageIcon image;
- private double high;
- private double low;
- private double close;
-
- check push
- */
