@@ -142,3 +142,99 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
         }
     }
 }
+//
+//public class PortfolioMenuView extends JFrame implements ActionListener {
+//    private final JButton addStockButton = new JButton("ADD");
+//    private final JButton removeStockButton = new JButton("REMOVE");
+//    private final JButton simulateButton = new JButton("SIMULATE");
+//    private final JButton compareButton = new JButton("COMPARE");
+//    private final JButton saveButton = new JButton("SAVE");
+//    private final JButton refreshButton = new JButton("Refresh");
+//    private final JButton backButton = new JButton("Return");
+//    private final JLabel messageLabel = new JLabel();
+//    private final JTextArea portfolioDataArea = new JTextArea();
+//
+//    private String currentPortfolioName;
+//    private RefreshDataController refreshDataController;
+//
+//    public PortfolioMenuView() {
+//        super("Portfolio menu");
+//        setupUI();
+//        setupListeners();
+//
+//        setSize(800, 600);
+//        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        setLocationRelativeTo(null);
+//    }
+//
+//    private void setupUI() {
+//        JPanel mainPanel = new JPanel(new BorderLayout());
+//
+//        //  Panel
+//        JPanel buttonPanel = new JPanel(new GridLayout(1, 7, 5, 5));
+//        buttonPanel.add(addStockButton);
+//        buttonPanel.add(removeStockButton);
+//        buttonPanel.add(simulateButton);
+//        buttonPanel.add(compareButton);
+//        buttonPanel.add(saveButton);
+//        buttonPanel.add(refreshButton);
+//        buttonPanel.add(backButton);
+//
+//        // Data area
+//        portfolioDataArea.setEditable(false);
+//        JScrollPane scrollPane = new JScrollPane(portfolioDataArea);
+//
+//        // message
+//        JPanel messagePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//        messagePanel.add(messageLabel);
+//
+//        mainPanel.add(buttonPanel, BorderLayout.NORTH);
+//        mainPanel.add(scrollPane, BorderLayout.CENTER);
+//        mainPanel.add(messagePanel, BorderLayout.SOUTH);
+//
+//        add(mainPanel);
+//    }
+//
+//    private void setupListeners() {
+//        addStockButton.addActionListener(this);
+//        removeStockButton.addActionListener(this);
+//        simulateButton.addActionListener(this);
+//        compareButton.addActionListener(this);
+//        saveButton.addActionListener(this);
+//        refreshButton.addActionListener(this);
+//        backButton.addActionListener(this);
+//    }
+//
+//    public void setCurrentPortfolio(Portfolio portfolio) {
+//        this.currentPortfolioName = portfolio.getName();
+//        updatePortfolioData();
+//    }
+//
+//    public void setRefreshDataController(RefreshDataController controller) {
+//        this.refreshDataController = controller;
+//    }
+//
+//    public void showRefreshMessage(String message) {
+//        messageLabel.setText(message);
+//    }
+//
+//    public void updatePortfolioData() {
+//
+//
+//        portfolioDataArea.setText(": " + currentPortfolioName + "\n");
+//        portfolioDataArea.append("");
+//        portfolioDataArea.append(": " + new java.util.Date() + "\n");
+//    }
+//
+//    @Override
+//    public void actionPerformed(ActionEvent e) {
+//        if (e.getSource() == refreshButton) {
+//            if (currentPortfolioName != null && refreshDataController != null) {
+//                refreshDataController.execute(currentPortfolioName);
+//            } else {
+//                showRefreshMessage("");
+//            }
+//        }
+//        //Event handling for other buttons
+//    }
+//}
