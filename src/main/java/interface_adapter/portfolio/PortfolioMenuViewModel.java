@@ -14,7 +14,8 @@ public class PortfolioMenuViewModel extends ViewModel<PortfolioMenuState> {
     public static final String COMPARE_BUTTON_LABEL = "Compare";
     public static final String SELECT_ALL_BUTTON_LABEL = "Select All";
     public static final String CLEAR_SELECTION_BUTTON_LABEL = "Clear Selection";
-    public static final String SAVE_PORTFOLIO_BUTTON_LABEL = "Save Portfolio";
+    public static final String SAVE_PORTFOLIO_JSON_BUTTON_LABEL = "Save Portfolio as JSON";
+    public static final String SAVE_PORTFOLIO_DATABASE_BUTTON_LABEL = "Save Portfolio in Database";
     public static final String EXIT_BUTTON_LABEL = "Back to Main Menu";
     public static final String CHANGE_NAME_LABEL = "Change Name";
 

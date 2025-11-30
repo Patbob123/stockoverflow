@@ -46,6 +46,7 @@ public class MainMenuBuilder {
     private final ArrayList<ViewViewModelBuilderWrapper<?, ?>> viewBuildInstruction = new ArrayList<>();
     private final ArrayList<UseCaseWrapper<?, ?, ?, ?, ?>> useCaseBuildInstruction = new ArrayList<>();
     private Boolean addChangeView = false;
+    private final Boolean clearCacheAfterBuild = true;
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -222,6 +223,7 @@ public class MainMenuBuilder {
             usecaseBuilder.build(this);
         }
         useCaseBuildInstruction.clear();
+
         final JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setTitle("Stockoverflow");
@@ -231,7 +233,7 @@ public class MainMenuBuilder {
 
         viewManagerModel.setActiveView(getView(MainMenuView.VIEW_NAME).getViewName());
         viewManagerModel.firePropertyChange();
-
+        
         return frame;
     }
 }
