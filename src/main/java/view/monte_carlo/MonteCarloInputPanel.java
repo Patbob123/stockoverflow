@@ -131,26 +131,4 @@ public class MonteCarloInputPanel extends JPanel {
         });
     }
 
-    public static void main(String[] args) {
-
-        SwingMonteCarloView view = new SwingMonteCarloView();
-        MonteCarloAnalysisInteractor interactor = new MonteCarloAnalysisInteractor(new StooqStockDataAccess(),
-        new MonteCarloSimulator(),
-        new StatisticsCalculator(),
-        new MonteCarloPresenter(view));
-
-        // Instantiate the Controller
-        MonteCarloController controller = new MonteCarloController(interactor);
-
-        // Create the GUI Frame and Panel, passing the pre-selected ticker
-        JFrame frame = new JFrame("Monte Carlo Simulation Input");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        MonteCarloInputPanel inputPanel = new MonteCarloInputPanel("AAPL", controller);
-
-        frame.add(inputPanel);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
 }

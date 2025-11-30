@@ -215,6 +215,8 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
             return;
         }
         JFrame frame = new JFrame("Monte Carlo Simulation Input for " + tkr);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         MonteCarloInputPanel panel = new MonteCarloInputPanel(tkr, monteCarloController);
 
         frame.add(panel);
