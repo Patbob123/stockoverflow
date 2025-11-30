@@ -11,26 +11,31 @@ import use_case.portfolio_analysis.PortfolioAnalysisInteractor;
 import use_case.portfolio_analysis.PortfolioAnalysisOutputBoundary;
 import view.PortfolioAnalysisView;
 
+import javax.swing.*;
+
 public class PortfolioAnalysisUseCaseFactory {
+
     private PortfolioAnalysisUseCaseFactory() {}
 
-
-    public static PortfolioAnalysisView create(
+    public static PortfolioAnalysisController createPortfolioAnalysisUseCase(
             ViewManagerModel viewManagerModel,
-            PortfolioAnalysisViewModel viewModel) {
-        return new PortfolioAnalysisView(viewModel, viewManagerModel);
-    }
+            PortfolioAnalysisViewModel portfolioAnalysisViewModel,
+            UserDataAccessInterface userDataAccessInterface,
+            APIDataAccessInterface apiDataAccessInterface) {
 
+        try {
+            PortfolioAnalysisOutputBoundary outputBoundary = new PortfolioAnalysisPresenter(viewManagerModel, portfolioAnalysisViewModel);
 
-    public static PortfolioAnalysisController createController(
-            ViewManagerModel viewManagerModel,
-            PortfolioAnalysisViewModel viewModel,
-            UserDataAccessInterface userDataAccess,
-            APIDataAccessInterface apiDataAccess) {
+            PortfolioAnalysisInputBoundary interactor = new PortfolioAnalysisInteractor(
+                    userDataAccessInterface,
+                    apiDataAccessInterface,
+                    outputBoundary
+            );
 
-        PortfolioAnalysisOutputBoundary outputBoundary = new PortfolioAnalysisPresenter(viewModel, viewManagerModel);
-        PortfolioAnalysisInputBoundary interactor = new PortfolioAnalysisInteractor(userDataAccess, apiDataAccess, outputBoundary);
-
-        return new PortfolioAnalysisController(interactor);
+            return new PortfolioAnalysisController(interactor);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error creating Portfolio Analysis Use Case.");
+            return null;
+        }
     }
 }

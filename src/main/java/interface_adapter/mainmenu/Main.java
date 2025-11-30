@@ -1,19 +1,26 @@
 package interface_adapter.mainmenu;
 
 import app.*;
+
 import data_access.FileUserDataAccessObject;
 import data_access.StockDataAccessObject;
+
 import entities.CommonUserFactory;
+
+import interface_adapter.ViewManagerModel;
 import interface_adapter.Login.LoginViewModel;
 import interface_adapter.Signup.SignupViewModel;
-import interface_adapter.ViewManagerModel;
-import interface_adapter.add_stock.AddStockViewModel;
-import interface_adapter.create_portfolio.CreatePortfolioViewModel;
-import interface_adapter.portfolio_analysis.PortfolioAnalysisController;
-import interface_adapter.portfolio_analysis.PortfolioAnalysisViewModel;
 import interface_adapter.search.SearchViewModel;
 import interface_adapter.show_graph.ShowGraphController;
 import interface_adapter.show_graph.ShowGraphViewModel;
+import interface_adapter.create_portfolio.CreatePortfolioViewModel;
+import interface_adapter.add_stock.AddStockViewModel;
+import interface_adapter.portfolio_analysis.PortfolioAnalysisController;
+import interface_adapter.portfolio_analysis.PortfolioAnalysisViewModel;
+import interface_adapter.monte_carlo.MonteCarloController;
+import interface_adapter.monte_carlo.MonteCarloViewModel;
+import app.MonteCarloUseCaseFactory;
+
 import view.*;
 
 import javax.swing.*;
@@ -22,89 +29,151 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        JFrame application = new JFrame("Stock Overflow");
-        application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        // Ensure Swing components are created on the Event Dispatch Thread
+        SwingUtilities.invokeLater(() -> {
 
-        CardLayout cardLayout = new CardLayout();
-        JPanel views = new JPanel(cardLayout);
-        application.add(views);
+            // 1. Main Window Setup
+            JFrame application = new JFrame("Stock Overflow");
+            application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            application.setSize(1000, 800);
 
-        ViewManagerModel viewManagerModel = new ViewManagerModel();
-        new ViewManager(views, cardLayout, viewManagerModel);
+            CardLayout cardLayout = new CardLayout();
+            JPanel views = new JPanel(cardLayout);
+            application.add(views);
 
-        // ViewModels
-        LoginViewModel loginViewModel = new LoginViewModel();
-        SignupViewModel signupViewModel = new SignupViewModel();
-        MainMenuViewModel mainMenuViewModel = new MainMenuViewModel();
-        SearchViewModel searchViewModel = new SearchViewModel();
-        ShowGraphViewModel showGraphViewModel = new ShowGraphViewModel();
-        CreatePortfolioViewModel createPortfolioViewModel = new CreatePortfolioViewModel();
-        AddStockViewModel addStockViewModel = new AddStockViewModel();
-        PortfolioAnalysisViewModel portfolioAnalysisViewModel = new PortfolioAnalysisViewModel(); // 新增
+            // 2. View Manager
+            ViewManagerModel viewManagerModel = new ViewManagerModel();
+            new ViewManager(views, cardLayout, viewManagerModel);
 
-        // DAOs
-        FileUserDataAccessObject userDataAccessObject;
-        try {
-            userDataAccessObject = new FileUserDataAccessObject("./users.csv", new CommonUserFactory());
-        } catch (IOException e) {
-            throw new RuntimeException("Could not create/open user data file.", e);
-        }
-        StockDataAccessObject stockDataAccessObject = new StockDataAccessObject();
+            // 3. ViewModels
+            LoginViewModel loginViewModel = new LoginViewModel();
+            SignupViewModel signupViewModel = new SignupViewModel();
+            MainMenuViewModel mainMenuViewModel = new MainMenuViewModel();
+            SearchViewModel searchViewModel = new SearchViewModel();
+            ShowGraphViewModel showGraphViewModel = new ShowGraphViewModel();
+            CreatePortfolioViewModel createPortfolioViewModel = new CreatePortfolioViewModel();
+            AddStockViewModel addStockViewModel = new AddStockViewModel();
+            PortfolioAnalysisViewModel portfolioAnalysisViewModel = new PortfolioAnalysisViewModel();
+            MonteCarloViewModel monteCarloViewModel = new MonteCarloViewModel();
 
-        // Controllers
-        MainMenuController mainMenuController = new MainMenuController(
-                viewManagerModel, searchViewModel, createPortfolioViewModel, addStockViewModel
-        );
+            // 4. Data Access Objects
+            FileUserDataAccessObject userDataAccessObject;
+            try {
+                userDataAccessObject = new FileUserDataAccessObject("./users.csv", new CommonUserFactory());
+            } catch (IOException e) {
+                throw new RuntimeException("Could not create/open user data file.", e);
+            }
 
-        ShowGraphController showGraphController = ShowGraphUseCaseFactory.createShowGraphUseCase(
-                viewManagerModel, showGraphViewModel, stockDataAccessObject
-        );
+            StockDataAccessObject stockDataAccessObject = new StockDataAccessObject();
 
-        PortfolioAnalysisController portfolioAnalysisController = PortfolioAnalysisUseCaseFactory.createController(
-                viewManagerModel, portfolioAnalysisViewModel, userDataAccessObject, stockDataAccessObject
-        );
+            // 5. Independent Controllers
+            ShowGraphController showGraphController = ShowGraphUseCaseFactory.createShowGraphUseCase(
+                    viewManagerModel,
+                    showGraphViewModel,
+                    stockDataAccessObject
+            );
 
-        // Views Assembly
-        SignupView signupView = SignupUseCaseFactory.create(viewManagerModel, loginViewModel, signupViewModel, userDataAccessObject);
-        views.add(signupView, signupView.viewName);
+            PortfolioAnalysisController portfolioAnalysisController = PortfolioAnalysisUseCaseFactory.createPortfolioAnalysisUseCase(
+                    viewManagerModel,
+                    portfolioAnalysisViewModel,
+                    userDataAccessObject,
+                    stockDataAccessObject
+            );
 
-        LoginView loginView = LoginUseCaseFactory.create(viewManagerModel, loginViewModel, mainMenuViewModel, userDataAccessObject);
-        views.add(loginView, loginView.viewName);
+            MonteCarloController monteCarloController = MonteCarloUseCaseFactory.create(
+                    monteCarloViewModel,
+                    stockDataAccessObject
+            );
 
-        MainMenuView mainMenuView = new MainMenuView(mainMenuViewModel, mainMenuController);
-        views.add(mainMenuView, mainMenuView.viewName);
+            // 6. Assemble Views
 
-        SearchView searchView = new SearchView(searchViewModel, showGraphController, viewManagerModel);
-        views.add(searchView, searchView.viewName);
+            // --- Signup View ---
+            SignupView signupView = SignupUseCaseFactory.create(
+                    viewManagerModel,
+                    loginViewModel,
+                    signupViewModel,
+                    userDataAccessObject
+            );
+            views.add(signupView, signupView.viewName);
 
-        ShowGraphView showGraphView = ShowGraphUseCaseFactory.create(viewManagerModel, showGraphViewModel, stockDataAccessObject);
-        views.add(showGraphView, showGraphView.viewName);
+            // --- Login View ---
+            LoginView loginView = LoginUseCaseFactory.create(
+                    viewManagerModel,
+                    loginViewModel,
+                    mainMenuViewModel,
+                    userDataAccessObject
+            );
+            views.add(loginView, loginView.viewName);
 
-        PortfolioMenuView portfolioMenuView = CreatePortfolioUseCaseFactory.create(
-                viewManagerModel, createPortfolioViewModel, userDataAccessObject, mainMenuController
-        );
-        views.add(portfolioMenuView, portfolioMenuView.viewName);
+            // --- Main Menu View ---
+            // Main is now in the same package as MainMenuController, but Factory creates it
+            MainMenuView mainMenuView = MainMenuUseCaseFactory.create(
+                    viewManagerModel,
+                    mainMenuViewModel,
+                    createPortfolioViewModel,
+                    searchViewModel,
+                    loginViewModel,
+                    addStockViewModel
+            );
+            views.add(mainMenuView, mainMenuView.viewName);
 
-        AddStockView addStockView = AddStockUseCaseFactory.create(
-                viewManagerModel,
-                addStockViewModel,
-                showGraphController,
-                portfolioAnalysisController,
-                userDataAccessObject,
-                stockDataAccessObject
-        );
-        views.add(addStockView, addStockView.viewName);
+            MainMenuController mainMenuController = mainMenuView.getMainMenuController();
 
-        PortfolioAnalysisView portfolioAnalysisView = PortfolioAnalysisUseCaseFactory.create(
-                viewManagerModel, portfolioAnalysisViewModel
-        );
-        views.add(portfolioAnalysisView, portfolioAnalysisView.viewName);
+            // --- Portfolio Menu View (Create Portfolio) ---
+            PortfolioMenuView portfolioMenuView = CreatePortfolioUseCaseFactory.create(
+                    viewManagerModel,
+                    createPortfolioViewModel,
+                    userDataAccessObject,
+                    mainMenuController
+            );
+            views.add(portfolioMenuView, portfolioMenuView.viewName);
 
-        // Start
-        viewManagerModel.setActiveView(loginView.viewName);
-        viewManagerModel.firePropertyChanged();
+            // --- Add Stock View ---
+            AddStockView addStockView = AddStockUseCaseFactory.create(
+                    viewManagerModel,
+                    addStockViewModel,
+                    showGraphController,
+                    portfolioAnalysisController,
+                    monteCarloController,
+                    monteCarloViewModel,
+                    userDataAccessObject,
+                    stockDataAccessObject
+            );
+            views.add(addStockView, addStockView.viewName);
 
-        application.pack();
-        application.setVisible(true);
+            // --- Search View ---
+            SearchView searchView = SearchUseCaseFactory.create(
+                    viewManagerModel,
+                    searchViewModel,
+                    showGraphController,
+                    stockDataAccessObject
+            );
+            views.add(searchView, searchView.viewName);
+
+            // --- Show Graph View ---
+            ShowGraphView showGraphView = new ShowGraphView(
+                    showGraphViewModel,
+                    showGraphController,
+                    viewManagerModel
+            );
+            views.add(showGraphView, showGraphView.viewName);
+
+            // --- Portfolio Analysis View ---
+            // Updated to match the 3-argument constructor we fixed earlier
+            PortfolioAnalysisView portfolioAnalysisView = new PortfolioAnalysisView(
+                    portfolioAnalysisViewModel,
+                    portfolioAnalysisController,
+                    viewManagerModel
+            );
+            views.add(portfolioAnalysisView, portfolioAnalysisView.viewName);
+
+            // 7. Start Application
+            viewManagerModel.setActiveView(loginView.viewName);
+            viewManagerModel.firePropertyChanged();
+
+            application.pack();
+            application.setLocationRelativeTo(null);
+            application.setVisible(true);
+        });
     }
 }

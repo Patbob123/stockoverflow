@@ -8,37 +8,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ShowGraphInteractor implements ShowGraphInputBoundary {
-    private final APIDataAccessInterface apiDataAccessObject;
-    private final ShowGraphOutputBoundary showGraphPresenter;
+    final APIDataAccessInterface apiDataAccessObject;
+    final ShowGraphOutputBoundary showGraphPresenter;
 
-    public ShowGraphInteractor(APIDataAccessInterface apiDataAccessObject, ShowGraphOutputBoundary showGraphPresenter) {
+    public ShowGraphInteractor(APIDataAccessInterface apiDataAccessObject,
+                               ShowGraphOutputBoundary showGraphPresenter) {
         this.apiDataAccessObject = apiDataAccessObject;
         this.showGraphPresenter = showGraphPresenter;
     }
 
     @Override
-    public void execute(ShowGraphInputData showGraphInputData) {
-        Map<String, Map<LocalDate, Double>> allStocksData = new HashMap<>();
-        StringBuilder errorMessages = new StringBuilder();
+    public void execute(ShowGraphInputData inputData) {
+        if (inputData.getTickers() == null || inputData.getTickers().isEmpty()) {
+            showGraphPresenter.prepareFailView("No tickers provided.");
+            return;
+        }
 
-        for (String ticker : showGraphInputData.getTickers()) {
-            // Fetch stock data from API
+        Map<String, Map<LocalDate, Double>> data = new HashMap<>();
+
+        for (String ticker : inputData.getTickers()) {
             Stock stock = apiDataAccessObject.getStock(ticker);
-
-            if (stock == null || stock.getHistoricalPrices().isEmpty()) {
-                errorMessages.append("No data for: ").append(ticker).append("\n");
-            } else {
-                allStocksData.put(ticker, stock.getHistoricalPrices());
+            if (stock != null && stock.getHistoricalPrices() != null) {
+                data.put(stock.getTicker(), stock.getHistoricalPrices());
             }
         }
 
-        if (allStocksData.isEmpty()) {
-            // If no valid data was found for any stock
-            showGraphPresenter.prepareFailView("Could not fetch data for selected stocks: " + errorMessages);
+        if (data.isEmpty()) {
+            showGraphPresenter.prepareFailView("No valid data found for the provided tickers.");
         } else {
-            // Success: pass the map of data to the presenter
-            ShowGraphOutputData outputData = new ShowGraphOutputData(allStocksData, false, null);
-            showGraphPresenter.prepareSuccessView(outputData);
+            ShowGraphOutputData output = new ShowGraphOutputData(
+                    data,
+                    null,
+                    inputData.getPreviousViewName()
+            );
+            showGraphPresenter.prepareSuccessView(output);
         }
     }
 }

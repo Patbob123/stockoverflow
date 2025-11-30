@@ -7,12 +7,18 @@ import interface_adapter.add_stock.AddStockViewModel;
 import interface_adapter.portfolio_analysis.PortfolioAnalysisController;
 import interface_adapter.remove_stock.RemoveStockController;
 import interface_adapter.show_graph.ShowGraphController;
+import interface_adapter.monte_carlo.MonteCarloController;
+import interface_adapter.monte_carlo.MonteCarloViewModel;
+
 import use_case.APIDataAccessInterface;
 import use_case.UserDataAccessInterface;
 import use_case.add_stock.AddStockInputBoundary;
 import use_case.add_stock.AddStockInteractor;
 import use_case.add_stock.AddStockOutputBoundary;
 import view.AddStockView;
+
+import javax.swing.*;
+import java.io.IOException;
 
 public class AddStockUseCaseFactory {
     private AddStockUseCaseFactory() {}
@@ -22,13 +28,25 @@ public class AddStockUseCaseFactory {
             AddStockViewModel addStockViewModel,
             ShowGraphController showGraphController,
             PortfolioAnalysisController analysisController,
+            MonteCarloController monteCarloController,
+            MonteCarloViewModel monteCarloViewModel,
             UserDataAccessInterface userDataAccess,
             APIDataAccessInterface apiDataAccess) {
 
         AddStockController addController = createAddUseCase(addStockViewModel, userDataAccess, apiDataAccess);
         RemoveStockController removeController = RemoveStockUseCaseFactory.createRemoveStockUseCase(addStockViewModel, userDataAccess);
 
-        return new AddStockView(addStockViewModel, addController, removeController, showGraphController, analysisController, viewManagerModel, userDataAccess, apiDataAccess);
+        return new AddStockView(
+                addStockViewModel,
+                addController,
+                removeController,
+                showGraphController,
+                analysisController,
+                monteCarloController,
+                monteCarloViewModel,
+                viewManagerModel,
+                userDataAccess,
+                apiDataAccess);
     }
 
     private static AddStockController createAddUseCase(

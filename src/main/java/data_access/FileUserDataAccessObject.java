@@ -10,12 +10,16 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Data Access Object for persisting User data to a CSV file.
+ */
 public class FileUserDataAccessObject implements UserDataAccessInterface {
 
     private final File csvFile;
     private final Map<String, Integer> headers = new LinkedHashMap<>();
     private final Map<String, User> accounts = new HashMap<>();
 
+    // Deprecated if not used directly, but kept for factory injection if needed later
     private UserFactory userFactory;
 
     public FileUserDataAccessObject(String csvPath, UserFactory userFactory) throws IOException {
@@ -51,6 +55,7 @@ public class FileUserDataAccessObject implements UserDataAccessInterface {
                     }
                 }
 
+                // Updated: user.getUserID() (Capital ID matches your User entity)
                 String line = String.format("%s,%s,%s,%s,%s",
                         user.getUserID(),
                         user.getUsername(),
@@ -61,13 +66,13 @@ public class FileUserDataAccessObject implements UserDataAccessInterface {
                 writer.newLine();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to save user data", e);
         }
     }
 
     private void load() throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
-            String header = reader.readLine();
+            String header = reader.readLine(); // Skip header
 
             String row;
             while ((row = reader.readLine()) != null) {
@@ -80,7 +85,7 @@ public class FileUserDataAccessObject implements UserDataAccessInterface {
                 String email = String.valueOf(col[headers.get("email")]);
 
                 String portfolioNames = "";
-                if (col.length > 4) {
+                if (col.length > 4 && headers.containsKey("portfolios")) {
                     portfolioNames = String.valueOf(col[headers.get("portfolios")]);
                 }
 
@@ -90,6 +95,9 @@ public class FileUserDataAccessObject implements UserDataAccessInterface {
                     String[] names = portfolioNames.split(";");
                     for (String name : names) {
                         if (!name.trim().isEmpty()) {
+                            // Note: This only creates empty portfolios with names.
+                            // To fully load stocks inside portfolios, you might need a separate PortfolioDAO
+                            // or expand the CSV structure, but this fits the current scope.
                             user.getPortfolioList().addPortfolio(new Portfolio(name));
                         }
                     }

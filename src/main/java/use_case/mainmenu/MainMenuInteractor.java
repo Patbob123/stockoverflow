@@ -1,39 +1,36 @@
 package use_case.mainmenu;
 
-import entities.User;
+/**
+ * Interactor for the Main Menu.
+ * Handles the business logic for navigating between different sections of the app.
+ */
+public class MainMenuInteractor implements MainMenuInputBoundary {
 
-public class MainMenuInteractor implements MainMenuInputBoundary{
-    //private final NoteDataAccessInterface noteDataAccessInterface;
     private final MainMenuOutputBoundary mainMenuOutputBoundary;
-
-    private final User user = new User("123", "guy", password);
 
     public MainMenuInteractor(MainMenuOutputBoundary mainMenuOutputBoundary) {
         this.mainMenuOutputBoundary = mainMenuOutputBoundary;
     }
 
     @Override
-    public void executeAnaylzePortfolio() {
-        mainMenuOutputBoundary.prepareSuccessView("we went to different view");
+    public void executeLogout() {
+        // Here you might want to clear any session data or current user state.
+        mainMenuOutputBoundary.prepareLoginView();
     }
 
     @Override
-    public void executeAnaylzeStock() {
-        mainMenuOutputBoundary.prepareSuccessView("we went to different view");
-    }
-
-
-    @Override
-    public void executeLoadStock() {
-        mainMenuOutputBoundary.prepareSuccessView("we went to different view");
+    public void switchToPortfolioView() {
+        mainMenuOutputBoundary.preparePortfolioView();
     }
 
     @Override
-    public void executeExit() {
-        mainMenuOutputBoundary.prepareSuccessView("we went to different view");
-        System.exit(0);
+    public void switchToSearchView() {
+        mainMenuOutputBoundary.prepareSearchView();
     }
 
-
-
+    @Override
+    public void switchToAddStockView(String portfolioName, String username) {
+        // Logic: Prepare the Add Stock View with the context of the selected portfolio
+        mainMenuOutputBoundary.prepareAddStockView(portfolioName, username);
+    }
 }

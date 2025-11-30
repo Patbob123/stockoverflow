@@ -10,26 +10,41 @@ import use_case.show_graph.ShowGraphInteractor;
 import use_case.show_graph.ShowGraphOutputBoundary;
 import view.ShowGraphView;
 
+import javax.swing.*;
+
 public class ShowGraphUseCaseFactory {
+
     private ShowGraphUseCaseFactory() {}
 
-    public static ShowGraphView create(
-            ViewManagerModel viewManagerModel,
-            ShowGraphViewModel showGraphViewModel,
-            APIDataAccessInterface apiDataAccessObject) {
-
-
-        return new ShowGraphView(showGraphViewModel, viewManagerModel);
-    }
-
+    // Factory method to create the Controller specifically
     public static ShowGraphController createShowGraphUseCase(
             ViewManagerModel viewManagerModel,
             ShowGraphViewModel showGraphViewModel,
             APIDataAccessInterface apiDataAccessObject) {
 
-        ShowGraphOutputBoundary outputBoundary = new ShowGraphPresenter(showGraphViewModel, viewManagerModel);
-        ShowGraphInputBoundary interactor = new ShowGraphInteractor(apiDataAccessObject, outputBoundary);
+        try {
+            ShowGraphOutputBoundary showGraphOutputBoundary = new ShowGraphPresenter(viewManagerModel, showGraphViewModel);
 
-        return new ShowGraphController(interactor, showGraphViewModel);
+            ShowGraphInputBoundary showGraphInteractor = new ShowGraphInteractor(
+                    apiDataAccessObject,
+                    showGraphOutputBoundary
+            );
+
+            return new ShowGraphController(showGraphInteractor);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error creating Graph Use Case.");
+            return null;
+        }
+    }
+
+    // Optional: Factory method to create the View if needed directly
+    public static ShowGraphView create(
+            ViewManagerModel viewManagerModel,
+            ShowGraphViewModel showGraphViewModel,
+            APIDataAccessInterface apiDataAccessObject) {
+
+        ShowGraphController controller = createShowGraphUseCase(viewManagerModel, showGraphViewModel, apiDataAccessObject);
+
+        return new ShowGraphView(showGraphViewModel, controller, viewManagerModel);
     }
 }

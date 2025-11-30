@@ -11,11 +11,9 @@ public class MainMenuState {
 
     public MainMenuState() {}
 
-    // Getters
     public String getUsername() { return username; }
     public String getErrorMessage() { return errorMessage; }
 
-    // Setters
     public void setUsername(String username) { this.username = username; }
     public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
 }

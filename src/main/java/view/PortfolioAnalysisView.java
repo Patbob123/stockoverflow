@@ -1,5 +1,6 @@
 package view;
 
+import interface_adapter.portfolio_analysis.PortfolioAnalysisController;
 import interface_adapter.portfolio_analysis.PortfolioAnalysisState;
 import interface_adapter.portfolio_analysis.PortfolioAnalysisViewModel;
 import interface_adapter.ViewManagerModel;
@@ -13,13 +14,17 @@ public class PortfolioAnalysisView extends JPanel implements PropertyChangeListe
     public final String viewName = "portfolio analysis";
 
     private final PortfolioAnalysisViewModel viewModel;
+    private final PortfolioAnalysisController controller;
     private final ViewManagerModel viewManagerModel;
 
-    private final JLabel resultLabel;
+    private final JTextArea resultArea;
     private final JButton backButton;
 
-    public PortfolioAnalysisView(PortfolioAnalysisViewModel viewModel, ViewManagerModel viewManagerModel) {
+    public PortfolioAnalysisView(PortfolioAnalysisViewModel viewModel,
+                                 PortfolioAnalysisController controller,
+                                 ViewManagerModel viewManagerModel) {
         this.viewModel = viewModel;
+        this.controller = controller;
         this.viewManagerModel = viewManagerModel;
         this.viewModel.addPropertyChangeListener(this);
 
@@ -30,13 +35,14 @@ public class PortfolioAnalysisView extends JPanel implements PropertyChangeListe
         title.setFont(new Font("Arial", Font.BOLD, 18));
         this.add(title, BorderLayout.NORTH);
 
-        resultLabel = new JLabel();
-        resultLabel.setVerticalAlignment(SwingConstants.TOP);
-        resultLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        resultArea = new JTextArea();
+        resultArea.setEditable(false);
+        resultArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        resultArea.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        this.add(new JScrollPane(resultLabel), BorderLayout.CENTER);
+        this.add(new JScrollPane(resultArea), BorderLayout.CENTER);
 
-        backButton = new JButton("Back to Portfolio");
+        backButton = new JButton("Back to Stock List");
         backButton.addActionListener(e -> {
             viewManagerModel.setActiveView("add stock");
             viewManagerModel.firePropertyChanged();
@@ -52,9 +58,9 @@ public class PortfolioAnalysisView extends JPanel implements PropertyChangeListe
         PortfolioAnalysisState state = (PortfolioAnalysisState) evt.getNewValue();
         if (state.getError() != null) {
             JOptionPane.showMessageDialog(this, state.getError());
-            state.setError(null); // Clear error
+            state.setError(null);
         } else if (state.getAnalysisResult() != null) {
-            resultLabel.setText(state.getAnalysisResult());
+            resultArea.setText(state.getAnalysisResult());
         }
     }
 }

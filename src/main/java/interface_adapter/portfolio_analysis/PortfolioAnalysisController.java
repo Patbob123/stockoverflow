@@ -11,6 +11,7 @@ public class PortfolioAnalysisController {
     }
 
     public void execute(String username, String portfolioName) {
-        interactor.execute(new PortfolioAnalysisInputData(username, portfolioName));
+        PortfolioAnalysisInputData inputData = new PortfolioAnalysisInputData(username, portfolioName);
+        interactor.execute(inputData);
     }
 }
