@@ -5,11 +5,19 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
+import data_access.AlphaVantageStockPriceDataAccess;
+import data_access.CombinedStockPriceDataAccess;
+import data_access.FredRiskFreeRateDataAccess;
+import data_access.StooqStockDataAccess;
 import interface_adapter.portfolio.PortfolioMenuController;
 import interface_adapter.portfolio.PortfolioMenuPresenter;
 import interface_adapter.portfolio.addStock.AddStockMenuController;
 import interface_adapter.portfolio.addStock.AddStockMenuPresenter;
 import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
+import interface_adapter.singlestock.SingleStockController;
+import interface_adapter.singlestock.SingleStockPresenter;
+import interface_adapter.singlestock.SingleStockViewInterface;
+import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.import_export.ImportExportDataAccessInterface;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
@@ -33,6 +41,10 @@ import use_case.import_export.ImportExportInteractor;
 import use_case.mainmenu.MainMenuInteractor;
 import use_case.portfolio.PortfolioMenuInteractor;
 import use_case.portfolio.addStock.AddStockMenuInteractor;
+import use_case.singlestock.AnalyzeSingleStockInteractor;
+import use_case.singlestock.CompareTwoStocksInteractor;
+import use_case.singlestock.RiskFreeRateDataAccessInterface;
+import use_case.singlestock.StockPriceDataAccessInterface;
 import view.*;
 import app.wrapper.UseCaseWrapper;
 import app.wrapper.ViewViewModelBuilderWrapper;
@@ -46,12 +58,15 @@ public class MainMenuBuilder {
     private final ArrayList<ViewViewModelBuilderWrapper<?, ?>> viewBuildInstruction = new ArrayList<>();
     private final ArrayList<UseCaseWrapper<?, ?, ?, ?, ?>> useCaseBuildInstruction = new ArrayList<>();
     private Boolean addChangeView = false;
+    private Boolean addSingleStock = false;
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
     private ImportExportDataAccessInterface importExportDAO;
+    private StockPriceDataAccessInterface stockPriceDAO;
+    private RiskFreeRateDataAccessInterface riskFreeRateDAO;
 
     private final ViewViewModelBuilderWrapper<MainMenuViewModel, MainMenuView> mainMenu =
             new ViewViewModelBuilderWrapper<>(new MainMenuViewModel(), MainMenuView::new);
@@ -67,6 +82,9 @@ public class MainMenuBuilder {
 
     private final ViewViewModelBuilderWrapper<AddStockMenuViewModel, AddStockMenuView> addStockMenu =
             new ViewViewModelBuilderWrapper<>(new AddStockMenuViewModel(), AddStockMenuView::new);
+
+    private final ViewViewModelBuilderWrapper<SingleStockViewModel, SingleStockView> singleStockMenu =
+            new ViewViewModelBuilderWrapper<>(new SingleStockViewModel(), SingleStockView::new);
 
     private final UseCaseWrapper<MainMenuInteractor,
             MainMenuPresenter,
@@ -150,9 +168,35 @@ public class MainMenuBuilder {
         return this;
     }
 
+    public MainMenuBuilder addSingleStockView() {
+        viewBuildInstruction.add(singleStockMenu);
+        return this;
+    }
+
+    public MainMenuBuilder addSingleStockUseCase() {
+        this.addSingleStock = true;
+        return this;
+    }
+
     public MainMenuBuilder addChangeViewUseCase() {
         this.addChangeView = true;
         return this;
+    }
+
+    private void addSingleStockUseCaseDirectly() {
+        final SingleStockView view = (SingleStockView) getView(SingleStockView.VIEW_NAME);
+        final SingleStockPresenter presenter = new SingleStockPresenter(view);
+
+        final AnalyzeSingleStockInteractor analyzeInteractor =
+                new AnalyzeSingleStockInteractor(stockPriceDAO, riskFreeRateDAO, presenter);
+
+        final CompareTwoStocksInteractor compareInteractor =
+                new CompareTwoStocksInteractor(stockPriceDAO, riskFreeRateDAO, presenter);
+
+        final SingleStockController controller =
+                new SingleStockController(analyzeInteractor, compareInteractor);
+
+        view.setController(controller);
     }
 
     private void addChangeViewUseCaseDirectly() {
@@ -194,19 +238,40 @@ public class MainMenuBuilder {
         return this;
     }
 
+    public MainMenuBuilder addSingleStockDAO() {
+        String alphaKey = "YOUR_ALPHA_KEY_HERE"; // or System.getenv("ALPHAVANTAGE_API_KEY");
+
+        final StockPriceDataAccessInterface stooqGateway =
+                new StooqStockDataAccess();
+        final StockPriceDataAccessInterface alphaGateway =
+                new AlphaVantageStockPriceDataAccess(alphaKey);
+
+        String fredKey = System.getenv("FRED_API_KEY");
+
+
+        stockPriceDAO = new CombinedStockPriceDataAccess(stooqGateway, alphaGateway);
+        riskFreeRateDAO = new FredRiskFreeRateDataAccess(fredKey);
+
+        return this;
+    }
+
     public JFrame autoBuild() {
-        return this.addMainView()
-                    .addImportExportView()
-                    .addPortfolioMenuView()
-                    .addAddPortfolioView()
-                    .addStockMenuView()
-                    .addChangeViewUseCase()
-                    .addMainViewUseCase()
-                    .addPortfolioUseCase()
-                    .addImportExportUseCase()
-                    .addPortfolioMenuUseCase()
-                    .addStockMenuUseCase()
-                    .build();
+        return this
+                .addMainView()
+                .addImportExportView()
+                .addPortfolioMenuView()
+                .addAddPortfolioView()
+                .addStockMenuView()
+                .addSingleStockView()
+                .addChangeViewUseCase()
+                .addMainViewUseCase()
+                .addPortfolioUseCase()
+                .addImportExportUseCase()
+                .addPortfolioMenuUseCase()
+                .addStockMenuUseCase()
+                .addSingleStockUseCase()
+                .addSingleStockDAO()
+                .build();
     }
 
     public JFrame build() {
@@ -217,6 +282,9 @@ public class MainMenuBuilder {
         viewBuildInstruction.clear();
         if (addChangeView) {
             this.addChangeViewUseCaseDirectly();
+        }
+        if (addSingleStock) {
+            this.addSingleStockUseCaseDirectly();
         }
         for (UseCaseWrapper<?, ?, ?, ?, ?> usecaseBuilder : this.useCaseBuildInstruction) {
             usecaseBuilder.build(this);

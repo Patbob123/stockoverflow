@@ -46,7 +46,7 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         stockButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(stockButton)) {
-                        //MainMenuController.execute(noteInputField.getText());
+                        changeViewController.changeView("SingleStockMenu");
 
                     }
                 }

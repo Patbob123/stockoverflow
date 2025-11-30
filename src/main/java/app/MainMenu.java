@@ -34,17 +34,20 @@ public class MainMenu {
 //        Stock s = new Stock("ASDB", "asdasdasd");
 //        System.out.println(s.getTicker());
         final JFrame application = builder
+                .addSingleStockDAO()
                 .addMainView()
                 .addImportExportView()
                 .addPortfolioMenuView()
                 .addAddPortfolioView()
                 .addStockMenuView()
+                .addSingleStockView()
                 .addChangeViewUseCase()
                 .addMainViewUseCase()
                 .addPortfolioUseCase()
                 .addImportExportUseCase()
                 .addPortfolioMenuUseCase()
                 .addStockMenuUseCase()
+                .addSingleStockUseCase()
                 .build();
 
         application.setExtendedState(JFrame.MAXIMIZED_BOTH);
