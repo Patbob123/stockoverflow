@@ -1,13 +1,30 @@
 package use_case.mainmenu;
 
+/**
+ * Input Boundary for the Main Menu Use Case.
+ * Defines the actions a user can take from the main menu.
+ */
 public interface MainMenuInputBoundary {
 
-    void executeAnaylzePortfolio();
+    /**
+     * Logs the user out and returns to the login screen.
+     */
+    void executeLogout();
 
-    void executeAnaylzeStock();
+    /**
+     * Navigates the user to the Portfolio view.
+     */
+    void switchToPortfolioView();
 
-    void executeLoadStock();
+    /**
+     * Navigates the user to the Search/Analysis view.
+     */
+    void switchToSearchView();
 
-    void executeExit();
-
+    /**
+     * Navigates the user to the Add Stock View for a specific portfolio.
+     * @param portfolioName The name of the selected portfolio.
+     * @param username The current user's username.
+     */
+    void switchToAddStockView(String portfolioName, String username);
 }

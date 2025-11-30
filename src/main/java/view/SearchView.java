@@ -1,5 +1,6 @@
 package view;
 
+import interface_adapter.search.SearchController;
 import interface_adapter.search.SearchState;
 import interface_adapter.search.SearchViewModel;
 import interface_adapter.show_graph.ShowGraphController;
@@ -9,93 +10,121 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 
 public class SearchView extends JPanel implements ActionListener, PropertyChangeListener {
     public final String viewName = "search stock";
 
     private final SearchViewModel searchViewModel;
-    private final ShowGraphController showGraphController;
+    private final SearchController searchController;     // 负责搜索
+    private final ShowGraphController showGraphController; // 负责画图
     private final ViewManagerModel viewManagerModel;
 
-    private final JTextField tickerInputField = new JTextField(15);
-    private final JButton searchButton;
-    private final JButton backButton;
 
-    public SearchView(SearchViewModel searchViewModel, ShowGraphController controller, ViewManagerModel viewManagerModel) {
+    private final JTextField searchInputField = new JTextField(15);
+    private final JButton searchButton = new JButton("Search Symbols");
+
+
+    private final DefaultListModel<String> listModel = new DefaultListModel<>();
+    private final JList<String> resultList = new JList<>(listModel);
+
+    private final JButton plotButton = new JButton("Plot Selected Graph");
+    private final JButton backButton = new JButton("Back");
+
+    public SearchView(SearchViewModel searchViewModel,
+                      SearchController searchController,
+                      ShowGraphController showGraphController,
+                      ViewManagerModel viewManagerModel) {
+
         this.searchViewModel = searchViewModel;
-        this.showGraphController = controller;
+        this.searchController = searchController;
+        this.showGraphController = showGraphController;
         this.viewManagerModel = viewManagerModel;
 
         this.searchViewModel.addPropertyChangeListener(this);
+        this.setLayout(new BorderLayout(10, 10));
 
+        // --- Top: Title ---
         JLabel title = new JLabel(SearchViewModel.TITLE_LABEL);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        this.add(title, BorderLayout.NORTH);
 
-        LabelTextPanel tickerInfo = new LabelTextPanel(
-                new JLabel(SearchViewModel.SEARCH_LABEL), tickerInputField);
+        // --- Center: Search Box & List ---
+        JPanel centerPanel = new JPanel(new BorderLayout());
 
-        JPanel buttons = new JPanel();
-        searchButton = new JButton(SearchViewModel.SEARCH_BUTTON_LABEL);
-        backButton = new JButton(SearchViewModel.BACK_BUTTON_LABEL);
-        buttons.add(searchButton);
-        buttons.add(backButton);
+        JPanel inputPanel = new JPanel();
+        inputPanel.add(new JLabel("Keyword:"));
+        inputPanel.add(searchInputField);
+        inputPanel.add(searchButton);
 
+        centerPanel.add(inputPanel, BorderLayout.NORTH);
+        centerPanel.add(new JScrollPane(resultList), BorderLayout.CENTER); // 滚动列表
 
-        searchButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(searchButton)) {
-                            SearchState currentState = searchViewModel.getState();
+        this.add(centerPanel, BorderLayout.CENTER);
 
-                            showGraphController.execute(Collections.singletonList(currentState.getTicker()), "search stock");
-                        }
-                    }
+        // --- Bottom: Buttons ---
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(plotButton);
+        bottomPanel.add(backButton);
+        this.add(bottomPanel, BorderLayout.SOUTH);
+
+        // --- Action Listeners ---
+
+        // 1. Search Logic
+        searchButton.addActionListener(e -> {
+            String query = searchInputField.getText();
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    searchController.execute(query);
+                    return null;
                 }
-        );
+            }.execute();
+        });
 
-        backButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(backButton)) {
-                            viewManagerModel.setActiveView("main menu");
-                            viewManagerModel.firePropertyChanged();
-                        }
-                    }
+        // 2. Plot Logic
+        plotButton.addActionListener(e -> {
+            String selected = resultList.getSelectedValue();
+            if (selected != null) {
+                // 格式通常是 "AAPL - Apple Inc."，我们只需要 "AAPL"
+                String ticker = selected.split(" - ")[0];
+                showGraphController.execute(ticker);
+            } else {
+                String directText = searchInputField.getText();
+                if (!directText.isEmpty()) {
+                    showGraphController.execute(directText);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Please select a stock to plot.");
                 }
-        );
+            }
+        });
 
-        tickerInputField.addKeyListener(
-                new KeyListener() {
-                    @Override
-                    public void keyTyped(KeyEvent e) {
-                        SearchState currentState = searchViewModel.getState();
-                        String text = tickerInputField.getText() + e.getKeyChar();
-                        currentState.setTicker(text);
-                        searchViewModel.setState(currentState);
-                    }
+        // 3. Back Logic
+        backButton.addActionListener(e -> {
+            viewManagerModel.setActiveView("main menu");
+            viewManagerModel.firePropertyChanged();
+        });
+    }
 
-                    @Override
-                    public void keyPressed(KeyEvent e) {}
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        SearchState state = (SearchState) evt.getNewValue();
 
-                    @Override
-                    public void keyReleased(KeyEvent e) {}
-                }
-        );
+        if (state.getError() != null) {
+            JOptionPane.showMessageDialog(this, state.getError());
+            state.setError(null);
+        }
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title);
-        this.add(tickerInfo);
-        this.add(buttons);
+        if (state.getSearchResults() != null) {
+            listModel.clear();
+            for (String result : state.getSearchResults()) {
+                listModel.addElement(result);
+            }
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {}
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {}
 }

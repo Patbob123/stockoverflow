@@ -2,25 +2,30 @@ package interface_adapter.show_graph;
 
 import use_case.show_graph.ShowGraphInputBoundary;
 import use_case.show_graph.ShowGraphInputData;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ShowGraphController {
-    final ShowGraphInputBoundary showGraphInteractor;
-    final ShowGraphViewModel showGraphViewModel;
+    private final ShowGraphInputBoundary showGraphInteractor;
 
-    public ShowGraphController(ShowGraphInputBoundary showGraphInteractor, ShowGraphViewModel showGraphViewModel) {
+    public ShowGraphController(ShowGraphInputBoundary showGraphInteractor) {
         this.showGraphInteractor = showGraphInteractor;
-        this.showGraphViewModel = showGraphViewModel;
     }
 
-    public void execute(List<String> tickers, String fromViewName) {
-        // Update the state with the view name we are coming from
-        ShowGraphState state = showGraphViewModel.getState();
-        state.setPreviousViewName(fromViewName);
-        showGraphViewModel.setState(state);
+    public void execute(String tickers, String previousViewName) {
+        List<String> tickerList = Arrays.stream(tickers.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
 
-        // Execute use case
-        ShowGraphInputData inputData = new ShowGraphInputData(tickers);
+        ShowGraphInputData inputData = new ShowGraphInputData(tickerList, null, null, previousViewName);
         showGraphInteractor.execute(inputData);
+    }
+
+
+    public void execute(String tickers) {
+        execute(tickers, "main menu");
     }
 }

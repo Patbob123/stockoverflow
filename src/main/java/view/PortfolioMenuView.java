@@ -25,7 +25,7 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
     private final CreatePortfolioController controller;
     private final UserDataAccessInterface userDataAccess;
     private final ViewManagerModel viewManagerModel;
-    private final MainMenuController mainMenuController; // 新增：用于跳转
+    private final MainMenuController mainMenuController;
 
     private final JTextField nameInputField = new JTextField(15);
     private final JButton createButton;
@@ -83,31 +83,42 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
                 }
         );
 
+        // Back Button Logic
         backButton.addActionListener(e -> {
             viewManagerModel.setActiveView("main menu");
             viewManagerModel.firePropertyChanged();
         });
 
+        // Key Listener to update State as user types
         nameInputField.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
+                // Not used, use keyReleased for accurate text capture
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {}
+
+            @Override
+            public void keyReleased(KeyEvent e) {
                 CreatePortfolioState currentState = viewModel.getState();
-                currentState.setPortfolioName(nameInputField.getText() + e.getKeyChar());
+                currentState.setPortfolioName(nameInputField.getText());
                 viewModel.setState(currentState);
             }
-            @Override public void keyPressed(KeyEvent e) {}
-            @Override public void keyReleased(KeyEvent e) {}
         });
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(title);
         this.add(inputPanel);
-        this.add(new JLabel("Your Portfolios (Click to Add Stocks):"));
+        this.add(new JLabel("Your Portfolios (Click to Manage):"));
         this.add(scrollPane);
     }
 
     private void refreshPortfolioList() {
         portfolioListPanel.removeAll();
+        // 确保 state 不为空
+        if (viewModel.getState() == null) return;
+
         String currentUsername = viewModel.getState().getUsername();
 
         if (currentUsername != null && !currentUsername.isEmpty()) {
@@ -115,8 +126,13 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
             if (user != null && user.getPortfolioList() != null) {
                 for (Portfolio p : user.getPortfolioList()) {
                     JButton pButton = new JButton(p.getName());
+                    // Align width to fill panel
+                    pButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, pButton.getPreferredSize().height));
+                    pButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
                     pButton.addActionListener(e -> {
+                        // Use MainMenuController to switch to AddStockView context
+                        // Ensure your MainMenuController has a goToAddStock method!
                         mainMenuController.goToAddStock(p.getName(), currentUsername);
                     });
 
@@ -129,112 +145,24 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {}
+    public void actionPerformed(ActionEvent e) {
+        // Required by ActionListener interface, but we use lambdas/anonymous classes above
+    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         CreatePortfolioState state = (CreatePortfolioState) evt.getNewValue();
         if (state.getError() != null) {
             JOptionPane.showMessageDialog(this, state.getError());
-        } else {
-            nameInputField.setText("");
-            refreshPortfolioList();
+        }
+
+        // Always refresh list if state changes (e.g. username set or portfolio added)
+        refreshPortfolioList();
+
+        // Clear input only if successful creation (error is null) and it was a specific property change
+        if ("state".equals(evt.getPropertyName()) && state.getError() == null) {
+            // Optional: Only clear if you want to reset field after success
+            // nameInputField.setText("");
         }
     }
 }
-//
-//public class PortfolioMenuView extends JFrame implements ActionListener {
-//    private final JButton addStockButton = new JButton("ADD");
-//    private final JButton removeStockButton = new JButton("REMOVE");
-//    private final JButton simulateButton = new JButton("SIMULATE");
-//    private final JButton compareButton = new JButton("COMPARE");
-//    private final JButton saveButton = new JButton("SAVE");
-//    private final JButton refreshButton = new JButton("Refresh");
-//    private final JButton backButton = new JButton("Return");
-//    private final JLabel messageLabel = new JLabel();
-//    private final JTextArea portfolioDataArea = new JTextArea();
-//
-//    private String currentPortfolioName;
-//    private RefreshDataController refreshDataController;
-//
-//    public PortfolioMenuView() {
-//        super("Portfolio menu");
-//        setupUI();
-//        setupListeners();
-//
-//        setSize(800, 600);
-//        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        setLocationRelativeTo(null);
-//    }
-//
-//    private void setupUI() {
-//        JPanel mainPanel = new JPanel(new BorderLayout());
-//
-//        //  Panel
-//        JPanel buttonPanel = new JPanel(new GridLayout(1, 7, 5, 5));
-//        buttonPanel.add(addStockButton);
-//        buttonPanel.add(removeStockButton);
-//        buttonPanel.add(simulateButton);
-//        buttonPanel.add(compareButton);
-//        buttonPanel.add(saveButton);
-//        buttonPanel.add(refreshButton);
-//        buttonPanel.add(backButton);
-//
-//        // Data area
-//        portfolioDataArea.setEditable(false);
-//        JScrollPane scrollPane = new JScrollPane(portfolioDataArea);
-//
-//        // message
-//        JPanel messagePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-//        messagePanel.add(messageLabel);
-//
-//        mainPanel.add(buttonPanel, BorderLayout.NORTH);
-//        mainPanel.add(scrollPane, BorderLayout.CENTER);
-//        mainPanel.add(messagePanel, BorderLayout.SOUTH);
-//
-//        add(mainPanel);
-//    }
-//
-//    private void setupListeners() {
-//        addStockButton.addActionListener(this);
-//        removeStockButton.addActionListener(this);
-//        simulateButton.addActionListener(this);
-//        compareButton.addActionListener(this);
-//        saveButton.addActionListener(this);
-//        refreshButton.addActionListener(this);
-//        backButton.addActionListener(this);
-//    }
-//
-//    public void setCurrentPortfolio(Portfolio portfolio) {
-//        this.currentPortfolioName = portfolio.getName();
-//        updatePortfolioData();
-//    }
-//
-//    public void setRefreshDataController(RefreshDataController controller) {
-//        this.refreshDataController = controller;
-//    }
-//
-//    public void showRefreshMessage(String message) {
-//        messageLabel.setText(message);
-//    }
-//
-//    public void updatePortfolioData() {
-//
-//
-//        portfolioDataArea.setText(": " + currentPortfolioName + "\n");
-//        portfolioDataArea.append("");
-//        portfolioDataArea.append(": " + new java.util.Date() + "\n");
-//    }
-//
-//    @Override
-//    public void actionPerformed(ActionEvent e) {
-//        if (e.getSource() == refreshButton) {
-//            if (currentPortfolioName != null && refreshDataController != null) {
-//                refreshDataController.execute(currentPortfolioName);
-//            } else {
-//                showRefreshMessage("");
-//            }
-//        }
-//        //Event handling for other buttons
-//    }
-//}

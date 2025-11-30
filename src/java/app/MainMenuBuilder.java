@@ -1,7 +1,5 @@
 package app;
 
-import entities.UserRepository;
-import entities.UserSession;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.change_view.ChangeViewPresenter;

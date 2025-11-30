@@ -1,8 +1,9 @@
 package view;
 
+import interface_adapter.ViewManagerModel;
+import interface_adapter.show_graph.ShowGraphController;
 import interface_adapter.show_graph.ShowGraphState;
 import interface_adapter.show_graph.ShowGraphViewModel;
-import interface_adapter.ViewManagerModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,52 +12,87 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class ShowGraphView extends JPanel implements PropertyChangeListener {
-    public final String viewName = "show graph";
-    private final ShowGraphViewModel viewModel;
-    private final ViewManagerModel viewManagerModel;
-    private final GraphPanel graphPanel;
+public class ShowGraphView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    public ShowGraphView(ShowGraphViewModel viewModel, ViewManagerModel viewManagerModel) {
+    public final String viewName = "show graph";
+
+    private final ShowGraphViewModel viewModel;
+    private final ShowGraphController controller;
+    private final ViewManagerModel viewManagerModel;
+
+    // UI Components
+    private final JTextField tickerInputField = new JTextField(20);
+    private final StockGraphPanel graphPanel;
+    private final JButton plotButton;
+    private final JButton backButton;
+
+    public ShowGraphView(ShowGraphViewModel viewModel, ShowGraphController controller, ViewManagerModel viewManagerModel) {
         this.viewModel = viewModel;
+        this.controller = controller;
         this.viewManagerModel = viewManagerModel;
         this.viewModel.addPropertyChangeListener(this);
 
         this.setLayout(new BorderLayout());
 
-        JLabel title = new JLabel(ShowGraphViewModel.TITLE_LABEL);
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        this.add(title, BorderLayout.NORTH);
+        // --- Top Panel: Controls ---
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new FlowLayout());
 
-        graphPanel = new GraphPanel();
+        JLabel tickerLabel = new JLabel("Tickers (comma separated):");
+        controlPanel.add(tickerLabel);
+        controlPanel.add(tickerInputField);
+
+        plotButton = new JButton(ShowGraphViewModel.PLOT_BUTTON_LABEL);
+        controlPanel.add(plotButton);
+
+        backButton = new JButton("Back");
+        controlPanel.add(backButton);
+
+        this.add(controlPanel, BorderLayout.NORTH);
+
+        // --- Center: Graph ---
+        graphPanel = new StockGraphPanel();
+        graphPanel.setPreferredSize(new Dimension(800, 500));
+        graphPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         this.add(graphPanel, BorderLayout.CENTER);
 
-        JPanel buttons = new JPanel();
-        JButton backButton = new JButton("Back");
-        buttons.add(backButton);
-        this.add(buttons, BorderLayout.SOUTH);
+        // --- Listeners ---
+        plotButton.addActionListener(e -> {
+            if (e.getSource().equals(plotButton)) {
+                String tickers = tickerInputField.getText();
+                if (tickers != null && !tickers.isEmpty()) {
+                    controller.execute(tickers, viewModel.getState().getPreviousViewName());
+                } else {
+                    JOptionPane.showMessageDialog(ShowGraphView.this, "Please enter a ticker symbol.");
+                }
+            }
+        });
 
-        // Dynamic Back Logic
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String target = viewModel.getState().getPreviousViewName();
-                if (target == null) target = "search stock";
-
-                viewManagerModel.setActiveView(target);
+        backButton.addActionListener(e -> {
+            if (e.getSource().equals(backButton)) {
+                String targetView = viewModel.getState().getPreviousViewName();
+                if (targetView == null || targetView.isEmpty()) {
+                    targetView = "main menu";
+                }
+                viewManagerModel.setActiveView(targetView);
                 viewManagerModel.firePropertyChanged();
             }
         });
     }
 
     @Override
+    public void actionPerformed(ActionEvent e) {}
+
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         ShowGraphState state = (ShowGraphState) evt.getNewValue();
+
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage());
-        } else {
-            graphPanel.updateData(state.getStockData());
+        }
+
+        if (state.getStockData() != null && !state.getStockData().isEmpty()) {
+            graphPanel.setDatasets(state.getStockData());
         }
     }
 }

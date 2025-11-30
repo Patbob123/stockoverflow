@@ -19,6 +19,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
 
     private final SignupViewModel signupViewModel;
     private final SignupController signupController;
+    private final ViewManagerModel viewManagerModel;
 
     private final JTextField usernameInputField = new JTextField(15);
     private final JPasswordField passwordInputField = new JPasswordField(15);
@@ -26,13 +27,13 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
 
     private final JButton signUp;
     private final JButton cancel;
-    private ViewManagerModel viewManagerModel = new ViewManagerModel();
 
     public SignupView(SignupController controller, SignupViewModel signupViewModel, ViewManagerModel viewManagerModel) {
 
         this.signupController = controller;
         this.signupViewModel = signupViewModel;
-        this.viewManagerModel = this.viewManagerModel;
+        this.viewManagerModel = viewManagerModel;
+
         signupViewModel.addPropertyChangeListener(this);
 
         JLabel title = new JLabel(SignupViewModel.TITLE_LABEL);
@@ -48,14 +49,13 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         JPanel buttons = new JPanel();
         signUp = new JButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
         buttons.add(signUp);
+
         cancel = new JButton(SignupViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancel);
 
-        JButton goToLogin = new JButton("Go to Login");
-        buttons.add(goToLogin);
+
 
         signUp.addActionListener(
-                // This creates an anonymous subclass of ActionListener and instantiates it.
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(signUp)) {
@@ -71,7 +71,15 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
                 }
         );
 
-        cancel.addActionListener(this);
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                viewManagerModel.setActiveView("log in"); // 确保这个字符串和 LoginView 的 viewName 一致
+                viewManagerModel.firePropertyChanged();
+            }
+        });
+
+
 
         usernameInputField.addKeyListener(
                 new KeyListener() {
@@ -84,12 +92,10 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
                     }
 
                     @Override
-                    public void keyPressed(KeyEvent e) {
-                    }
+                    public void keyPressed(KeyEvent e) {}
 
                     @Override
-                    public void keyReleased(KeyEvent e) {
-                    }
+                    public void keyReleased(KeyEvent e) {}
                 });
 
         passwordInputField.addKeyListener(
@@ -102,12 +108,10 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
                     }
 
                     @Override
-                    public void keyPressed(KeyEvent e) {
-                    }
+                    public void keyPressed(KeyEvent e) {}
 
                     @Override
-                    public void keyReleased(KeyEvent e) {
-                    }
+                    public void keyReleased(KeyEvent e) {}
                 });
 
         repeatPasswordInputField.addKeyListener(
@@ -120,19 +124,11 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
                     }
 
                     @Override
-                    public void keyPressed(KeyEvent e) {
-                    }
+                    public void keyPressed(KeyEvent e) {}
 
                     @Override
-                    public void keyReleased(KeyEvent e) {
-                    }
+                    public void keyReleased(KeyEvent e) {}
                 });
-
-        goToLogin.addActionListener(e -> {
-            this.viewManagerModel.setActiveView("log in");
-            this.viewManagerModel.firePropertyChanged();
-        });
-
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -143,9 +139,6 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         this.add(buttons);
     }
 
-    /**
-     * React to a button click that results in evt.
-     */
     public void actionPerformed(ActionEvent evt) {
         System.out.println("Click " + evt.getActionCommand());
     }

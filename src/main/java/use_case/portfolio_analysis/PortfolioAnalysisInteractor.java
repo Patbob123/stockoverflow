@@ -1,6 +1,7 @@
 package use_case.portfolio_analysis;
 
 import entities.Portfolio;
+import entities.StatisticsCalculator;
 import entities.Stock;
 import entities.User;
 import use_case.APIDataAccessInterface;
@@ -13,6 +14,7 @@ public class PortfolioAnalysisInteractor implements PortfolioAnalysisInputBounda
     private final UserDataAccessInterface userDataAccess;
     private final APIDataAccessInterface apiDataAccess;
     private final PortfolioAnalysisOutputBoundary outputBoundary;
+    private final StatisticsCalculator statsCalculator;
 
     public PortfolioAnalysisInteractor(UserDataAccessInterface userDataAccess,
                                        APIDataAccessInterface apiDataAccess,
@@ -20,79 +22,80 @@ public class PortfolioAnalysisInteractor implements PortfolioAnalysisInputBounda
         this.userDataAccess = userDataAccess;
         this.apiDataAccess = apiDataAccess;
         this.outputBoundary = outputBoundary;
+        this.statsCalculator = new StatisticsCalculator();
     }
 
     @Override
     public void execute(PortfolioAnalysisInputData inputData) {
+        // 1. Validate User and Portfolio
         User user = userDataAccess.get(inputData.getUsername());
         if (user == null) {
-            outputBoundary.prepareFailView("User not found.");
+            outputBoundary.prepareFailView("User not found: " + inputData.getUsername());
             return;
         }
 
         Portfolio portfolio = user.getPortfolioList().getPortfolio(inputData.getPortfolioName());
         if (portfolio == null || portfolio.getStocks().isEmpty()) {
-            outputBoundary.prepareFailView("Portfolio is empty or not found.");
+            outputBoundary.prepareFailView("Portfolio is empty or does not exist.");
             return;
         }
 
+        // 2. Fetch Historical Data
         Map<String, Stock> stocks = portfolio.getStocks();
         Map<String, Map<LocalDate, Double>> allHistories = new HashMap<>();
 
-        // 1. Fetch Data
         for (String ticker : stocks.keySet()) {
-            Stock stock = apiDataAccess.getStock(ticker); // Ensure we have historical data
+            Stock stock = apiDataAccess.getStock(ticker);
             if (stock != null && stock.getHistoricalPrices() != null && !stock.getHistoricalPrices().isEmpty()) {
                 allHistories.put(ticker, stock.getHistoricalPrices());
             }
         }
 
         if (allHistories.isEmpty()) {
-            outputBoundary.prepareFailView("Could not fetch historical data for analysis.");
+            outputBoundary.prepareFailView("Could not fetch sufficient historical data.");
             return;
         }
 
+        // 3. Analyze Data
         Map<String, Double> individualReturns = new HashMap<>();
-        List<Double> portfolioDailyReturns = new ArrayList<>();
-
+        Map<LocalDate, Double> portfolioValueCurve = new TreeMap<>(); // Dates sorted automatically
 
         double maxReturn = -Double.MAX_VALUE;
         double minReturn = Double.MAX_VALUE;
         String bestStock = "N/A";
         String worstStock = "N/A";
 
-        // Aggregate Portfolio Value per day
-        Map<LocalDate, Double> portfolioValueCurve = new TreeMap<>();
-
+        // 3a. Individual Stock Performance & Portfolio Curve Construction
         for (Map.Entry<String, Map<LocalDate, Double>> entry : allHistories.entrySet()) {
             String ticker = entry.getKey();
             Map<LocalDate, Double> history = entry.getValue();
 
-            // Individual Total Return
+            // Calculate Individual Return (Simple: End - Start / Start)
             List<LocalDate> dates = new ArrayList<>(history.keySet());
             Collections.sort(dates);
+
             if (dates.size() > 1) {
                 double startPrice = history.get(dates.get(0));
                 double endPrice = history.get(dates.get(dates.size() - 1));
                 double ret = (endPrice - startPrice) / startPrice;
+
                 individualReturns.put(ticker, ret);
 
                 if (ret > maxReturn) { maxReturn = ret; bestStock = ticker; }
                 if (ret < minReturn) { minReturn = ret; worstStock = ticker; }
             }
 
-            // Add to portfolio curve (Assuming 1 share each)
+            // Aggregate to Portfolio Value (Assuming Equal Weight / 1 share each for simplicity in MVP)
             for (LocalDate date : history.keySet()) {
                 portfolioValueCurve.put(date, portfolioValueCurve.getOrDefault(date, 0.0) + history.get(date));
             }
         }
 
-        // 3. Calculate Portfolio Metrics
+        // 4. Calculate Portfolio Metrics
         List<LocalDate> sortedDates = new ArrayList<>(portfolioValueCurve.keySet());
-        Collections.sort(sortedDates);
 
         if (sortedDates.size() < 2) {
-            outputBoundary.prepareFailView("Not enough historical data points.");
+            outputBoundary.prepareFailView("Not enough overlapping historical data points across stocks.");
             return;
         }
 
@@ -100,47 +103,46 @@ public class PortfolioAnalysisInteractor implements PortfolioAnalysisInputBounda
         double endValue = portfolioValueCurve.get(sortedDates.get(sortedDates.size() - 1));
         double totalPortfolioReturn = (endValue - startValue) / startValue;
 
-        // Calculate Volatility (Std Dev of Daily Returns)
-        List<Double> dailyReturns = new ArrayList<>();
+        // Calculate Daily Returns for Volatility/Sharpe
+        // Using StatisticsCalculator entity if possible, or helper methods
+        double[] dailyReturns = new double[sortedDates.size() - 1];
         for (int i = 1; i < sortedDates.size(); i++) {
             double prev = portfolioValueCurve.get(sortedDates.get(i-1));
             double curr = portfolioValueCurve.get(sortedDates.get(i));
             if (prev != 0) {
-                dailyReturns.add((curr - prev) / prev);
+                dailyReturns[i-1] = (curr - prev) / prev;
             }
         }
 
-        double meanDailyReturn = calculateMean(dailyReturns);
-        double variance = 0.0;
-        for (double r : dailyReturns) {
-            variance += Math.pow(r - meanDailyReturn, 2);
+        // Use Entity for Math
+        double meanDailyReturn = statsCalculator.mean(dailyReturns);
+        double stdDevDaily = statsCalculator.standardDeviation(dailyReturns);
+
+        // Annualize
+        double annualizedVolatility = stdDevDaily * Math.sqrt(252);
+
+        // Sharpe Ratio (Risk Free Rate approx 2% annual)
+        double riskFreeRateDaily = 0.02 / 252.0;
+        double sharpeRatio = 0.0;
+        if (stdDevDaily > 0) {
+            sharpeRatio = (meanDailyReturn - riskFreeRateDaily) / stdDevDaily;
+            // Annualize Sharpe
+            sharpeRatio = sharpeRatio * Math.sqrt(252);
         }
-        double stdDev = Math.sqrt(variance / dailyReturns.size());
-        double annualizedVolatility = stdDev * Math.sqrt(252); // Annualized
 
-        // Calculate Sharpe Ratio (Assuming Risk Free Rate = 2% annual)
-        double riskFreeRateDaily = 0.02 / 252;
-        double sharpeRatio = (meanDailyReturn - riskFreeRateDaily) / stdDev;
-        // Annualize Sharpe (approx)
-        double annualizedSharpe = sharpeRatio * Math.sqrt(252);
-
+        // 5. Prepare Output
         PortfolioAnalysisOutputData outputData = new PortfolioAnalysisOutputData(
                 totalPortfolioReturn,
                 annualizedVolatility,
-                annualizedSharpe,
+                sharpeRatio,
                 bestStock,
                 worstStock,
                 individualReturns,
+                sortedDates.size(), // Number of days analyzed
                 false,
                 null
         );
-        outputBoundary.prepareSuccessView(outputData);
-    }
 
-    private double calculateMean(List<Double> data) {
-        if (data == null || data.isEmpty()) return 0.0;
-        double sum = 0.0;
-        for(Double d : data) sum += d;
-        return sum / data.size();
+        outputBoundary.prepareSuccessView(outputData);
     }
 }

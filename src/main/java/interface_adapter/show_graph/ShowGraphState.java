@@ -7,22 +7,37 @@ import java.util.Map;
 public class ShowGraphState {
     private Map<String, Map<LocalDate, Double>> stockData = new HashMap<>();
     private String errorMessage = null;
-    private String previousViewName = "search stock"; // Default fallback
+    private String previousViewName = "main menu";
 
     public ShowGraphState(ShowGraphState copy) {
-        this.stockData = copy.stockData;
+        this.stockData = new HashMap<>(copy.stockData);
         this.errorMessage = copy.errorMessage;
         this.previousViewName = copy.previousViewName;
     }
 
     public ShowGraphState() {}
 
-    public Map<String, Map<LocalDate, Double>> getStockData() { return stockData; }
-    public void setStockData(Map<String, Map<LocalDate, Double>> stockData) { this.stockData = stockData; }
+    public Map<String, Map<LocalDate, Double>> getStockData() {
+        return stockData;
+    }
 
-    public String getErrorMessage() { return errorMessage; }
-    public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+    public void setStockData(Map<String, Map<LocalDate, Double>> stockData) {
+        this.stockData = stockData;
+    }
 
-    public String getPreviousViewName() { return previousViewName; }
-    public void setPreviousViewName(String previousViewName) { this.previousViewName = previousViewName; }
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public String getPreviousViewName() {
+        return previousViewName;
+    }
+
+    public void setPreviousViewName(String previousViewName) {
+        this.previousViewName = previousViewName;
+    }
 }
