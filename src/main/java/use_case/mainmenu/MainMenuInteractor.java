@@ -1,36 +1,30 @@
 package use_case.mainmenu;
 
-/**
- * Interactor for the Main Menu.
- * Handles the business logic for navigating between different sections of the app.
- */
 public class MainMenuInteractor implements MainMenuInputBoundary {
 
-    private final MainMenuOutputBoundary mainMenuOutputBoundary;
+    private final MainMenuOutputBoundary outputBoundary;
 
-    public MainMenuInteractor(MainMenuOutputBoundary mainMenuOutputBoundary) {
-        this.mainMenuOutputBoundary = mainMenuOutputBoundary;
+    public MainMenuInteractor(MainMenuOutputBoundary outputBoundary) {
+        this.outputBoundary = outputBoundary;
     }
 
     @Override
     public void executeLogout() {
-        // Here you might want to clear any session data or current user state.
-        mainMenuOutputBoundary.prepareLoginView();
+        outputBoundary.prepareLoginView();
     }
 
     @Override
     public void switchToPortfolioView() {
-        mainMenuOutputBoundary.preparePortfolioView();
+        outputBoundary.preparePortfolioView();
     }
 
     @Override
-    public void switchToSearchView() {
-        mainMenuOutputBoundary.prepareSearchView();
+    public void switchToSingleStockView() {
+        outputBoundary.prepareSingleStockView();
     }
 
     @Override
     public void switchToAddStockView(String portfolioName, String username) {
-        // Logic: Prepare the Add Stock View with the context of the selected portfolio
-        mainMenuOutputBoundary.prepareAddStockView(portfolioName, username);
+        outputBoundary.prepareAddStockView(portfolioName, username);
     }
 }

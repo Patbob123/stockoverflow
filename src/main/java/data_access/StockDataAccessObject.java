@@ -2,8 +2,19 @@ package data_access;
 
 import entities.Stock;
 import use_case.APIDataAccessInterface;
+
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,27 +25,35 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-/**
- * Data Access Object for retrieving stock data.
- * <p>
- * Strategy:
- * 1. Historical Data (getStock): Uses Stooq (CSV format) for unlimited, free historical data.
- * 2. Symbol Search (searchSymbols): Uses Alpha Vantage (JSON) because Stooq lacks a search API.
- */
+
 public class StockDataAccessObject implements APIDataAccessInterface {
 
-    // Alpha Vantage Key for SEARCH functionality only
-    private static final String ALPHA_VANTAGE_KEY = "RS6QLHWDVT98HTGB";
+    // --- API Keys ---
+    private static final String ALPHA_VANTAGE_KEY = "YOUR_ALPHA_VANTAGE_KEY";
+    private String fredApiKey = "YOUR_FRED_API_KEY";
+
+    // --- URLs ---
     private static final String ALPHA_VANTAGE_URL = "https://www.alphavantage.co/query";
-
-    // Stooq Base URL for historical data (CSV)
-    // Format: https://stooq.com/q/d/l/?s=AAPL.US&i=d
     private static final String STOOQ_BASE_URL = "https://stooq.com/q/d/l/";
+    private static final String FRED_BASE_URL = "https://api.stlouisfed.org/fred/series/observations";
 
+    // OkHttp Client
+    private final OkHttpClient client = new OkHttpClient();
+
+    public StockDataAccessObject() {
+
+    }
+
+
+    public StockDataAccessObject(String fredApiKey) {
+        this.fredApiKey = fredApiKey;
+    }
+
+    // =========================================================
+    // 1. Stooq
+    // =========================================================
     @Override
     public Stock getStock(String ticker) {
-        // Stooq usually requires a suffix for US stocks (e.g., "AAPL.US").
-        // We append .US if not present, assuming the user is searching for US stocks.
         String stooqTicker = ticker.toUpperCase();
         if (!stooqTicker.contains(".")) {
             stooqTicker += ".US";
@@ -44,28 +63,18 @@ public class StockDataAccessObject implements APIDataAccessInterface {
 
         try {
             List<String> csvLines = makeCSVCall(urlString);
-
-            // If the list is empty or only contains the header
             if (csvLines.size() <= 1) {
-                System.out.println("No data found for ticker: " + ticker);
                 return null;
             }
 
-            // Stooq CSV Header: Date,Open,High,Low,Close,Volume
-            // We skip the first line (header)
             Map<LocalDate, Double> historicalPrices = new TreeMap<>();
-
-            // Temporary variables for the latest quote
             Double latestOpen = null, latestHigh = null, latestLow = null, latestClose = null;
             LocalDate latestDate = null;
-
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
             for (int i = 1; i < csvLines.size(); i++) {
                 String row = csvLines.get(i);
                 String[] cols = row.split(",");
-
-                // Ensure row has enough columns
                 if (cols.length < 5) continue;
 
                 try {
@@ -78,8 +87,6 @@ public class StockDataAccessObject implements APIDataAccessInterface {
                     LocalDate date = LocalDate.parse(dateStr, formatter);
                     historicalPrices.put(date, close);
 
-                    // Since Stooq usually returns newest first or unsorted, we check dates
-                    // However, we are parsing all lines. We need the MOST RECENT one for the stock object fields.
                     if (latestDate == null || date.isAfter(latestDate)) {
                         latestDate = date;
                         latestOpen = open;
@@ -87,9 +94,7 @@ public class StockDataAccessObject implements APIDataAccessInterface {
                         latestLow = low;
                         latestClose = close;
                     }
-
                 } catch (NumberFormatException e) {
-                    // Skip malformed lines
                     continue;
                 }
             }
@@ -98,8 +103,7 @@ public class StockDataAccessObject implements APIDataAccessInterface {
                 return null;
             }
 
-            // Create Stock Entity
-            Stock stock = new Stock(ticker.toUpperCase(), ticker.toUpperCase()); // Name is same as ticker for Stooq
+            Stock stock = new Stock(ticker.toUpperCase(), ticker.toUpperCase());
             stock.setHistoricalPrices(historicalPrices);
             stock.updateQuote(latestDate, latestOpen, latestClose, latestHigh, latestLow);
 
@@ -111,10 +115,11 @@ public class StockDataAccessObject implements APIDataAccessInterface {
         }
     }
 
+    // =========================================================
+    // 2. Alpha Vantage
+    // =========================================================
     @Override
     public List<String> searchSymbols(String query) {
-        // KEEPING ALPHA VANTAGE FOR SEARCH
-        // Stooq does not have a robust "Search by keyword" API returning JSON.
         String function = "SYMBOL_SEARCH";
         String urlString = String.format("%s?function=%s&keywords=%s&apikey=%s",
                 ALPHA_VANTAGE_URL, function, query, ALPHA_VANTAGE_KEY);
@@ -139,54 +144,89 @@ public class StockDataAccessObject implements APIDataAccessInterface {
         return results;
     }
 
-    // --- Helper Methods ---
-
-    /**
-     * Makes an HTTP GET request and returns lines of CSV data.
-     */
-    private List<String> makeCSVCall(String urlString) throws IOException {
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setConnectTimeout(5000); // 5 seconds timeout
-        conn.setReadTimeout(5000);
-
-        int responseCode = conn.getResponseCode();
-        if (responseCode != 200) {
-            throw new IOException("HTTP error code: " + responseCode);
+    // =========================================================
+    // 3. FRED API
+    // =========================================================
+    @Override
+    public double getRiskFreeRate() {
+        if (fredApiKey == null || fredApiKey.isEmpty()) {
+            System.out.println("Warning: No FRED API Key provided. Using default 4.5%");
+            return 0.045;
         }
 
-        List<String> lines = new ArrayList<>();
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                lines.add(inputLine);
+        // Series ID: DGS3MO (3-Month Treasury Constant Maturity Rate)
+        String seriesId = "DGS3MO";
+
+        HttpUrl url = HttpUrl.parse(FRED_BASE_URL).newBuilder()
+                .addQueryParameter("series_id", seriesId)
+                .addQueryParameter("api_key", fredApiKey)
+                .addQueryParameter("file_type", "json")
+                .addQueryParameter("sort_order", "desc")
+                .addQueryParameter("limit", "1")
+                .build();
+
+        Request request = new Request.Builder().url(url).get().build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new RuntimeException("FRED API call failed: " + response.code());
             }
+
+            String body = response.body().string();
+            JsonObject root = JsonParser.parseString(body).getAsJsonObject();
+            JsonArray observations = root.getAsJsonArray("observations");
+
+            if (observations == null || observations.size() == 0) {
+                return 0.045; // Fallback
+            }
+
+            JsonObject latest = observations.get(0).getAsJsonObject();
+            String valueStr = latest.get("value").getAsString();
+
+            if (valueStr == null || valueStr.equals(".") || valueStr.isEmpty()) {
+                return 0.045;
+            }
+
+            double percent = Double.parseDouble(valueStr);
+            return percent / 100.0;
+
+        } catch (Exception e) {
+            System.err.println("Error calling FRED: " + e.getMessage());
+            return 0.045;
         }
-        return lines;
     }
 
-    /**
-     * Makes an HTTP GET request and returns raw JSON string.
-     */
-    private String makeJSONCall(String urlString) throws IOException {
+    // --- Helper Methods ---
+
+    private List<String> makeCSVCall(String urlString) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setConnectTimeout(5000);
         conn.setReadTimeout(5000);
 
-        int responseCode = conn.getResponseCode();
-        if (responseCode != 200) {
-            throw new IOException("HTTP error code: " + responseCode);
+        if (conn.getResponseCode() != 200) throw new IOException("HTTP error: " + conn.getResponseCode());
+
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) lines.add(inputLine);
         }
+        return lines;
+    }
+
+    private String makeJSONCall(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setConnectTimeout(5000);
+
+        if (conn.getResponseCode() != 200) throw new IOException("HTTP error: " + conn.getResponseCode());
 
         StringBuilder content = new StringBuilder();
         try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
             String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
+            while ((inputLine = in.readLine()) != null) content.append(inputLine);
         }
         return content.toString();
     }

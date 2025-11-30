@@ -6,8 +6,7 @@ import interface_adapter.create_portfolio.CreatePortfolioViewModel;
 import interface_adapter.mainmenu.MainMenuController;
 import interface_adapter.mainmenu.MainMenuPresenter;
 import interface_adapter.mainmenu.MainMenuViewModel;
-import interface_adapter.search.SearchViewModel;
-// Import AddStockViewModel
+import interface_adapter.singlestock.SingleStockViewModel;
 import interface_adapter.add_stock.AddStockViewModel;
 
 import use_case.mainmenu.MainMenuInputBoundary;
@@ -22,22 +21,23 @@ public class MainMenuUseCaseFactory {
 
     private MainMenuUseCaseFactory() {}
 
+
     public static MainMenuView create(
             ViewManagerModel viewManagerModel,
             MainMenuViewModel mainMenuViewModel,
             CreatePortfolioViewModel createPortfolioViewModel,
-            SearchViewModel searchViewModel,
             LoginViewModel loginViewModel,
-            AddStockViewModel addStockViewModel) { // Added Argument
+            AddStockViewModel addStockViewModel,
+            SingleStockViewModel singleStockViewModel) {
 
         try {
             MainMenuController mainMenuController = createMainMenuUseCase(
                     viewManagerModel,
                     mainMenuViewModel,
                     createPortfolioViewModel,
-                    searchViewModel,
                     loginViewModel,
-                    addStockViewModel); // Pass it down
+                    addStockViewModel,
+                    singleStockViewModel);
 
             return new MainMenuView(mainMenuViewModel, mainMenuController);
         } catch (IOException e) {
@@ -51,21 +51,23 @@ public class MainMenuUseCaseFactory {
             ViewManagerModel viewManagerModel,
             MainMenuViewModel mainMenuViewModel,
             CreatePortfolioViewModel createPortfolioViewModel,
-            SearchViewModel searchViewModel,
             LoginViewModel loginViewModel,
-            AddStockViewModel addStockViewModel) throws IOException { // Added Argument
+            AddStockViewModel addStockViewModel,
+            SingleStockViewModel singleStockViewModel) throws IOException {
 
-        // Updated Constructor call to match your MainMenuPresenter changes
+
         MainMenuOutputBoundary mainMenuOutputBoundary = new MainMenuPresenter(
                 viewManagerModel,
                 mainMenuViewModel,
                 loginViewModel,
                 createPortfolioViewModel,
-                searchViewModel,
-                addStockViewModel // Injecting dependency
+                addStockViewModel,
+                singleStockViewModel
         );
 
+
         MainMenuInputBoundary mainMenuInteractor = new MainMenuInteractor(mainMenuOutputBoundary);
+
 
         return new MainMenuController(mainMenuInteractor);
     }

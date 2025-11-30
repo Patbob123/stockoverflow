@@ -18,15 +18,10 @@ public class MainMenuController {
         mainMenuInteractor.switchToPortfolioView();
     }
 
-    public void switchToSearchView() {
-        mainMenuInteractor.switchToSearchView();
+    public void switchToSingleStockView() {
+        mainMenuInteractor.switchToSingleStockView();
     }
 
-    /**
-     * Navigates to the Add Stock View for a specific portfolio.
-     * @param portfolioName The name of the portfolio to manage.
-     * @param username The current user's username.
-     */
     public void goToAddStock(String portfolioName, String username) {
         mainMenuInteractor.switchToAddStockView(portfolioName, username);
     }

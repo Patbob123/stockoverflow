@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface APIDataAccessInterface {
     Stock getStock(String ticker);
-
     List<String> searchSymbols(String query);
+    double getRiskFreeRate();
 }

@@ -9,7 +9,7 @@ public class MainMenuViewModel extends ViewModel {
 
     public static final String TITLE_LABEL = "Main Menu";
     public static final String PORTFOLIO_BUTTON_LABEL = "My Portfolios";
-    public static final String SEARCH_BUTTON_LABEL = "Search Stock";
+    public static final String SINGLE_STOCK_BUTTON_LABEL = "Single Stock Analysis";
     public static final String LOGOUT_BUTTON_LABEL = "Log out";
     public static final String LOGGED_IN_USER_LABEL = "Current User: ";
 

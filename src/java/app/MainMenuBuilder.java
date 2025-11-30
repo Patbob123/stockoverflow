@@ -30,7 +30,6 @@ import use_case.portfolio.PortfolioMenuInputBoundary;
 import use_case.portfolio.PortfolioMenuInteractor;
 import use_case.portfolio.PortfolioMenuOutputBoundary;
 <<<<<<< HEAD:src/java/app/MainMenuBuilder.java
-import view.MainMenuView;
 import view.SimulationView;
 import view.ViewManager;
 =======

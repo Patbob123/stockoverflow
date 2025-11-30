@@ -5,9 +5,10 @@ import interface_adapter.Login.LoginViewModel;
 import interface_adapter.Login.LoginState;
 import interface_adapter.create_portfolio.CreatePortfolioState;
 import interface_adapter.create_portfolio.CreatePortfolioViewModel;
-import interface_adapter.search.SearchViewModel;
 import interface_adapter.add_stock.AddStockViewModel;
 import interface_adapter.add_stock.AddStockState;
+import interface_adapter.singlestock.SingleStockViewModel;
+import interface_adapter.singlestock.SingleStockState;
 import use_case.mainmenu.MainMenuOutputBoundary;
 
 public class MainMenuPresenter implements MainMenuOutputBoundary {
@@ -16,51 +17,44 @@ public class MainMenuPresenter implements MainMenuOutputBoundary {
     private final ViewManagerModel viewManagerModel;
     private final LoginViewModel loginViewModel;
     private final CreatePortfolioViewModel createPortfolioViewModel;
-    private final SearchViewModel searchViewModel;
-    // Added to support navigation to AddStockView
     private final AddStockViewModel addStockViewModel;
+    private final SingleStockViewModel singleStockViewModel;
 
     public MainMenuPresenter(ViewManagerModel viewManagerModel,
                              MainMenuViewModel mainMenuViewModel,
                              LoginViewModel loginViewModel,
                              CreatePortfolioViewModel createPortfolioViewModel,
-                             SearchViewModel searchViewModel,
-                             AddStockViewModel addStockViewModel) {
+                             AddStockViewModel addStockViewModel,
+                             SingleStockViewModel singleStockViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.mainMenuViewModel = mainMenuViewModel;
         this.loginViewModel = loginViewModel;
         this.createPortfolioViewModel = createPortfolioViewModel;
-        this.searchViewModel = searchViewModel;
         this.addStockViewModel = addStockViewModel;
+        this.singleStockViewModel = singleStockViewModel;
     }
 
     @Override
     public void prepareLoginView() {
-        // Clear Main Menu State
         MainMenuState mainState = mainMenuViewModel.getState();
         mainState.setUsername("");
         mainMenuViewModel.setState(mainState);
         mainMenuViewModel.firePropertyChanged();
 
-        // Clear Login State (security)
         LoginState loginState = loginViewModel.getState();
         loginState.setPassword("");
         loginViewModel.setState(loginState);
         loginViewModel.firePropertyChanged();
 
-        // Switch to Login View
         viewManagerModel.setActiveView(loginViewModel.getViewName());
         viewManagerModel.firePropertyChanged();
     }
 
     @Override
     public void preparePortfolioView() {
-        // Pass the current username to the CreatePortfolio State
         String currentUser = mainMenuViewModel.getState().getUsername();
-
         CreatePortfolioState portfolioState = createPortfolioViewModel.getState();
         portfolioState.setUsername(currentUser);
-        // Reset error state if any
         portfolioState.setError(null);
 
         createPortfolioViewModel.setState(portfolioState);
@@ -71,21 +65,22 @@ public class MainMenuPresenter implements MainMenuOutputBoundary {
     }
 
     @Override
-    public void prepareSearchView() {
-        viewManagerModel.setActiveView(searchViewModel.getViewName());
+    public void prepareSingleStockView() {
+        SingleStockState state = singleStockViewModel.getState();
+        state.setReport("");
+        state.setErrorMessage(null);
+        singleStockViewModel.setState(state);
+        singleStockViewModel.firePropertyChanged();
+
+        viewManagerModel.setActiveView(SingleStockViewModel.VIEW_NAME);
         viewManagerModel.firePropertyChanged();
     }
 
-    /**
-     * Prepares the Add Stock View.
-     * This needs to be defined in MainMenuOutputBoundary interface.
-     */
     @Override
     public void prepareAddStockView(String portfolioName, String username) {
         AddStockState state = addStockViewModel.getState();
         state.setPortfolioName(portfolioName);
         state.setUsername(username);
-
         state.setMessage(null);
 
         addStockViewModel.setState(state);

@@ -17,8 +17,8 @@ public class SearchView extends JPanel implements ActionListener, PropertyChange
     public final String viewName = "search stock";
 
     private final SearchViewModel searchViewModel;
-    private final SearchController searchController;     // 负责搜索
-    private final ShowGraphController showGraphController; // 负责画图
+    private final SearchController searchController;
+    private final ShowGraphController showGraphController;
     private final ViewManagerModel viewManagerModel;
 
 
@@ -60,7 +60,7 @@ public class SearchView extends JPanel implements ActionListener, PropertyChange
         inputPanel.add(searchButton);
 
         centerPanel.add(inputPanel, BorderLayout.NORTH);
-        centerPanel.add(new JScrollPane(resultList), BorderLayout.CENTER); // 滚动列表
+        centerPanel.add(new JScrollPane(resultList), BorderLayout.CENTER);
 
         this.add(centerPanel, BorderLayout.CENTER);
 
@@ -88,7 +88,6 @@ public class SearchView extends JPanel implements ActionListener, PropertyChange
         plotButton.addActionListener(e -> {
             String selected = resultList.getSelectedValue();
             if (selected != null) {
-                // 格式通常是 "AAPL - Apple Inc."，我们只需要 "AAPL"
                 String ticker = selected.split(" - ")[0];
                 showGraphController.execute(ticker);
             } else {
