@@ -28,4 +28,15 @@ public class SingleStockController extends AbsController {
                 new CompareTwoStocksInputData(ticker1, ticker2, rfAnnual);
         compareInteractor.execute(input);
     }
+    //TODO do these if you worked on Monte carlo or scenario its for you to change
+    public void runScenario(String ticker, double rfAnnual) {
+        System.out.println("Scenario for " + ticker + " (rf=" + rfAnnual + ")");//just check for now
+        //scenarioInputBoundary.execute(new ScenarioInputData(ticker, rfAnnual)); change it to something like this
+    }
+
+    public void runMonteCarlo(String ticker, double rfAnnual) {
+        System.out.println("Monte Carlo for " + ticker + " (rf=" + rfAnnual + ")");//just check, delete it
+        //monteCarloInputBoundary.execute(new MonteCarloInputData(ticker, rfAnnual)); change it to somethimg loike this , anything you need
+    }
+
 }
