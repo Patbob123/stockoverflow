@@ -2,6 +2,7 @@ package use_case.monte_carlo;
 
 import data_access.FileMonteCarloDataAccess;
 import entities.StockMetrics;
+import entities.monte_carlo.MonteCarloSimulation;
 import entities.monte_carlo.MonteCarloSimulator;
 import data_access.StooqStockDataAccess;
 import entities.PriceBar;
@@ -81,6 +82,19 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
                     initialPrice,
                     meanTerminalPrice
             );
+
+            MonteCarloSimulation simulationResult = new MonteCarloSimulation(
+                    inputData.getTicker(),
+                    inputData.getHorizonYears(),
+                    inputData.getNPaths(),
+                    inputData.getNSteps(),
+                    muAnnual,
+                    sigmaAnnual,
+                    meanTerminalPrice,
+                    simulatedPaths
+            );
+
+            montecarloDataAccess.saveSimulation(simulationResult);
 
             outputBoundary.presentSuccess(output);
 
