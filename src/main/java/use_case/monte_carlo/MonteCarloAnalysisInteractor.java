@@ -1,5 +1,6 @@
 package use_case.monte_carlo;
 
+import data_access.FileMonteCarloDataAccess;
 import entities.StockMetrics;
 import entities.monte_carlo.MonteCarloSimulator;
 import data_access.StooqStockDataAccess;
@@ -19,18 +20,20 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
     private final MonteCarloSimulator simulator;
     private final StatisticsCalculator metricsCalculator;
     private final MonteCarloOutputBoundary outputBoundary;
-
+    private final FileMonteCarloDataAccess montecarloDataAccess;
     /**
      * Interactor dependencies are injected.
      */
     public MonteCarloAnalysisInteractor(StooqStockDataAccess dataAccess,
                                         MonteCarloSimulator simulator,
                                         StatisticsCalculator metricsCalculator,
-                                        MonteCarloOutputBoundary outputBoundary) {
+                                        MonteCarloOutputBoundary outputBoundary,
+                                        FileMonteCarloDataAccess montecarloDataAccess) {
         this.dataAccess = dataAccess;
         this.simulator = simulator;
         this.metricsCalculator = metricsCalculator;
         this.outputBoundary = outputBoundary;
+        this.montecarloDataAccess = montecarloDataAccess;
     }
 
     /**
