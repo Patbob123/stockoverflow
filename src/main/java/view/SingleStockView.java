@@ -1,8 +1,10 @@
 package view;
 
+import interface_adapter.monte_carlo.MonteCarloController;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockViewInterface;
 import use_case.singlestock.AnalyzeSingleStockOutputData;
+import view.monte_carlo.MonteCarloInputPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -33,9 +35,11 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
     private final JTextArea infoArea = new JTextArea(18, 48);
 
     private SingleStockController controller;
+    private final MonteCarloController monteCarloController;
 
-    public SingleStockView(SingleStockController controller) {
+    public SingleStockView(SingleStockController controller, MonteCarloController monteCarloController) {
         this.controller = controller;
+        this.monteCarloController = monteCarloController;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(screenSize);
         setLayout(new BorderLayout());
@@ -201,6 +205,25 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
         } catch (RuntimeException ex) {
             showError("FRED error: " + ex.getMessage());
         }
+    }
+
+    private void onMonteCarloClicked(ActionEvent e) {
+        String tkr =  tickerField.getText().trim().toUpperCase(Locale.ROOT);
+
+        if (!tkr.matches("[A-Z0-9.]{1,10}")) {
+            showError("Invalid base ticker format.");
+            return;
+        }
+        JFrame frame = new JFrame("Monte Carlo Simulation Input for " + tkr);
+        MonteCarloInputPanel panel = new MonteCarloInputPanel(tkr, monteCarloController);
+
+        frame.add(panel);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
+
+
     }
 
     @Override
