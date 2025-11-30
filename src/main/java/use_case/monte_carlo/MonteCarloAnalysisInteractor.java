@@ -44,7 +44,6 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
             int nSteps = inputData.getNSteps();
             int nPaths = inputData.getNPaths();
 
-            // 1. Data Fetching (Use 400 days history as per your previous interactor)
             List<PriceBar> priceHistory = dataAccess.getDailySeries(ticker, 400);
 
             if (priceHistory.size() < 2) {
