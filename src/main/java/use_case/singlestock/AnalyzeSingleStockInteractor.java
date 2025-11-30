@@ -2,6 +2,7 @@
 package use_case.singlestock;
 
 import entities.PriceBar;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Locale;
@@ -10,15 +11,13 @@ public class AnalyzeSingleStockInteractor implements AnalyzeSingleStockInputBoun
 
     private static final int TRADING_DAYS = 252; //as we have (365 - holidays or weekend
 
-    private final StockPriceDataAccessInterface priceGateway;
-    private final RiskFreeRateDataAccessInterface riskFreeGateway;
+    @Setter
+    private StockPriceDataAccessInterface priceGateway;
+    @Setter
+    private RiskFreeRateDataAccessInterface riskFreeGateway;
     private final AnalyzeSingleStockOutputBoundary outputBoundary;
 
-    public AnalyzeSingleStockInteractor(StockPriceDataAccessInterface priceGateway,
-                                        RiskFreeRateDataAccessInterface riskFreeGateway,
-                                        AnalyzeSingleStockOutputBoundary outputBoundary) {
-        this.priceGateway = priceGateway;
-        this.riskFreeGateway = riskFreeGateway;
+    public AnalyzeSingleStockInteractor(AnalyzeSingleStockOutputBoundary outputBoundary) {
         this.outputBoundary = outputBoundary;
     }
 

@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class AddStockMenuView extends PaddedView<AddStockMenuViewModel, AddStockMenuController> implements ActionListener, PropertyChangeListener {
+public class AddStockMenuView extends PaddedView<AddStockMenuViewModel, AddStockMenuController> {
 
     public static final String VIEW_NAME = "Add Stock";
 

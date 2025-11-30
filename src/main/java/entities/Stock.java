@@ -1,6 +1,7 @@
 package entities;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class Stock {
 
@@ -19,6 +20,7 @@ public class Stock {
     // highest prise during period
     private Double low;
     // lowest
+    private List<PriceBar> priceHistory;
 
     public Stock(String ticker, String name) {
         this.ticker = ticker;

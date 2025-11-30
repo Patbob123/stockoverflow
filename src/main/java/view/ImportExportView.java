@@ -19,7 +19,7 @@ import interface_adapter.import_export.ImportExportViewModel;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ImportExportView extends PaddedView<ImportExportViewModel, ImportExportController> implements ActionListener, PropertyChangeListener {
+public class ImportExportView extends PaddedView<ImportExportViewModel, ImportExportController> {
     public static final String VIEW_NAME = "ImportExportMenu";
     @Setter
     private ChangeViewController changeViewController;

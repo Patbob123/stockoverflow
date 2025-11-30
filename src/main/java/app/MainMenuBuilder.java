@@ -10,6 +10,9 @@ import interface_adapter.portfolio.PortfolioMenuPresenter;
 import interface_adapter.portfolio.addStock.AddStockMenuController;
 import interface_adapter.portfolio.addStock.AddStockMenuPresenter;
 import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
+import interface_adapter.singlestock.SingleStockController;
+import interface_adapter.singlestock.SingleStockPresenter;
+import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.import_export.ImportExportDataAccessInterface;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
@@ -33,6 +36,8 @@ import use_case.import_export.ImportExportInteractor;
 import use_case.mainmenu.MainMenuInteractor;
 import use_case.portfolio.PortfolioMenuInteractor;
 import use_case.portfolio.addStock.AddStockMenuInteractor;
+import use_case.singlestock.AnalyzeSingleStockInteractor;
+import use_case.singlestock.CompareTwoStocksInteractor;
 import view.*;
 import app.wrapper.UseCaseWrapper;
 import app.wrapper.ViewViewModelBuilderWrapper;
@@ -68,6 +73,9 @@ public class MainMenuBuilder {
 
     private final ViewViewModelBuilderWrapper<AddStockMenuViewModel, AddStockMenuView> addStockMenu =
             new ViewViewModelBuilderWrapper<>(new AddStockMenuViewModel(), AddStockMenuView::new);
+
+    private final ViewViewModelBuilderWrapper<SingleStockViewModel, SingleStockView> singleStockMenu =
+            new ViewViewModelBuilderWrapper<>(new SingleStockViewModel(), SingleStockView::new);
 
     private final UseCaseWrapper<MainMenuInteractor,
             MainMenuPresenter,
@@ -151,6 +159,11 @@ public class MainMenuBuilder {
         return this;
     }
 
+    public MainMenuBuilder addSingleStockView() {
+        viewBuildInstruction.add(singleStockMenu);
+        return this;
+    }
+
     public MainMenuBuilder addChangeViewUseCase() {
         this.addChangeView = true;
         return this;
@@ -168,6 +181,7 @@ public class MainMenuBuilder {
         getView(AddPortfolioView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(PortfolioMenuView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(AddStockMenuView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(SingleStockView.VIEW_NAME).setChangeViewController(changeViewController);
     }
 
     public MainMenuBuilder addMainViewUseCase() {
@@ -195,6 +209,41 @@ public class MainMenuBuilder {
         return this;
     }
 
+    public MainMenuBuilder addSingleStockMenuUseCase() {
+        final UseCaseWrapper<AnalyzeSingleStockInteractor,
+                SingleStockPresenter,
+                SingleStockController,
+                SingleStockViewModel,
+                SingleStockView> singleStockAnalyzeUsecase =
+                new UseCaseWrapper<>(viewManager,
+                        SingleStockPresenter::new,
+                        AnalyzeSingleStockInteractor::new,
+                        null,
+                        SingleStockView.VIEW_NAME);
+
+        final UseCaseWrapper<CompareTwoStocksInteractor,
+                SingleStockPresenter,
+                SingleStockController,
+                SingleStockViewModel,
+                SingleStockView> compareStockUsecase =
+                new UseCaseWrapper<>(viewManager,
+                        viewModel -> {
+                            return singleStockAnalyzeUsecase
+                                    .makePresenter((SingleStockView) viewManager.getViews()
+                                            .get(SingleStockView.VIEW_NAME));
+                    },
+                        CompareTwoStocksInteractor::new,
+                        interactor -> {
+                            return new SingleStockController(
+                                    singleStockAnalyzeUsecase.getInteractor(
+                                            (SingleStockView) viewManager
+                                                    .getViews().get(SingleStockView.VIEW_NAME)), interactor);
+                        },
+                        SingleStockView.VIEW_NAME);
+        useCaseBuildInstruction.add(compareStockUsecase);
+        return this;
+    }
+
     public JFrame autoBuild() {
         return this.addMainView()
                     .addImportExportView()
@@ -207,6 +256,8 @@ public class MainMenuBuilder {
                     .addImportExportUseCase()
                     .addPortfolioMenuUseCase()
                     .addStockMenuUseCase()
+                    .addSingleStockMenuUseCase()
+                    .addSingleStockView()
                     .build();
     }
 

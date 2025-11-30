@@ -16,7 +16,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuController> implements ActionListener, PropertyChangeListener {
+public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuController> {
 
     @Setter
     private ChangeViewController changeViewController;
@@ -47,7 +47,7 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
                 evt -> {
                     if (evt.getSource().equals(stockButton)) {
                         //MainMenuController.execute(noteInputField.getText());
-
+                        changeViewController.changeView(SingleStockView.VIEW_NAME);
                     }
                 }
         );

@@ -19,7 +19,7 @@ import interface_adapter.portfolio.addStock.AddStockMenuState;
 import lombok.Getter;
 import lombok.Setter;
 
-public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, PortfolioMenuController> implements ActionListener, PropertyChangeListener {
+public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, PortfolioMenuController> {
 
     @Setter
     private ChangeViewController changeViewController;

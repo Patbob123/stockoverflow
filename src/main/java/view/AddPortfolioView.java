@@ -22,8 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class AddPortfolioView
-        extends PaddedView<AddPortfolioViewModel, AddPortfolioController>
-        implements ActionListener, PropertyChangeListener {
+        extends PaddedView<AddPortfolioViewModel, AddPortfolioController> {
     public static final String VIEW_NAME = "AddPortfolioMenu";
     @Setter
     private ChangeViewController changeViewController;

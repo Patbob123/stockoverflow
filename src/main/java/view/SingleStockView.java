@@ -1,7 +1,10 @@
 package view;
 
 import data_access.FredRiskFreeRateDataAccess;
+import interface_adapter.ViewManagerModel;
+import interface_adapter.ViewModel;
 import interface_adapter.singlestock.SingleStockController;
+import interface_adapter.singlestock.SingleStockPresenter;
 import interface_adapter.singlestock.SingleStockViewInterface;
 import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.singlestock.AnalyzeSingleStockOutputData;
@@ -10,21 +13,22 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-public class SingleStockView extends JPanel implements SingleStockViewInterface {
+public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStockController> {
+
+    public static final String VIEW_NAME = "single stock";
 
     private static final Path HISTORY_FILE =
             Paths.get(System.getProperty("user.home"),
                     SingleStockViewModel.HISTORY_FILE_NAME);
             //or maybe to the project im not sure
     //private static final Path HISTORY_FILE = Paths.get("stockoverflow-history.txt");   // not sure which is better , choose when mege with import stuff
-
-    private final SingleStockViewModel viewModel;
 
     // Inputs
     private final JTextField tickerField;
@@ -51,12 +55,8 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
 
     private final JTextArea infoArea = new JTextArea(18, 48);
 
-    private SingleStockController controller;
-
-    public SingleStockView(SingleStockViewModel viewModel,
-                           SingleStockController controller) {
-        this.viewModel = viewModel;
-        this.controller = controller;
+    public SingleStockView(SingleStockViewModel viewModel) {
+        super(viewModel);
 
         // Initialize text fields using ViewModel defaults
         this.tickerField = new JTextField(
@@ -161,9 +161,7 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
         ScenarioBtn.addActionListener(this::onScenarioClicked);
         MonteCarloBtn.addActionListener(this::onMonteCarloClicked);
     }
-    public void setController(SingleStockController controller) {
-        this.controller = controller;
-    }
+
     //lets save history after we closed the app
     private void addToHistory(String ticker) {
         if (ticker == null) return;
@@ -242,13 +240,13 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
             return;
         }
 
-        if (controller == null) {
+        if (this.getController() == null) {
             showError("Controller not set.");
             return;
         }
 
         // TODO: implement this in controller for scenario ALEX!
-        controller.runScenario(tkr, rf);
+        this.getController().runScenario(tkr, rf);
     }
 
     private void onMonteCarloClicked(ActionEvent e) {
@@ -266,13 +264,13 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
             return;
         }
 
-        if (controller == null) {
+        if (this.getController() == null) {
             showError("Controller not set.");
             return;
         }
 
         // TODO:implement this in controller for monte carlo ALI!
-        controller.runMonteCarlo(tkr, rf);
+        this.getController().runMonteCarlo(tkr, rf);
     }
 
     //when analyze button
@@ -294,14 +292,14 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
     infoArea.setText("Analyzing " + tkr + "...");
 
     try {
-        if (controller == null) {
+        if (this.getController() == null) {
             showError("Controller not set.");
             return;
         }
-        controller.analyze(tkr, rf);
+        this.getController().analyze(tkr, rf);
 
-        viewModel.setCurrentTicker(tkr);
-        viewModel.setCurrentRiskFree(rfField.getText().trim());
+        this.getViewModel().setCurrentTicker(tkr);
+        this.getViewModel().setCurrentRiskFree(rfField.getText().trim());
         addToHistory(tkr);
     } catch (RuntimeException ex) {
         showError(ex.getMessage());
@@ -350,11 +348,11 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
         infoArea.setText("Comparing " + baseTicker + " vs " + other + "...");
 
         try {
-            if (controller == null) {
+            if (this.getController() == null) {
                 showError("Controller not set.");
                 return;
             }
-            controller.compare(baseTicker, other, rf);
+            this.getController().compare(baseTicker, other, rf);
 
             addToHistory(baseTicker);
             addToHistory(other);
@@ -383,8 +381,8 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
             double rf = fred.getCurrentRiskFreeRate();
             String rfTxt = String.format(Locale.US, "%.4f", rf);
             rfField.setText(rfTxt);
-            viewModel.setFredApiKey(key);
-            viewModel.setCurrentRiskFree(rfTxt);
+            this.getViewModel().setFredApiKey(key);
+            this.getViewModel().setCurrentRiskFree(rfTxt);
             JOptionPane.showMessageDialog(this,
                     String.format(Locale.US, "Loaded risk-free: %.2f%%", rf * 100),
                     "FRED", JOptionPane.INFORMATION_MESSAGE);
@@ -393,14 +391,26 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
         }
     }
 
-    @Override
-    public void showAnalysis(AnalyzeSingleStockOutputData outputData) {
-        infoArea.setText(outputData.getReport());
+    private void showError(String message) {
+        this.getViewModel().showError(message);
     }
 
     @Override
-    public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message,
-                "Error", JOptionPane.ERROR_MESSAGE);
+    public void actionPerformed(ActionEvent e) {
+
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(SingleStockViewModel.SHOW_ANALTSIS)) {
+            infoArea.setText(
+                    this.getViewModel().getState().getAnalyzeSingleStockOutputData().getReport());
+
+        }
+        else if (evt.getPropertyName().equals(SingleStockViewModel.SHOW_ERROR)) {
+            JOptionPane.showMessageDialog(this,
+                    this.getViewModel().getState().getErrorMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

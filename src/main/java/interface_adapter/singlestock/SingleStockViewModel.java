@@ -1,9 +1,15 @@
 package interface_adapter.singlestock;
 
-public class SingleStockViewModel {
+import interface_adapter.ViewModel;
+import lombok.Getter;
+import lombok.Setter;
+import use_case.singlestock.AnalyzeSingleStockOutputData;
+import view.SingleStockView;
+
+@Getter
+public class SingleStockViewModel extends ViewModel<SingleStockState> {
 
     // view name if you use a ViewManager later
-    public static final String VIEW_NAME = "single stock";
 
     // Labels
     public static final String LABEL_TICKER = "Ticker:";
@@ -31,31 +37,35 @@ public class SingleStockViewModel {
 
     public static final String HISTORY_FILE_NAME = ".stockoverflow-history.txt";
 
+    // Instructions
+    public static final String SHOW_ANALTSIS = "showAnalysis";
+    public static final String SHOW_ERROR = "showError";
+
     private String currentTicker = DEFAULT_TICKER;
     private String currentRiskFree = DEFAULT_RISK_FREE_TXT;
     private String fredApiKey = "";
 
-    public String getCurrentTicker() {
-        return currentTicker;
+    public SingleStockViewModel() {
+        super(SingleStockView.VIEW_NAME);
     }
 
     public void setCurrentTicker(String currentTicker) {
         this.currentTicker = currentTicker;
     }
 
-    public String getCurrentRiskFree() {
-        return currentRiskFree;
-    }
-
     public void setCurrentRiskFree(String currentRiskFree) {
         this.currentRiskFree = currentRiskFree;
-    }
-
-    public String getFredApiKey() {
-        return fredApiKey;
     }
 
     public void setFredApiKey(String fredApiKey) {
         this.fredApiKey = fredApiKey;
     }
+
+    public void showAnalysis(AnalyzeSingleStockOutputData outputData){
+
+        firePropertyChange(SHOW_ANALTSIS);
+    };
+    public void showError(String message){
+        firePropertyChange(SHOW_ERROR);
+    };
 }
