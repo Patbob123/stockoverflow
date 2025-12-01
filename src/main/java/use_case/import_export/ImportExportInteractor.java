@@ -1,7 +1,7 @@
 package use_case.import_export;
 
 import entities.Portfolio.Portfolio;
-import entities.PortfolioList;
+import entities.Portfolio.PortfolioList;
 import entities.Simulation;
 
 import java.util.List;

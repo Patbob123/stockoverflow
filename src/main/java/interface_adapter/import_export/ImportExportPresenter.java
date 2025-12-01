@@ -1,11 +1,6 @@
 package interface_adapter.import_export;
 
-import entities.Portfolio.Portfolio;
-import entities.PortfolioList;
-import entities.Simulation;
 import use_case.import_export.ImportExportOutputBoundary;
-
-import java.util.List;
 
 public class ImportExportPresenter implements ImportExportOutputBoundary {
     private final ImportExportViewModel importExportViewModel;

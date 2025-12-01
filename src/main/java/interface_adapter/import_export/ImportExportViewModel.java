@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.swing.*;
 
-import entities.PortfolioList;
+import entities.Portfolio.PortfolioList;
 import entities.Simulation;
 import interface_adapter.ViewModel;
 import view.ImportExportView;

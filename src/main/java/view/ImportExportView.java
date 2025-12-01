@@ -11,12 +11,11 @@ import javax.swing.border.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import entities.Portfolio.Portfolio;
-import entities.PortfolioList;
+import entities.Portfolio.PortfolioList;
 import entities.Simulation;
 import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.import_export.ImportExportController;
 import interface_adapter.import_export.ImportExportViewModel;
-import lombok.Getter;
 import lombok.Setter;
 
 public class ImportExportView extends PaddedView<ImportExportViewModel, ImportExportController> implements ActionListener, PropertyChangeListener {

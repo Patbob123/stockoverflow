@@ -5,8 +5,8 @@ import use_case.portfolio.addStock.AddStockMenuOutputBoundary;
 public class AddStockMenuPresenter implements AddStockMenuOutputBoundary {
     private final AddStockMenuViewModel addStockMenuViewModel;
 
-    public AddStockMenuPresenter(AddStockMenuViewModel mainMenuViewModel) {
-        this.addStockMenuViewModel = mainMenuViewModel;
+    public AddStockMenuPresenter(AddStockMenuViewModel addStockMenuViewModel) {
+        this.addStockMenuViewModel = addStockMenuViewModel;
     }
 
     @Override

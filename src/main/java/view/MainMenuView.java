@@ -121,7 +121,7 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         titleLabel.setFont(SingleStockViewModel.TITLE_FONT.deriveFont(36f));
         titleLabel.setForeground(Color.WHITE);
 
-        usernameLabel = new JLabel("Welcome, User");
+        usernameLabel = new JLabel("Welcome, " + viewModel.getState().getUsername());
         usernameLabel.setFont(SingleStockViewModel.BASE_FONT.deriveFont(Font.BOLD, 18f));
         usernameLabel.setForeground(SingleStockViewModel.PRIMARY_COLOUR);
 
@@ -219,6 +219,6 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-
+        usernameLabel.setText("Welcome, " + getViewModel().getState().getUsername());
     }
 }

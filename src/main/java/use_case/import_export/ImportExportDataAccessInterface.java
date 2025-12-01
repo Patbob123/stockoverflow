@@ -3,7 +3,7 @@ package use_case.import_export;
 import java.util.List;
 
 import entities.Portfolio.Portfolio;
-import entities.PortfolioList;
+import entities.Portfolio.PortfolioList;
 import entities.Simulation;
 
 public interface ImportExportDataAccessInterface {

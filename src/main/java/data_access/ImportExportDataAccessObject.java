@@ -1,12 +1,11 @@
 package data_access;
 
 import entities.Portfolio.Portfolio;
-import entities.PortfolioList;
+import entities.Portfolio.PortfolioList;
 import entities.Simulation;
 import use_case.import_export.ImportExportDataAccessInterface;
 import java.io.*;
 import java.util.List;
-import java.util.ArrayList;
 
 public class ImportExportDataAccessObject implements ImportExportDataAccessInterface {
 

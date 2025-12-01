@@ -1,5 +1,7 @@
 package entities;
 
+import entities.Portfolio.PortfolioList;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,14 +1,13 @@
 package app;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.*;
 
-import data_access.AlphaVantageStockPriceDataAccess;
-import data_access.CombinedStockPriceDataAccess;
-import data_access.FredRiskFreeRateDataAccess;
-import data_access.StooqStockDataAccess;
+import data_access.*;
+import entities.CommonUserFactory;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
@@ -17,10 +16,14 @@ import interface_adapter.portfolio.PortfolioMenuPresenter;
 import interface_adapter.portfolio.addStock.AddStockMenuController;
 import interface_adapter.portfolio.addStock.AddStockMenuPresenter;
 import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
+import interface_adapter.signup.SignupController;
+import interface_adapter.signup.SignupPresenter;
+import interface_adapter.signup.SignupViewModel;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockPresenter;
 import interface_adapter.singlestock.SingleStockViewInterface;
 import interface_adapter.singlestock.SingleStockViewModel;
+import use_case.UserDataAccessInterface;
 import use_case.import_export.ImportExportDataAccessInterface;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
@@ -45,6 +48,7 @@ import use_case.login.LoginInteractor;
 import use_case.mainmenu.MainMenuInteractor;
 import use_case.portfolio.PortfolioMenuInteractor;
 import use_case.portfolio.addStock.AddStockMenuInteractor;
+import use_case.signup.SignupInteractor;
 import use_case.singlestock.AnalyzeSingleStockInteractor;
 import use_case.singlestock.CompareTwoStocksInteractor;
 import use_case.singlestock.RiskFreeRateDataAccessInterface;
@@ -63,6 +67,8 @@ public class MainMenuBuilder {
     private final ArrayList<UseCaseWrapper<?, ?, ?, ?, ?>> useCaseBuildInstruction = new ArrayList<>();
     private Boolean addChangeView = false;
     private Boolean addSingleStock = false;
+    private Boolean addLogin = false;
+    private Boolean addSignup = false;
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -71,6 +77,7 @@ public class MainMenuBuilder {
     private ImportExportDataAccessInterface importExportDAO;
     private StockPriceDataAccessInterface stockPriceDAO;
     private RiskFreeRateDataAccessInterface riskFreeRateDAO;
+    private UserDataAccessInterface userDAO;
 
     private final ViewViewModelBuilderWrapper<MainMenuViewModel, MainMenuView> mainMenu =
             new ViewViewModelBuilderWrapper<>(new MainMenuViewModel(), MainMenuView::new);
@@ -92,6 +99,9 @@ public class MainMenuBuilder {
 
     private final ViewViewModelBuilderWrapper<LoginViewModel, LoginView> loginView =
             new ViewViewModelBuilderWrapper<>(new LoginViewModel(), LoginView::new);
+
+    private final ViewViewModelBuilderWrapper<SignupViewModel, SignupView> signupView =
+            new ViewViewModelBuilderWrapper<>(new SignupViewModel(), SignupView::new);
 
     private final UseCaseWrapper<MainMenuInteractor,
             MainMenuPresenter,
@@ -142,15 +152,6 @@ public class MainMenuBuilder {
             AddStockMenuInteractor::new,
             AddStockMenuController::new, AddStockMenuView.VIEW_NAME);
 
-    private final UseCaseWrapper<LoginInteractor,
-            LoginPresenter,
-            LoginController,
-            LoginViewModel,
-            LoginView> loginUseCase =
-            new UseCaseWrapper<>(viewManager,
-            LoginPresenter::new,
-            LoginInteractor::new,
-            LoginController::new, LoginView.VIEW_NAME);
 
     private PaddedView<?, ?> getView(String viewName) {
         return viewManager.getViews().get(viewName);
@@ -190,14 +191,56 @@ public class MainMenuBuilder {
         return this;
     }
 
+    public MainMenuBuilder addLoginView() {
+        viewBuildInstruction.add(loginView);
+        return this;
+    }
+
+    public MainMenuBuilder addSignupView() {
+        viewBuildInstruction.add(signupView);
+        return this;
+    }
+
     public MainMenuBuilder addSingleStockUseCase() {
         this.addSingleStock = true;
+        return this;
+    }
+
+    public MainMenuBuilder addLoginUseCase() {
+        this.addLogin = true;
         return this;
     }
 
     public MainMenuBuilder addChangeViewUseCase() {
         this.addChangeView = true;
         return this;
+    }
+
+    public MainMenuBuilder addSignupUseCase() {
+        this.addSignup = true;
+        return this;
+    }
+
+    private void addSignUpUseCaseDirectly() {
+        final SignupView view = (SignupView) getView(SignupView.VIEW_NAME);
+        final SignupPresenter presenter = new SignupPresenter(loginView.getView().getViewModel(), view.getViewModel(), viewManagerModel);
+
+        final SignupInteractor signupInteractor = new SignupInteractor(userDAO, presenter, new CommonUserFactory());
+        final SignupController controller =
+                new SignupController(signupInteractor);
+
+        view.setController(controller);
+    }
+
+    private void addLoginUseCaseDirectly() {
+        final LoginView view = (LoginView) getView(LoginView.VIEW_NAME);
+        final LoginPresenter presenter = new LoginPresenter(mainMenu.getView().getViewModel(), view.getViewModel(), viewManagerModel);
+
+        final LoginInteractor loginInteractor = new LoginInteractor(userDAO, presenter);
+        final LoginController controller =
+                new LoginController(loginInteractor);
+
+        view.setController(controller);
     }
 
     private void addSingleStockUseCaseDirectly() {
@@ -228,6 +271,7 @@ public class MainMenuBuilder {
         getView(AddPortfolioView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(PortfolioMenuView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(AddStockMenuView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(LoginView.VIEW_NAME).setChangeViewController(changeViewController);
     }
 
     public MainMenuBuilder addMainViewUseCase() {
@@ -272,8 +316,20 @@ public class MainMenuBuilder {
         return this;
     }
 
+    public MainMenuBuilder addUserDAO() {
+        try {
+            userDAO = new FileUserDataAccessObject("./users.csv", new CommonUserFactory());
+        }
+        catch (IOException ioException) {
+            throw new RuntimeException("Could not create/open user data file.", ioException);
+        }
+        return this;
+    }
+
     public JFrame autoBuild() {
         return this
+                .addLoginView()
+                .addSignupView()
                 .addMainView()
                 .addImportExportView()
                 .addPortfolioMenuView()
@@ -287,7 +343,10 @@ public class MainMenuBuilder {
                 .addPortfolioMenuUseCase()
                 .addStockMenuUseCase()
                 .addSingleStockUseCase()
+                .addLoginUseCase()
+                .addSignupUseCase()
                 .addSingleStockDAO()
+                .addUserDAO()
                 .build();
     }
 
@@ -303,6 +362,12 @@ public class MainMenuBuilder {
         if (addSingleStock) {
             this.addSingleStockUseCaseDirectly();
         }
+        if (addLogin) {
+            this.addLoginUseCaseDirectly();
+        }
+        if(addSignup){
+            this.addSignUpUseCaseDirectly();
+        }
         for (UseCaseWrapper<?, ?, ?, ?, ?> usecaseBuilder : this.useCaseBuildInstruction) {
             usecaseBuilder.build(this);
         }
@@ -314,7 +379,7 @@ public class MainMenuBuilder {
 
         frame.add(cardPanel);
 
-        viewManagerModel.setActiveView(getView(MainMenuView.VIEW_NAME).getViewName());
+        viewManagerModel.setActiveView(getView(LoginView.VIEW_NAME).getViewName());
         viewManagerModel.firePropertyChange();
 
         return frame;
