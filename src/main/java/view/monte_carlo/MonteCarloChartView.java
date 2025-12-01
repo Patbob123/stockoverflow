@@ -24,7 +24,7 @@ public class MonteCarloChartView {
 
     // ---------- CHART BUILDERS ----------
 
-    private static JFreeChart buildPathsChart(double[][] paths, int nToShow, String title) {
+    public static JFreeChart buildPathsChart(double[][] paths, int nToShow, String title) {
         XYSeriesCollection dataset = new XYSeriesCollection();
         int show = Math.min(nToShow, paths.length);
 
@@ -73,4 +73,3 @@ public class MonteCarloChartView {
         frame.setVisible(true);
     }
 }
-

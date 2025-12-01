@@ -7,12 +7,11 @@ public class StatisticsCalculator {
 
     private static final int TRADING_DAYS_PER_YEAR = 252;
 
-    // --- Core Statistical Methods (MISSING METHOD ADDED) ---
 
     /**
      * Calculates the mean (average) of an array of doubles.
      */
-    public double mean(double[] returns) { // <--- THIS IS THE MISSING METHOD
+    public double mean(double[] returns) {
         double sum = 0.0;
         if (returns.length == 0) {
             return 0.0;

@@ -1,6 +1,8 @@
 package use_case.monte_carlo;
 
+import data_access.FileMonteCarloDataAccess;
 import entities.StockMetrics;
+import entities.monte_carlo.MonteCarloSimulation;
 import entities.monte_carlo.MonteCarloSimulator;
 import data_access.StooqStockDataAccess;
 import entities.PriceBar;
@@ -19,18 +21,20 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
     private final MonteCarloSimulator simulator;
     private final StatisticsCalculator metricsCalculator;
     private final MonteCarloOutputBoundary outputBoundary;
-
+    private final FileMonteCarloDataAccess montecarloDataAccess;
     /**
      * Interactor dependencies are injected.
      */
     public MonteCarloAnalysisInteractor(StooqStockDataAccess dataAccess,
                                         MonteCarloSimulator simulator,
                                         StatisticsCalculator metricsCalculator,
-                                        MonteCarloOutputBoundary outputBoundary) {
+                                        MonteCarloOutputBoundary outputBoundary,
+                                        FileMonteCarloDataAccess montecarloDataAccess) {
         this.dataAccess = dataAccess;
         this.simulator = simulator;
         this.metricsCalculator = metricsCalculator;
         this.outputBoundary = outputBoundary;
+        this.montecarloDataAccess = montecarloDataAccess;
     }
 
     /**
@@ -44,7 +48,6 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
             int nSteps = inputData.getNSteps();
             int nPaths = inputData.getNPaths();
 
-            // 1. Data Fetching (Use 400 days history as per your previous interactor)
             List<PriceBar> priceHistory = dataAccess.getDailySeries(ticker, 400);
 
             if (priceHistory.size() < 2) {
@@ -79,6 +82,19 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
                     initialPrice,
                     meanTerminalPrice
             );
+
+            MonteCarloSimulation simulationResult = new MonteCarloSimulation(
+                    inputData.getTicker(),
+                    inputData.getHorizonYears(),
+                    inputData.getNPaths(),
+                    inputData.getNSteps(),
+                    muAnnual,
+                    sigmaAnnual,
+                    meanTerminalPrice,
+                    simulatedPaths
+            );
+
+            montecarloDataAccess.saveSimulation(simulationResult);
 
             outputBoundary.presentSuccess(output);
 

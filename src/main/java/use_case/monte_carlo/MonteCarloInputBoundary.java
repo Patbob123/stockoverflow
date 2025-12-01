@@ -1,7 +1,5 @@
 package use_case.monte_carlo;
 
-import use_case.InputBoundary;
-
-public interface MonteCarloInputBoundary extends InputBoundary {
+public interface MonteCarloInputBoundary {
     void execute(MonteCarloInputData inputData);
 }

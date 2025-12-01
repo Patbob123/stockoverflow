@@ -1,6 +1,5 @@
 package interface_adapter.monte_carlo;
 
-import interface_adapter.AbsController;
 import use_case.monte_carlo.MonteCarloInputBoundary;
 import use_case.monte_carlo.MonteCarloInputData;
 
@@ -9,7 +8,7 @@ import use_case.monte_carlo.MonteCarloInputData;
  * suitable for the Use Case layer (Input Data), then triggers the Interactor.
  * This class belongs to the Interface Adapters Layer.
  */
-public class MonteCarloController extends AbsController {
+public class MonteCarloController {
 
     private final MonteCarloInputBoundary interactor;
 
