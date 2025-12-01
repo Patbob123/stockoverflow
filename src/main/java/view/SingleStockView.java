@@ -173,6 +173,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         CompareBtn.addActionListener(this::onCompareClicked);
         ScenarioBtn.addActionListener(this::onScenarioClicked);
         MonteCarloBtn.addActionListener(this::onMonteCarloClicked);
+        ExitBtn.addActionListener(this::onExitClicked);
     }
 
     //lets save history after we closed the app
@@ -407,6 +408,9 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
         }
     }
 
+    private void onExitClicked(ActionEvent e) {
+        System.exit(0);
+    }
     @Override
     public void showAnalysis(AnalyzeSingleStockOutputData outputData) {
         infoArea.setText(outputData.getReport());
