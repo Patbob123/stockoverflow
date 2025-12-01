@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +15,8 @@ import interface_adapter.portfolio.PortfolioMenuController;
 import interface_adapter.portfolio.PortfolioMenuViewModel;
 import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.portfolio.addStock.AddStockMenuState;
+import interface_adapter.historical_simulation.HistoricalSimulationViewModel;
+import interface_adapter.historical_simulation.HistoricalSimulationState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,14 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
 
     @Setter
     private ChangeViewController changeViewController;
+
+
+    private HistoricalSimulationViewModel historyViewModel;
+
+    public void setHistoryViewModel(HistoricalSimulationViewModel historyViewModel) {
+        this.historyViewModel = historyViewModel;
+    }
+
 
     public static final String VIEW_NAME = "PortfolioMenu";
 
@@ -50,8 +59,6 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
 
     public PortfolioMenuView(PortfolioMenuViewModel viewModel) {
         super(viewModel);
-        //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TO
-
         this.getViewModel().addPropertyChangeListener(this);
 
         final JPanel buttons = new JPanel();
@@ -66,10 +73,8 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
         buttons.add(exitButton);
 
         final JPanel changeNameBox = new JPanel();
-
         changeNameBox.add(nameField);
         changeNameBox.add(changeNameButton);
-
         buttons.add(changeNameBox);
 
         checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
@@ -91,13 +96,15 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
         addButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(addButton)) {
-                        //MainMenuController.execute(noteInputField.getText());
                         final String addStockViewName = AddStockMenuView.VIEW_NAME;
-                        final ViewModel<AddStockMenuState> addStockMenuViewModel =
-                                (ViewModel<AddStockMenuState>) changeViewController.getViewModel(
-                                        addStockViewName);
-                        this.getController().getPortfolioMenuInputBoundary().executeAddStock(addStockMenuViewModel);
 
+                        try {
+                            final ViewModel<AddStockMenuState> addStockMenuViewModel =
+                                    (ViewModel<AddStockMenuState>) changeViewController.getViewModel(addStockViewName);
+                            this.getController().getPortfolioMenuInputBoundary().executeAddStock(addStockMenuViewModel);
+                        } catch (Exception e) {
+                            System.out.println("Warning: AddStock logic might need update similar to Simulation.");
+                        }
                         changeViewController.changeView(addStockViewName);
                     }
                 }
@@ -122,16 +129,42 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
         simulationButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(simulationButton)) {
-                        //MainMenuController.execute(noteInputField.getText());
+                        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
 
+                        if (portfolio == null || portfolio.getStockAmount().isEmpty()) {
+                            JOptionPane.showMessageDialog(this, "Portfolio is empty!");
+                            return;
+                        }
+
+                        if (this.historyViewModel != null) {
+
+                            HistoricalSimulationState historyState = this.historyViewModel.getState();
+
+                            Map<String, Double> stockData = new HashMap<>();
+
+                            for (Map.Entry<String, Integer> entry : portfolio.getStockAmount().entrySet()) {
+                                stockData.put(entry.getKey(), entry.getValue().doubleValue());
+                            }
+                            historyState.setPortfolioStocks(stockData);
+                            this.historyViewModel.setState(historyState);
+
+
+                            this.historyViewModel.firePropertyChange();
+
+
+                            changeViewController.changeView(HistoricalSimulationViewModel.VIEW_NAME);
+                        } else {
+                            System.err.println("Error: HistoryViewModel not injected into PortfolioMenuView. Check AppBuilder.");
+                            JOptionPane.showMessageDialog(this, "System Error: Simulation module not connected.");
+                        }
                     }
                 }
         );
+        // ===================================
 
         selectAllButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(selectAllButton)) {
-                        //MainMenuController.execute(noteInputField.getText());
                         checkBoxConfigure(true);
                     }
                 }
@@ -141,7 +174,6 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
                 evt -> {
                     if (evt.getSource().equals(clearSelectionButton)) {
                         checkBoxConfigure(false);
-
                     }
                 }
         );
@@ -158,7 +190,7 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
         savePortfolioDatabaseButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(savePortfolioDatabaseButton)) {
-                        //
+                        // Implement DB save
                     }
                 }
         );
@@ -168,8 +200,9 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
                     if (evt.getSource().equals(sortbyComboBox)) {
                         final String method = (String) sortbyComboBox.getSelectedItem();
                         final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
-                        portfolio.sortStockBy(portfolio.getPortfolioSortMap().get(method));
-                        // portfolio.sortStockBy();
+                        if (portfolio != null && portfolio.getPortfolioSortMap() != null) {
+                            portfolio.sortStockBy(portfolio.getPortfolioSortMap().get(method));
+                        }
                     }
                 }
         );
@@ -179,15 +212,12 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
                     if (evt.getSource().equals(changeNameButton)) {
                         final String name = nameField.getText();
                         final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
-                        if (name.isEmpty()) {
-                            System.out.println(portfolio.getName());
+                        if (portfolio != null) {
+                            if (!name.isEmpty()) {
+                                portfolio.setName(name);
+                                this.refresh();
+                            }
                         }
-                        else {
-                            portfolio.setName(name);
-                            this.refresh();
-                            System.out.println(portfolio.getName());
-                        }
-                        // portfolio.sortStockBy();
                     }
                 }
         );
@@ -201,8 +231,6 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
         );
 
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-
-        //this.add(noteName);
         portfolioStockBox.add(stocksPanel);
         this.add(portfolioStockBox);
         this.add(buttons);
@@ -241,17 +269,20 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
             checkBoxPanel.add(tickerPanel);
             jPanelMap.put(checkBox, tickerPanel);
         }
+        checkBoxPanel.revalidate();
+        checkBoxPanel.repaint();
     }
 
     public void refresh() {
-        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
-        this.getController().getPortfolioMenuInputBoundary().executeUpdatePortfolio(portfolio);
-        this.refreshCheckBoxPanel(portfolio);
+        if (this.getViewModel().getState().getPortfolio() != null) {
+            final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+            this.getController().getPortfolioMenuInputBoundary().executeUpdatePortfolio(portfolio);
+            this.refreshCheckBoxPanel(portfolio);
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
     }
 
     @Override
