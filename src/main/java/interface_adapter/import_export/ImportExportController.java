@@ -28,8 +28,8 @@ public class ImportExportController extends AbsController {
         importExportInputBoundary.executeExportPortfolio(portfolioList, filepath);
     }
 
-    public void exportSimData(Simulation simulation, String filepath) {
-        importExportInputBoundary.executeExportSimData(simulation, filepath);
+    public void exportSimData(String filepath) {
+        importExportInputBoundary.executeExportSimData(filepath);
     }
 
     public void loadAvailableData() {

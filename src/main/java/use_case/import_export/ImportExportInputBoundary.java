@@ -11,7 +11,7 @@ public interface ImportExportInputBoundary extends InputBoundary {
 
     void executeExportPortfolio(PortfolioList portfolioList, String filepath);
 
-    void executeExportSimData(Simulation simulation, String filepath);
+    void executeExportSimData(String filepath);
 
     void loadAvailableData();
 

@@ -327,6 +327,11 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addImportExportDAO() {
+        importExportDAO = new ImportExportDataAccessObject();
+        return this;
+    }
+
     public JFrame autoBuild() {
         return this
                 .addLoginView()
@@ -348,6 +353,7 @@ public class AppBuilder {
                 .addSignupUseCase()
                 .addSingleStockDAO()
                 .addUserDAO()
+                .addImportExportDAO()
                 .build();
     }
 

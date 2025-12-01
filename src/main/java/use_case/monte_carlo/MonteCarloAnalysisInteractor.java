@@ -112,7 +112,7 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
         try {
             // 1. Call the persistence gateway to fetch the data
             List<MonteCarloSimulation> history =
-                    montecarloDataAccess.getHistory(ticker); // <-- Calls your FileMonteCarloDataAccess
+                    montecarloDataAccess.getHistory(ticker);
 
 
             if (history.isEmpty()) {
@@ -120,8 +120,7 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
                 return;
             }
 
-            // 2. Format and present the history
-            // NOTE: You'll need to update your Presenter/OutputData to handle this list.
+
             presenter.presentHistorySuccess(history);
 
         } catch (Exception e) {

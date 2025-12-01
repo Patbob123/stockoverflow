@@ -62,9 +62,9 @@ public class ImportExportInteractor implements ImportExportInputBoundary {
     }
 
     @Override
-    public void executeExportSimData(Simulation simulation, String filePath) {
+    public void executeExportSimData(String filePath) {
 //        try {
-            importExportDAO.saveSimulation(simulation, filePath);
+            importExportDAO.saveSimulation(filePath);
             importExportOutputBoundary.prepareSuccessView("Exported simulation to: " + filePath);
 
 //        }
@@ -78,7 +78,7 @@ public class ImportExportInteractor implements ImportExportInputBoundary {
     public void loadAvailableData() {
         //try {
             List<Portfolio> portfolios = importExportDAO.getAllPortfolios();
-            List<Simulation> simulations = importExportDAO.getAllSimulations();
+            //List<Simulation> simulations = importExportDAO.getAllSimulations();
             //importExportOutputBoundary.presentAvailableData(portfolios, simulations);
         //}
 //        catch (Exception e) {

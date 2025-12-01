@@ -5,13 +5,14 @@ import java.util.List;
 import entities.Portfolio.Portfolio;
 import entities.Portfolio.PortfolioList;
 import entities.Simulation;
+import entities.monte_carlo.MonteCarloSimulation;
 
 public interface ImportExportDataAccessInterface {
     void savePortfolio(PortfolioList portfolioList, String filePath);
-    void saveSimulation(Simulation simulation, String filePath);
+    void saveSimulation(String filePath);
     void saveCurrentSession(String filePath);
     PortfolioList loadPortfolios(String filePath);
 
     List<Portfolio> getAllPortfolios();
-    List<Simulation> getAllSimulations();
+    List<MonteCarloSimulation> getAllSimulations();
 }

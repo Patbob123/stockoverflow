@@ -29,7 +29,7 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
     private final JLabel errorLabel = new JLabel();
 
     private final JComboBox<Portfolio> portfolioDropdown = new JComboBox<>();
-    private final JComboBox<Simulation> simulationDropdown = new JComboBox<>();
+    private final JComboBox<String> simulationDropdown = new JComboBox<>(new String[]{"Bulk"});
 
     public ImportExportView(ImportExportViewModel importExportViewModel) {
         super(importExportViewModel);
@@ -326,7 +326,7 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         });
 
         currentSessionButton.addActionListener(e -> {
-            final String path = getDirectoryPath();
+            final String path = getDirectoryPath("ticker_history.csv");
             if (path == null) {
                 errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
                 return;
@@ -338,7 +338,7 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
             final Portfolio selected = (Portfolio) portfolioDropdown.getSelectedItem();
             PortfolioList portfolioList = new PortfolioList();
             portfolioList.addPortfolio(selected);
-            final String path = getDirectoryPath();
+            final String path = getDirectoryPath("portfolios.csv");
             if (path == null) {
                 errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
                 return;
@@ -351,17 +351,13 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         });
 
         selectSimDataButton.addActionListener(e -> {
-            final Simulation selected = (Simulation) simulationDropdown.getSelectedItem();
-            final String path = getDirectoryPath();
+            // Alexfinal Simulation selected = (Simulation) simulationDropdown.getSelectedItem();
+            final String path = getDirectoryPath("simulation.csv");
             if (path == null) {
                 errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
                 return;
             }
-            if (selected == null) {
-                errorLabel.setText(ImportExportViewModel.ERROR_NO_SIMULATION);
-                return;
-            }
-            this.getController().exportSimData(selected, path);
+            this.getController().exportSimData(path);
         });
 
         backButton.addActionListener(evt -> {
@@ -387,10 +383,11 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         return result == JFileChooser.APPROVE_OPTION ? chooser.getSelectedFile().getAbsolutePath() : null;
     }
 
-    private String getDirectoryPath() {
+    private String getDirectoryPath(String defaultFileName) {
         final JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.setSelectedFile(new java.io.File(defaultFileName));
         chooser.setDialogTitle(ImportExportViewModel.FOLDER_DIALOG_TITLE);
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         final int result = chooser.showSaveDialog(this);
         return result == JFileChooser.APPROVE_OPTION ? chooser.getSelectedFile().getAbsolutePath() : null;
     }

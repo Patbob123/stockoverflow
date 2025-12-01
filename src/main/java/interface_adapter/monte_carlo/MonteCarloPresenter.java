@@ -71,7 +71,6 @@ public class MonteCarloPresenter implements MonteCarloOutputBoundary {
             ));
         }
 
-        // Assuming your SwingMonteCarloView has a method to display this report
         view.displayHistory(report.toString());
     }
 
