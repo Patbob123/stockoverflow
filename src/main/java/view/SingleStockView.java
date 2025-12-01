@@ -281,10 +281,24 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
                 new FileMonteCarloDataAccess());
         MonteCarloInputPanel panel = new MonteCarloInputPanel(tkr, new MonteCarloController(interactor));
 
-        frame.add(panel);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        Window parent = SwingUtilities.getWindowAncestor(this);
+
+        // Use JDialog to ensure it is modal and closes correctly
+        JDialog dialog = new JDialog(
+                (parent instanceof Frame) ? (Frame) parent : null, // Cast parent to Frame if possible
+                "Monte Carlo Simulation Input for " + tkr,
+                Dialog.ModalityType.APPLICATION_MODAL // Blocks interaction with parent until dismissed
+        );
+
+        // --- CLOSING BUG FIX ---
+        // This tells the dialog to just close and dispose of itself, NOT the entire application.
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+        // 4. Display the Dialog
+        dialog.getContentPane().add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
 
 
 
