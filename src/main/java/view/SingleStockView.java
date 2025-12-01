@@ -422,6 +422,32 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
         }
     }
 
+    private void onMonteCarloHistoryClicked(ActionEvent e) {
+        String tkr = tickerField.getText().trim().toUpperCase(Locale.ROOT);
+
+        // 1. Ticker Validation
+        if (!tkr.matches("[A-Z0-9.]{1,10}")) {
+            showError("Invalid ticker format for history lookup.");
+            return;
+        }
+
+        SwingMonteCarloView view =  new SwingMonteCarloView();
+        MonteCarloAnalysisInteractor interactor = new MonteCarloAnalysisInteractor(new StooqStockDataAccess(),
+                new MonteCarloSimulator(),
+                new StatisticsCalculator(),
+                new MonteCarloPresenter(view),
+                new FileMonteCarloDataAccess());
+        MonteCarloController controller = new MonteCarloController(interactor);
+        MonteCarloInputPanel panel = new MonteCarloInputPanel(tkr, controller);
+
+        try {
+            controller.showHistory(tkr);
+        } catch (Exception ex) {
+            // Catch any unexpected runtime errors from the retrieval process
+            showError("Failed to initiate history retrieval: " + ex.getMessage());
+        }
+    }
+
     private void onExitClicked(ActionEvent e) {
         System.exit(0);
     }

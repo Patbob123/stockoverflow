@@ -10,6 +10,8 @@ public interface MonteCarloView {
      */
     void showSuccessView(MonteCarloViewModel viewModel);
 
+    void displayHistory(String history);
+
     /**
      * Shows the error view with the given message.
      */
