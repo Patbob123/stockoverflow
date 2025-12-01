@@ -8,9 +8,6 @@ import javax.swing.*;
 
 import data_access.*;
 import entities.CommonUserFactory;
-import interface_adapter.create_portfolio.CreatePortfolioController;
-import interface_adapter.create_portfolio.CreatePortfolioPresenter;
-import interface_adapter.create_portfolio.CreatePortfolioViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
@@ -28,7 +25,6 @@ import interface_adapter.singlestock.SingleStockPresenter;
 import interface_adapter.singlestock.SingleStockViewInterface;
 import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.UserDataAccessInterface;
-import use_case.create_portfolio.CreatePortfolioInteractor;
 import use_case.import_export.ImportExportDataAccessInterface;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
@@ -68,6 +64,13 @@ import view.*;
 import app.wrapper.UseCaseWrapper;
 import app.wrapper.ViewViewModelBuilderWrapper;
 
+
+import interface_adapter.historical_simulation.HistoricalSimulationViewModel;
+import interface_adapter.historical_simulation.HistoricalSimulationController;
+import interface_adapter.historical_simulation.HistoricalSimulationPresenter;
+import use_case.historical_simulation.HistoricalSimulationInteractor;
+
+
 public class AppBuilder {
 
     private static final Dimension SCREENSIZE = Toolkit.getDefaultToolkit().getScreenSize();
@@ -81,6 +84,7 @@ public class AppBuilder {
     private Boolean addSingleStock = false;
     private Boolean addLogin = false;
     private Boolean addSignup = false;
+    private Boolean addShowGraph = false;
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -115,11 +119,13 @@ public class AppBuilder {
     private final ViewViewModelBuilderWrapper<SignupViewModel, SignupView> signupView =
             new ViewViewModelBuilderWrapper<>(new SignupViewModel(), SignupView::new);
 
-    private final ViewViewModelBuilderWrapper<ShowGraphViewModel, ShowGraphView> showGraphView =
+    private final ViewViewModelBuilderWrapper<ShowGraphViewModel, ShowGraphView> showGraphMenu =
             new ViewViewModelBuilderWrapper<>(new ShowGraphViewModel(), ShowGraphView::new);
 
-    private final ViewViewModelBuilderWrapper<CreatePortfolioViewModel, CreatePortfolioMenuView> createPortfolioMenu =
-            new ViewViewModelBuilderWrapper<>(new CreatePortfolioViewModel(), CreatePortfolioMenuView::new);
+    // === Historical Simulation View Builder ===
+    private final ViewViewModelBuilderWrapper<HistoricalSimulationViewModel, HistoricalSimulationView> historicalSimulationMenu =
+            new ViewViewModelBuilderWrapper<>(new HistoricalSimulationViewModel(), HistoricalSimulationView::new);
+    // ===========================================
 
     private final UseCaseWrapper<MainMenuInteractor,
             MainMenuPresenter,
@@ -127,9 +133,9 @@ public class AppBuilder {
             MainMenuViewModel,
             MainMenuView> mainmenuUsecase =
             new UseCaseWrapper<>(viewManager,
-            MainMenuPresenter::new,
-            MainMenuInteractor::new,
-            MainMenuController::new, MainMenuView.VIEW_NAME);
+                    MainMenuPresenter::new,
+                    MainMenuInteractor::new,
+                    MainMenuController::new, MainMenuView.VIEW_NAME);
 
     private final UseCaseWrapper<ImportExportInteractor,
             ImportExportPresenter,
@@ -137,13 +143,8 @@ public class AppBuilder {
             ImportExportViewModel,
             ImportExportView> importExportUsecase =
             new UseCaseWrapper<>(viewManager,
-                    viewModel -> new ImportExportPresenter(
-                    (ImportExportViewModel) viewModel,
-                    portFolioMenu.getViewModel(),
-                    viewManagerModel
-            ),
-          presenter -> new ImportExportInteractor(presenter, importExportDAO),
-            ImportExportController::new, ImportExportView.VIEW_NAME);
+                    ImportExportPresenter::new, presenter -> new ImportExportInteractor(presenter, importExportDAO),
+                    ImportExportController::new, ImportExportView.VIEW_NAME);
 
     private final UseCaseWrapper<AddPortfolioInteractor,
             AddPortfolioPresenter,
@@ -151,9 +152,9 @@ public class AppBuilder {
             AddPortfolioViewModel,
             AddPortfolioView> addPortfolioUsecase =
             new UseCaseWrapper<>(viewManager,
-            AddPortfolioPresenter::new,
-            AddPortfolioInteractor::new,
-            AddPortfolioController::new, AddPortfolioView.VIEW_NAME);
+                    AddPortfolioPresenter::new,
+                    AddPortfolioInteractor::new,
+                    AddPortfolioController::new, AddPortfolioView.VIEW_NAME);
 
     private final UseCaseWrapper<PortfolioMenuInteractor,
             PortfolioMenuPresenter,
@@ -161,9 +162,9 @@ public class AppBuilder {
             PortfolioMenuViewModel,
             PortfolioMenuView> portfolioMenuUsecase =
             new UseCaseWrapper<>(viewManager,
-            PortfolioMenuPresenter::new,
-            PortfolioMenuInteractor::new,
-            PortfolioMenuController::new, PortfolioMenuView.VIEW_NAME);
+                    PortfolioMenuPresenter::new,
+                    PortfolioMenuInteractor::new,
+                    PortfolioMenuController::new, PortfolioMenuView.VIEW_NAME);
 
     private final UseCaseWrapper<AddStockMenuInteractor,
             AddStockMenuPresenter,
@@ -171,9 +172,9 @@ public class AppBuilder {
             AddStockMenuViewModel,
             AddStockMenuView> addStockMenuUsecase =
             new UseCaseWrapper<>(viewManager,
-            AddStockMenuPresenter::new,
-            AddStockMenuInteractor::new,
-            AddStockMenuController::new, AddStockMenuView.VIEW_NAME);
+                    AddStockMenuPresenter::new,
+                    AddStockMenuInteractor::new,
+                    AddStockMenuController::new, AddStockMenuView.VIEW_NAME);
 
     private final UseCaseWrapper<ShowGraphInteractor,
             ShowGraphPresenter,
@@ -191,17 +192,16 @@ public class AppBuilder {
                     },
                     ShowGraphView.VIEW_NAME);
 
-
-    private final UseCaseWrapper<CreatePortfolioInteractor,
-            CreatePortfolioPresenter,
-            CreatePortfolioController,
-            CreatePortfolioViewModel,
-            CreatePortfolioMenuView> createPortfolioMenuUsecase =
+    private final UseCaseWrapper<HistoricalSimulationInteractor,
+            HistoricalSimulationPresenter,
+            HistoricalSimulationController,
+            HistoricalSimulationViewModel,
+            HistoricalSimulationView> historicalSimulationUsecase =
             new UseCaseWrapper<>(viewManager,
-                    CreatePortfolioPresenter::new,
-                    presenter -> new CreatePortfolioInteractor(userDAO, presenter),
-                    CreatePortfolioController::new,
-                    CreatePortfolioMenuView.VIEW_NAME);
+                    HistoricalSimulationPresenter::new,
+                    presenter -> new HistoricalSimulationInteractor(presenter, stockPriceDAO),
+                    HistoricalSimulationController::new,
+                    HistoricalSimulationViewModel.VIEW_NAME);
 
     private PaddedView<?, ?> getView(String viewName) {
         return viewManager.getViews().get(viewName);
@@ -251,15 +251,12 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addShowGraphView(){
-        viewBuildInstruction.add(showGraphView);
+    // === Add Historical View ===
+    public AppBuilder addHistoricalSimulationView() {
+        viewBuildInstruction.add(historicalSimulationMenu);
         return this;
     }
-
-    public AppBuilder addCreatePortfolioView(){
-        viewBuildInstruction.add(createPortfolioMenu);
-        return this;
-    }
+    // ===============================
 
     public AppBuilder addSingleStockUseCase() {
         this.addSingleStock = true;
@@ -281,9 +278,22 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addShowGraphView(){
+        viewBuildInstruction.add(showGraphMenu);
+        return this;
+    }
+
+    public AppBuilder addShowGraphUseCase() {
+        this.addShowGraph = true;
+        useCaseBuildInstruction.add(showGraphUseCase);
+        return this;
+    }
 
 
-
+    public AppBuilder addHistoricalSimulationUseCase() {
+        useCaseBuildInstruction.add(historicalSimulationUsecase);
+        return this;
+    }
 
     private void addSignUpUseCaseDirectly() {
         final SignupView view = (SignupView) getView(SignupView.VIEW_NAME);
@@ -337,9 +347,13 @@ public class AppBuilder {
         getView(AddStockMenuView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(LoginView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(SignupView.VIEW_NAME).setChangeViewController(changeViewController);
-        getView(ShowGraphView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(SingleStockView.VIEW_NAME).setChangeViewController(changeViewController);
-        getView(CreatePortfolioMenuView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(ShowGraphView.VIEW_NAME).setChangeViewController(changeViewController);
+
+        HistoricalSimulationView historyView = (HistoricalSimulationView) getView(HistoricalSimulationViewModel.VIEW_NAME);
+        if (historyView != null) {
+            historyView.setChangeViewController(changeViewController);
+        }
     }
 
     public AppBuilder addMainViewUseCase() {
@@ -367,26 +381,13 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addShowGraphUseCase() {
-        useCaseBuildInstruction.add(showGraphUseCase);
-        return this;
-    }
-
-    public AppBuilder addCreatePortfolioUseCase() {
-        useCaseBuildInstruction.add(createPortfolioMenuUsecase);
-        return this;
-    }
-
     public AppBuilder addSingleStockDAO() {
-        String alphaKey = "YOUR_ALPHA_KEY_HERE"; // or System.getenv("ALPHAVANTAGE_API_KEY");
-
+        String alphaKey = "YOUR_ALPHA_KEY_HERE";
         final StockPriceDataAccessInterface stooqGateway =
                 new StooqStockDataAccess();
         final StockPriceDataAccessInterface alphaGateway =
                 new AlphaVantageStockPriceDataAccess(alphaKey);
-
         String fredKey = System.getenv("FRED_API_KEY");
-
 
         stockPriceDAO = new CombinedStockPriceDataAccess(stooqGateway, alphaGateway);
         riskFreeRateDAO = new FredRiskFreeRateDataAccess(fredKey);
@@ -418,12 +419,11 @@ public class AppBuilder {
                 .addPortfolioMenuView()
                 .addAddPortfolioView()
                 .addStockMenuView()
-                .addShowGraphView()
-                .addCreatePortfolioView()
                 .addSingleStockView()
+                .addShowGraphView()
+                .addHistoricalSimulationView()
                 .addChangeViewUseCase()
                 .addShowGraphUseCase()
-                .addCreatePortfolioUseCase()
                 .addMainViewUseCase()
                 .addPortfolioUseCase()
                 .addImportExportUseCase()
@@ -432,6 +432,7 @@ public class AppBuilder {
                 .addSingleStockUseCase()
                 .addLoginUseCase()
                 .addSignupUseCase()
+                .addHistoricalSimulationUseCase()
                 .addSingleStockDAO()
                 .addUserDAO()
                 .addImportExportDAO()
@@ -439,12 +440,9 @@ public class AppBuilder {
     }
 
     public JFrame build() {
-
         for (ViewViewModelBuilderWrapper<?, ?> viewBuilder : this.viewBuildInstruction) {
             viewBuilder.addView(this, cardPanel, viewManager);
         }
-        System.out.println("All registered views: " + viewManager.getViews().keySet());
-        System.out.println("ShowGraphView registered: " + viewManager.getViews().containsKey(ShowGraphView.VIEW_NAME));
         viewBuildInstruction.clear();
         if (addChangeView) {
             this.addChangeViewUseCaseDirectly();
@@ -468,6 +466,20 @@ public class AppBuilder {
                 System.out.println("DEBUG: Connected ShowGraphController to SingleStockView");
             }
         }
+
+        PortfolioMenuView portfolioMenuView = (PortfolioMenuView) getView(PortfolioMenuView.VIEW_NAME);
+        HistoricalSimulationView historyView = (HistoricalSimulationView) getView(HistoricalSimulationViewModel.VIEW_NAME);
+
+        if (portfolioMenuView != null && historyView != null) {
+            HistoricalSimulationViewModel historyViewModel = (HistoricalSimulationViewModel) historyView.getViewModel();
+            portfolioMenuView.setHistoryViewModel(historyViewModel);
+            System.out.println("DEBUG: Successfully injected HistoryViewModel into PortfolioMenuView");
+        } else {
+            System.err.println("ERROR: Could not find views to inject HistoryViewModel. " +
+                    "PortMenu: " + (portfolioMenuView!=null) + ", HistView: " + (historyView!=null));
+        }
+        // =========================================================================
+
         useCaseBuildInstruction.clear();
         final JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
