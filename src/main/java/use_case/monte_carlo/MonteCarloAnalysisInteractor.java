@@ -2,6 +2,7 @@ package use_case.monte_carlo;
 
 import data_access.FileMonteCarloDataAccess;
 import data_access.FileUserDataAccessObject;
+import entities.Stock;
 import entities.StockMetrics;
 import entities.monte_carlo.MonteCarloSimulation;
 import entities.monte_carlo.MonteCarloSimulator;
@@ -51,8 +52,8 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
             int nSteps = inputData.getNSteps();
             int nPaths = inputData.getNPaths();
 
-            List<PriceBar> priceHistory = dataAccess.getDailySeries(ticker, 400);
-
+            final Stock stock = dataAccess.getDailySeries(ticker, 400);
+            List<PriceBar> priceHistory = stock.getPriceHistory();
             if (priceHistory.size() < 2) {
                 outputBoundary.presentError("Analysis failed: Not enough data (" + priceHistory.size() + " days).");
                 return;

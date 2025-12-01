@@ -1,5 +1,6 @@
 package view;
 
+import entities.Portfolio.Portfolio;
 import entities.Stock;
 import interface_adapter.portfolio.PortfolioMenuState;
 import interface_adapter.portfolio.PortfolioMenuViewModel;
@@ -47,11 +48,26 @@ public class AddStockMenuView extends PaddedView<AddStockMenuViewModel, AddStock
         addStockButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(addStockButton)) {
-                        final Stock stock = ((PortfolioMenuState) getChangeViewController()
-                                .getViewModel(PortfolioMenuView.VIEW_NAME)
-                                .getState()).getStockPriceDataAccess()
-                                .getDailySeries(tickerField.getText().toUpperCase(), 400);
-                        this.getViewModel().getState().getPortfolio().addStock(stock, Integer.parseInt(tickerAmountField.getText()));
+                        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+                        if (portfolio.getStocks().containsKey(tickerField.getText())) {
+                            final int amount = Integer.parseInt(tickerAmountField.getText());
+                            if (amount != 0) {
+                                portfolio.addStock(portfolio.getStock(tickerField.getText()), amount);
+                            }
+                            else {
+                                portfolio.removeStock(tickerField.getText());
+                            }
+                        }
+                        else {
+                            final Stock stock = ((PortfolioMenuState) getChangeViewController()
+                                    .getViewModel(PortfolioMenuView.VIEW_NAME)
+                                    .getState()).getStockPriceDataAccess()
+                                    .getDailySeries(tickerField.getText().toUpperCase(), 400);
+
+                            portfolio.addStock(stock, Integer.parseInt(tickerAmountField.getText()));
+                        }
+                        tickerField.setText("");
+                        tickerAmountField.setText("");
                     }
                 }
         );
