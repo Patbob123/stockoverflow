@@ -26,8 +26,8 @@ public class SingleStockViewModel extends ViewModel<SingleStockState> {
     public static final String BUTTON_COMPARE = "Compare";
     public static final String BUTTON_SCENARIO = "Scenario and Stress Testing";
     public static final String BUTTON_MONTECARLO = "Monte Carlo";
+    public static final String BUTTON_MONTECARLOHISTORY = "Monte Carlo History";
     public static final String BUTTON_IMPORT = "Import/Export";
-    public static final String BUTTON_HISTORY = "History";
     public static final String BUTTON_EXIT = "Exit";
 
     // Default field values and sizes
