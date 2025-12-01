@@ -1,10 +1,19 @@
 package view;
 
+import data_access.FileMonteCarloDataAccess;
+import data_access.StooqStockDataAccess;
+import entities.StatisticsCalculator;
+import entities.monte_carlo.MonteCarloSimulator;
 import interface_adapter.monte_carlo.MonteCarloController;
+import interface_adapter.monte_carlo.MonteCarloPresenter;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockViewInterface;
+import use_case.monte_carlo.MonteCarloAnalysisInteractor;
+import use_case.monte_carlo.MonteCarloOutputBoundary;
 import use_case.singlestock.AnalyzeSingleStockOutputData;
 import view.monte_carlo.MonteCarloInputPanel;
+import view.monte_carlo.MonteCarloView;
+import view.monte_carlo.SwingMonteCarloView;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -35,11 +44,9 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
     private final JTextArea infoArea = new JTextArea(18, 48);
 
     private SingleStockController controller;
-    private final MonteCarloController monteCarloController;
 
-    public SingleStockView(SingleStockController controller, MonteCarloController monteCarloController) {
+    public SingleStockView(SingleStockController controller) {
         this.controller = controller;
-        this.monteCarloController = monteCarloController;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(screenSize);
         setLayout(new BorderLayout());
@@ -216,8 +223,14 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
         }
         JFrame frame = new JFrame("Monte Carlo Simulation Input for " + tkr);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        SwingMonteCarloView view = new  SwingMonteCarloView();
+        MonteCarloAnalysisInteractor interactor = new MonteCarloAnalysisInteractor(new StooqStockDataAccess(),
+                new MonteCarloSimulator(),
+                new StatisticsCalculator(),
+                new MonteCarloPresenter(view),
+                new FileMonteCarloDataAccess());
 
-        MonteCarloInputPanel panel = new MonteCarloInputPanel(tkr, monteCarloController);
+        MonteCarloInputPanel panel = new MonteCarloInputPanel(tkr, new MonteCarloController(interactor));
 
         frame.add(panel);
         frame.pack();
