@@ -28,6 +28,11 @@ public class SingleStockController extends AbsController {
                 new CompareTwoStocksInputData(ticker1, ticker2, rfAnnual);
         compareInteractor.execute(input);
     }
+
+    public void showGraph(String ticker){
+        System.out.println("Graphed requested for:" + ticker);
+    }
+
     //TODO do these if you worked on Monte carlo or scenario its for you to change
     public void runScenario(String ticker, double rfAnnual) {
         System.out.println("Scenario for " + ticker + " (rf=" + rfAnnual + ")");//just check for now

@@ -40,6 +40,9 @@ import interface_adapter.mainmenu.MainMenuController;
 import interface_adapter.mainmenu.MainMenuPresenter;
 import interface_adapter.mainmenu.MainMenuViewModel;
 import interface_adapter.portfolio.PortfolioMenuViewModel;
+import interface_adapter.show_graph.ShowGraphController;
+import interface_adapter.show_graph.ShowGraphPresenter;
+import interface_adapter.show_graph.ShowGraphViewModel;
 import use_case.add_portfolio.AddPortfolioInteractor;
 import use_case.change_view.ChangeViewInputBoundary;
 import use_case.change_view.ChangeViewInteractor;
@@ -54,6 +57,9 @@ import use_case.singlestock.AnalyzeSingleStockInteractor;
 import use_case.singlestock.CompareTwoStocksInteractor;
 import use_case.singlestock.RiskFreeRateDataAccessInterface;
 import use_case.singlestock.StockPriceDataAccessInterface;
+import use_case.show_graph.ShowGraphInteractor;
+import use_case.show_graph.ShowGraphInputBoundary;
+import use_case.show_graph.ShowGraphOutputBoundary;
 import view.*;
 import app.wrapper.UseCaseWrapper;
 import app.wrapper.ViewViewModelBuilderWrapper;
@@ -63,6 +69,7 @@ public class AppBuilder {
     private static final Dimension SCREENSIZE = Toolkit.getDefaultToolkit().getScreenSize();
     public static final double WIDTH = SCREENSIZE.getWidth();
     public static final double HEIGHT = SCREENSIZE.getHeight();
+    private ShowGraphController capturedShowGraphController;
 
     private final ArrayList<ViewViewModelBuilderWrapper<?, ?>> viewBuildInstruction = new ArrayList<>();
     private final ArrayList<UseCaseWrapper<?, ?, ?, ?, ?>> useCaseBuildInstruction = new ArrayList<>();
@@ -70,6 +77,7 @@ public class AppBuilder {
     private Boolean addSingleStock = false;
     private Boolean addLogin = false;
     private Boolean addSignup = false;
+    private Boolean addShowGraph = false;
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -103,6 +111,9 @@ public class AppBuilder {
 
     private final ViewViewModelBuilderWrapper<SignupViewModel, SignupView> signupView =
             new ViewViewModelBuilderWrapper<>(new SignupViewModel(), SignupView::new);
+
+    private final ViewViewModelBuilderWrapper<ShowGraphViewModel, ShowGraphView> showGraphMenu =
+            new ViewViewModelBuilderWrapper<>(new ShowGraphViewModel(), ShowGraphView::new);
 
     private final UseCaseWrapper<MainMenuInteractor,
             MainMenuPresenter,
@@ -152,6 +163,22 @@ public class AppBuilder {
             AddStockMenuPresenter::new,
             AddStockMenuInteractor::new,
             AddStockMenuController::new, AddStockMenuView.VIEW_NAME);
+
+    private final UseCaseWrapper<ShowGraphInteractor,
+            ShowGraphPresenter,
+            ShowGraphController,
+            ShowGraphViewModel,
+            ShowGraphView> showGraphUseCase =
+            new UseCaseWrapper<>(viewManager,
+                    (viewModel) -> new ShowGraphPresenter(viewManagerModel, (ShowGraphViewModel) viewModel),
+                    (presenter) -> {
+                        return new ShowGraphInteractor(stockPriceDAO, presenter);
+                    },
+                    (interactor) -> {
+                        this.capturedShowGraphController = new ShowGraphController(interactor);
+                        return this.capturedShowGraphController;
+                    },
+                    ShowGraphView.VIEW_NAME);
 
 
     private PaddedView<?, ?> getView(String viewName) {
@@ -222,6 +249,17 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addShowGraphView(){
+        viewBuildInstruction.add(showGraphMenu);
+        return this;
+    }
+
+    public AppBuilder addShowGraphUseCase() {
+        this.addShowGraph = true;
+        useCaseBuildInstruction.add(showGraphUseCase);
+        return this;
+    }
+
     private void addSignUpUseCaseDirectly() {
         final SignupView view = (SignupView) getView(SignupView.VIEW_NAME);
         final SignupPresenter presenter = new SignupPresenter(loginView.getView().getViewModel(), view.getViewModel(), viewManagerModel);
@@ -275,6 +313,7 @@ public class AppBuilder {
         getView(LoginView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(SignupView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(SingleStockView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(ShowGraphView.VIEW_NAME).setChangeViewController(changeViewController);
     }
 
     public AppBuilder addMainViewUseCase() {
@@ -344,7 +383,9 @@ public class AppBuilder {
                 .addAddPortfolioView()
                 .addStockMenuView()
                 .addSingleStockView()
+                .addShowGraphView()
                 .addChangeViewUseCase()
+                .addShowGraphUseCase()
                 .addMainViewUseCase()
                 .addPortfolioUseCase()
                 .addImportExportUseCase()
@@ -379,6 +420,13 @@ public class AppBuilder {
         }
         for (UseCaseWrapper<?, ?, ?, ?, ?> usecaseBuilder : this.useCaseBuildInstruction) {
             usecaseBuilder.build(this);
+        }
+        if (this.capturedShowGraphController != null) {
+            SingleStockView singleStockView = (SingleStockView) getView(SingleStockView.VIEW_NAME);
+            if (singleStockView != null) {
+                singleStockView.setShowGraphController(this.capturedShowGraphController);
+                System.out.println("DEBUG: Connected ShowGraphController to SingleStockView");
+            }
         }
         useCaseBuildInstruction.clear();
         final JFrame frame = new JFrame();
