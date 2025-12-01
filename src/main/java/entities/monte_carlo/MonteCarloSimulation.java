@@ -27,7 +27,7 @@ public class MonteCarloSimulation implements Serializable {
     private final double expectedTerminalPrice;
     @Getter
     private final double[][] simulationPaths;
-
+    @Getter
     private final LocalDateTime timestamp;
     @Getter
     @Setter

@@ -1,13 +1,15 @@
 package use_case.monte_carlo;
 
 import data_access.FileMonteCarloDataAccess;
-import entities.Stock;
+import data_access.FileUserDataAccessObject;
 import entities.StockMetrics;
 import entities.monte_carlo.MonteCarloSimulation;
 import entities.monte_carlo.MonteCarloSimulator;
 import data_access.StooqStockDataAccess;
 import entities.PriceBar;
 import entities.StatisticsCalculator;
+import interface_adapter.monte_carlo.MonteCarloPresenter;
+import view.monte_carlo.SwingMonteCarloView;
 
 import java.util.List;
 
@@ -49,8 +51,8 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
             int nSteps = inputData.getNSteps();
             int nPaths = inputData.getNPaths();
 
-            Stock stock = dataAccess.getDailySeries(ticker, 400);
-            List<PriceBar> priceHistory = stock.getPriceHistory();
+            List<PriceBar> priceHistory = dataAccess.getDailySeries(ticker, 400);
+
             if (priceHistory.size() < 2) {
                 outputBoundary.presentError("Analysis failed: Not enough data (" + priceHistory.size() + " days).");
                 return;
@@ -101,6 +103,29 @@ public class MonteCarloAnalysisInteractor implements MonteCarloInputBoundary {
 
         } catch (Exception e) {
             outputBoundary.presentError("An analysis error occurred: " + e.getMessage());
+        }
+    }
+
+    public void executeHistoryRetrieval(String ticker) {
+        SwingMonteCarloView view = new SwingMonteCarloView();
+        MonteCarloPresenter presenter = new MonteCarloPresenter(view);
+        try {
+            // 1. Call the persistence gateway to fetch the data
+            List<MonteCarloSimulation> history =
+                    montecarloDataAccess.getHistory(ticker); // <-- Calls your FileMonteCarloDataAccess
+
+
+            if (history.isEmpty()) {
+                presenter.presentError("No saved simulations found for " + ticker + ".");
+                return;
+            }
+
+            // 2. Format and present the history
+            // NOTE: You'll need to update your Presenter/OutputData to handle this list.
+            presenter.presentHistorySuccess(history);
+
+        } catch (Exception e) {
+            presenter.presentError("Error retrieving history: " + e.getMessage());
         }
     }
 }

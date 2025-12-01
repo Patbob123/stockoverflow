@@ -1,5 +1,9 @@
 package interface_adapter.mainmenu;
 
+import interface_adapter.login.LoginViewModel;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 
 /**
@@ -10,6 +14,10 @@ import java.util.Date;
 public class MainMenuState {
     private String username = "your name";
     private Date date;
+
+    @Getter
+    @Setter
+    private LoginViewModel loginViewModel;
 
     public String getUsername() {
         return username;

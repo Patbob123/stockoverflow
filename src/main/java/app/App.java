@@ -7,18 +7,14 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 
 
-
-
-public class MainMenu {
+public class App {
     public static void main(String[] args) {
 
         FlatDarkLaf.setup();
         try {
-            InputStream fontStream = MainMenu.class.getResourceAsStream("/fonts/MolganRegular-YqWj2.otf");
+            InputStream fontStream = App.class.getResourceAsStream("/fonts/MolganRegular-YqWj2.otf");
             Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontStream);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(customFont);
@@ -30,7 +26,7 @@ public class MainMenu {
             setUiFont(new FontUIResource("SansSerif", Font.PLAIN, 14));
         }
 
-        final MainMenuBuilder builder = new MainMenuBuilder();
+        final AppBuilder builder = new AppBuilder();
 //        Stock s = new Stock("ASDB", "asdasdasd");
 //        System.out.println(s.getTicker());
         final JFrame application = builder

@@ -21,13 +21,7 @@ public class LoginPresenter implements LoginOutputBoundary {
 @Override
 public void prepareSuccessView(LoginOutputData response) {
         this.mainMenuViewModel.getState().setUsername(response.getUsername());
-//    MainMenuState mainMenuState = mainMenuViewModel.getState();
-//    mainMenuState.setUsername(response.getUsername());
-//    this.mainMenuViewModel.setState(mainMenuState);
-    this.mainMenuViewModel.firePropertyChange();
-
-    this.viewManagerModel.setActiveView(mainMenuViewModel.getViewName());
-    this.viewManagerModel.firePropertyChange();
+        this.mainMenuViewModel.firePropertyChange();
 }
 
     @Override

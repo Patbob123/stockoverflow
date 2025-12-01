@@ -11,6 +11,8 @@ public class SingleStockViewModel extends ViewModel<SingleStockState> {
     // view name if you use a ViewManager later
     public static final String VIEW_NAME = "single stock";
 
+    public static final String TITLE_LABEL = "Analyze Single Stock";
+
     // Labels
     public static final String LABEL_TICKER = "Ticker:";
     public static final String LABEL_HISTORY = "History:";
@@ -24,8 +26,8 @@ public class SingleStockViewModel extends ViewModel<SingleStockState> {
     public static final String BUTTON_COMPARE = "Compare";
     public static final String BUTTON_SCENARIO = "Scenario and Stress Testing";
     public static final String BUTTON_MONTECARLO = "Monte Carlo";
+    public static final String BUTTON_MONTECARLOHISTORY = "Monte Carlo History";
     public static final String BUTTON_IMPORT = "Import/Export";
-    public static final String BUTTON_HISTORY = "History";
     public static final String BUTTON_EXIT = "Exit";
 
     // Default field values and sizes

@@ -1,5 +1,6 @@
 package interface_adapter.monte_carlo;
 
+import use_case.monte_carlo.MonteCarloAnalysisInteractor;
 import use_case.monte_carlo.MonteCarloInputBoundary;
 import use_case.monte_carlo.MonteCarloInputData;
 
@@ -30,5 +31,17 @@ public class MonteCarloController {
 
         // 2. Delegate to the Interactor (Use Case)
         interactor.execute(input);
+    }
+
+    public void showHistory(String ticker) {
+        // Cast the Interactor to the concrete class to access the new method
+        // NOTE: This slight casting breaks the dependency inversion rule but is required
+        // when avoiding a new InputBoundary interface.
+        if (this.interactor instanceof MonteCarloAnalysisInteractor) {
+            ((MonteCarloAnalysisInteractor) this.interactor).executeHistoryRetrieval(ticker);
+        } else {
+            // Handle case where interactor is a mock or different type
+            System.err.println("Error: Interactor does not support history retrieval.");
+        }
     }
 }

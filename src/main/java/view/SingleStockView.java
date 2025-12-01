@@ -1,11 +1,21 @@
 package view;
 
+import data_access.FileMonteCarloDataAccess;
 import data_access.FredRiskFreeRateDataAccess;
+import data_access.StooqStockDataAccess;
+import entities.StatisticsCalculator;
+import entities.monte_carlo.MonteCarloSimulator;
 import interface_adapter.import_export.ImportExportViewModel;
+import interface_adapter.monte_carlo.MonteCarloController;
+import interface_adapter.monte_carlo.MonteCarloPresenter;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockViewInterface;
 import interface_adapter.singlestock.SingleStockViewModel;
+import use_case.monte_carlo.MonteCarloAnalysisInteractor;
+import use_case.monte_carlo.MonteCarloOutputBoundary;
 import use_case.singlestock.AnalyzeSingleStockOutputData;
+import view.monte_carlo.MonteCarloInputPanel;
+import view.monte_carlo.SwingMonteCarloView;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -37,14 +47,12 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
 
     // Buttons (maybe more )
     private final JButton analyzeBtn;
-    private final JButton backBtn;
     private final JButton FredApiBtn;
     private final JButton CompareBtn;
     private final JButton ScenarioBtn;
     private final JButton MonteCarloBtn;
+    private final JButton MonteCarloHistoryBtn;
     private final JButton ImportBtn;
-    private final JButton HistoryBtn;
-    private final JButton ExitBtn;
     private final JButton backButton = createTextButton(ImportExportViewModel.BACK_BUTTON_LABEL);
 
     //now lets add history
@@ -61,6 +69,8 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         super(viewModel);
         this.viewModel = viewModel;
 
+
+
         // Initialize text fields using ViewModel defaults
         this.tickerField = new JTextField(
                 SingleStockViewModel.DEFAULT_TICKER,
@@ -76,18 +86,15 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
 
         // Initialize buttons using ViewModel labels
         this.analyzeBtn    = new JButton(SingleStockViewModel.BUTTON_ANALYZE);
-        this.backBtn       = new JButton(SingleStockViewModel.BUTTON_BACK);
         this.FredApiBtn    = new JButton(SingleStockViewModel.BUTTON_FRED);
         this.CompareBtn    = new JButton(SingleStockViewModel.BUTTON_COMPARE);
         this.ScenarioBtn   = new JButton(SingleStockViewModel.BUTTON_SCENARIO);
         this.MonteCarloBtn = new JButton(SingleStockViewModel.BUTTON_MONTECARLO);
+        this.MonteCarloHistoryBtn = new JButton(SingleStockViewModel.BUTTON_MONTECARLOHISTORY);
         this.ImportBtn     = new JButton(SingleStockViewModel.BUTTON_IMPORT);
-        this.HistoryBtn    = new JButton(SingleStockViewModel.BUTTON_HISTORY);
-        this.ExitBtn       = new JButton(SingleStockViewModel.BUTTON_EXIT);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(screenSize);
         setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(10, 10, 10, 10));
 
         JPanel inputs = new JPanel(new GridBagLayout());
         GridBagConstraints g = new GridBagConstraints();
@@ -122,14 +129,12 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         buttons.add(analyzeBtn);
-        buttons.add(backBtn);
         buttons.add(FredApiBtn);//add later done
         buttons.add(CompareBtn);
         buttons.add(ScenarioBtn);
         buttons.add(MonteCarloBtn);
+        buttons.add(MonteCarloHistoryBtn);
         buttons.add(ImportBtn);
-        buttons.add(HistoryBtn);
-        buttons.add(ExitBtn);
 
 
         g.gridx = 0; g.gridy = y;
@@ -141,8 +146,33 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         infoArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         JScrollPane infoScroll = new JScrollPane(infoArea);
 
-        add(inputs, BorderLayout.NORTH);
-        add(infoScroll, BorderLayout.CENTER);
+        add(inputs, BorderLayout.CENTER);
+        add(infoScroll, BorderLayout.SOUTH);
+
+        final JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(SingleStockViewModel.CARD_COLOUR);
+        topPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, SingleStockViewModel.BORDER_COLOUR),
+                new EmptyBorder(20, 30, 20, 30)
+        ));
+
+        topPanel.add(backButton, BorderLayout.WEST);
+
+        final JLabel title = new JLabel(SingleStockViewModel.TITLE_LABEL, SwingConstants.CENTER);
+        title.setFont(SingleStockViewModel.TITLE_FONT);
+        title.setForeground(SingleStockViewModel.TEXT_PRIMARY);
+        topPanel.add(title, BorderLayout.CENTER);
+
+        final JPanel spacer = new JPanel();
+        spacer.setOpaque(false);
+        spacer.setPreferredSize(new Dimension(100, 0));
+        topPanel.add(spacer, BorderLayout.EAST);
+
+        add(topPanel, BorderLayout.NORTH);
+
+        backButton.addActionListener(evt -> {
+            this.getChangeViewController().backView();
+        });
 
         loadHistoryFromDisk();
 
@@ -156,14 +186,12 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         });
 
         analyzeBtn.addActionListener(this::onAnalyzeClicked);
-        backBtn.addActionListener(e ->
-                JOptionPane.showMessageDialog(this, "Back to main menu (hook up in MainMenuBuilder)."));
         //connecting fred api to the button compare is added
         FredApiBtn.addActionListener(this::onFredApiClicked);
         CompareBtn.addActionListener(this::onCompareClicked);
         ScenarioBtn.addActionListener(this::onScenarioClicked);
         MonteCarloBtn.addActionListener(this::onMonteCarloClicked);
-        ExitBtn.addActionListener(this::onExitClicked);
+        MonteCarloHistoryBtn.addActionListener(this::onMonteCarloHistoryClicked);
     }
 
     //lets save history after we closed the app
@@ -254,27 +282,44 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
     }
 
     private void onMonteCarloClicked(ActionEvent e) {
-        String tkr = tickerField.getText().trim().toUpperCase(Locale.ROOT);
+        String tkr =  tickerField.getText().trim().toUpperCase(Locale.ROOT);
+
         if (!tkr.matches("[A-Z0-9.]{1,10}")) {
-            showError("Invalid ticker format.");
+            showError("Invalid base ticker format.");
             return;
         }
+        JFrame frame = new JFrame("Monte Carlo Simulation Input for " + tkr);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        double rf;
-        try {
-            rf = Double.parseDouble(rfField.getText().trim());
-        } catch (NumberFormatException ex) {
-            showError("Invalid risk-free rate.");
-            return;
-        }
+        SwingMonteCarloView view =  new SwingMonteCarloView();
+        MonteCarloAnalysisInteractor interactor = new MonteCarloAnalysisInteractor(new StooqStockDataAccess(),
+                new MonteCarloSimulator(),
+                new StatisticsCalculator(),
+                new MonteCarloPresenter(view),
+                new FileMonteCarloDataAccess());
+        MonteCarloInputPanel panel = new MonteCarloInputPanel(tkr, new MonteCarloController(interactor));
 
-        if (this.getController() == null) {
-            showError("Controller not set.");
-            return;
-        }
+        Window parent = SwingUtilities.getWindowAncestor(this);
 
-        // TODO:implement this in controller for monte carlo ALI!
-        this.getController().runMonteCarlo(tkr, rf);
+        // Use JDialog to ensure it is modal and closes correctly
+        JDialog dialog = new JDialog(
+                (parent instanceof Frame) ? (Frame) parent : null, // Cast parent to Frame if possible
+                "Monte Carlo Simulation Input for " + tkr,
+                Dialog.ModalityType.APPLICATION_MODAL // Blocks interaction with parent until dismissed
+        );
+
+        // --- CLOSING BUG FIX ---
+        // This tells the dialog to just close and dispose of itself, NOT the entire application.
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+        // 4. Display the Dialog
+        dialog.getContentPane().add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+
+
+
     }
 
     //when analyze button
@@ -392,6 +437,32 @@ private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
                     "FRED", JOptionPane.INFORMATION_MESSAGE);
         } catch (RuntimeException ex) {
             showError("FRED error: " + ex.getMessage());
+        }
+    }
+
+    private void onMonteCarloHistoryClicked(ActionEvent e) {
+        String tkr = tickerField.getText().trim().toUpperCase(Locale.ROOT);
+
+        // 1. Ticker Validation
+        if (!tkr.matches("[A-Z0-9.]{1,10}")) {
+            showError("Invalid ticker format for history lookup.");
+            return;
+        }
+
+        SwingMonteCarloView view =  new SwingMonteCarloView();
+        MonteCarloAnalysisInteractor interactor = new MonteCarloAnalysisInteractor(new StooqStockDataAccess(),
+                new MonteCarloSimulator(),
+                new StatisticsCalculator(),
+                new MonteCarloPresenter(view),
+                new FileMonteCarloDataAccess());
+        MonteCarloController controller = new MonteCarloController(interactor);
+        MonteCarloInputPanel panel = new MonteCarloInputPanel(tkr, controller);
+
+        try {
+            controller.showHistory(tkr);
+        } catch (Exception ex) {
+            // Catch any unexpected runtime errors from the retrieval process
+            showError("Failed to initiate history retrieval: " + ex.getMessage());
         }
     }
 

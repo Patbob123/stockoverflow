@@ -68,7 +68,9 @@ public class SignupView extends PaddedView<SignupViewModel, SignupController> im
                 }
         );
 
-        cancel.addActionListener(this);
+        cancel.addActionListener(e -> {
+            this.getChangeViewController().changeView(LoginView.VIEW_NAME);
+        });
 
         usernameInputField.addKeyListener(
                 new KeyListener() {
@@ -126,8 +128,7 @@ public class SignupView extends PaddedView<SignupViewModel, SignupController> im
                 });
 
         goToLogin.addActionListener(e -> {
-            this.viewManagerModel.setActiveView("log in");
-            this.viewManagerModel.firePropertyChange();
+            this.getChangeViewController().changeView(LoginView.VIEW_NAME);
         });
 
 
