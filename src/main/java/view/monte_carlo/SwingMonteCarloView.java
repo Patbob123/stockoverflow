@@ -8,13 +8,8 @@ import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.xy.*;
 import org.jfree.data.xy.*;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.BoxLayout;
-import java.awt.Dimension;
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Concrete implementation of the MonteCarloView interface using Swing/JFreeChart.
@@ -74,6 +69,31 @@ public class SwingMonteCarloView implements MonteCarloView {
     public void showErrorMessage(String message) {
         // Remains simple, as errors usually don't need complex formatting
         JOptionPane.showMessageDialog(null, message, "Analysis Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void displayHistory(String report) {
+        // Create the frame if not already created
+        JFrame frame = new JFrame("Monte Carlo Simulation History");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(700, 500);
+
+        // Create a text area to show the report
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 14)); // monospace keeps table aligned
+        textArea.setText(report);
+
+        // Put inside scroll pane
+        JScrollPane scrollPane = new JScrollPane(textArea);
+
+        // Add to frame
+        frame.add(scrollPane);
+
+        // Center window
+        frame.setLocationRelativeTo(null);
+
+        // Show frame
+        frame.setVisible(true);
     }
 
     // The previous displayMetrics and showPaths methods are removed/replaced

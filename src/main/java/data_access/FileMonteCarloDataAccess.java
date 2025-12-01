@@ -4,10 +4,12 @@ import entities.monte_carlo.MonteCarloSimulation;
 import use_case.monte_carlo.MonteCarloAccessInterface;
 
 import java.io.*;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,12 +64,32 @@ public class FileMonteCarloDataAccess implements MonteCarloAccessInterface{
         }
     }
 
+
+    // Inside data_access.FileMonteCarloDataAccess.java's getHistory method:
     @Override
     public List<MonteCarloSimulation> getHistory(String ticker) {
-        // This implementation would typically read all files, deserialize them,
-        // and filter by ticker. For simplicity, we just return an empty list here.
-        // In a real application, you would use a proper database (like SQL or MongoDB)
-        // for efficient querying/filtering.
-        return new ArrayList<>();
+        List<MonteCarloSimulation> history = new ArrayList<>();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(storagePath, "*.ser")) {
+            for (Path entry : stream) {
+                try {
+                    MonteCarloSimulation sim = getSimulation(entry.getFileName().toString().replace(".ser", ""));
+
+                    // Filter by Ticker
+                    if (sim.getTicker().equalsIgnoreCase(ticker)) {
+                        history.add(sim);
+                    }
+                } catch (RuntimeException ignore) {
+                    // Ignore corrupt or unreadable files
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading history directory.", e);
+        }
+
+        // Sort by timestamp (newest first)
+        history.sort(Comparator.comparing(MonteCarloSimulation::getTimestamp).reversed());
+
+        return history;
     }
 }
