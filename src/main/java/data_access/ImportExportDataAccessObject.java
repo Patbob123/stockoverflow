@@ -5,6 +5,7 @@ import entities.Portfolio.PortfolioList;
 import entities.Simulation;
 import use_case.import_export.ImportExportDataAccessInterface;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImportExportDataAccessObject implements ImportExportDataAccessInterface {
@@ -56,12 +57,12 @@ public class ImportExportDataAccessObject implements ImportExportDataAccessInter
 
     @Override
     public List<Portfolio> getAllPortfolios() {
-        return List.of();
+        return new ArrayList<>();
     }
 
     @Override
     public List<Simulation> getAllSimulations() {
-        return List.of();
+        return new ArrayList<>();
     }
 
 }

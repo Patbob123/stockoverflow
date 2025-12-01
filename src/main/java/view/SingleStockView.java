@@ -8,6 +8,7 @@ import interface_adapter.monte_carlo.MonteCarloController;
 import interface_adapter.monte_carlo.MonteCarloPresenter;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockViewInterface;
+import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.monte_carlo.MonteCarloAnalysisInteractor;
 import use_case.monte_carlo.MonteCarloOutputBoundary;
 import use_case.singlestock.AnalyzeSingleStockOutputData;
@@ -19,10 +20,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.util.Locale;
 
-public class SingleStockView extends JPanel implements SingleStockViewInterface {
+public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStockController> implements SingleStockViewInterface {
 
+    public static final String VIEW_NAME = "SingleStockView";
     // Inputs
     private final JTextField tickerField = new JTextField("AAPL", 10);
     private final JTextField rfField     = new JTextField("0.02", 6);
@@ -45,8 +48,8 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
 
     private SingleStockController controller;
 
-    public SingleStockView(SingleStockController controller) {
-        this.controller = controller;
+    public SingleStockView(SingleStockViewModel controller) {
+        super(controller);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(screenSize);
         setLayout(new BorderLayout());
@@ -109,6 +112,8 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
         //connecting fred api to the button compare is added
         FredApiBtn.addActionListener(this::onFredApiClicked);
         CompareBtn.addActionListener(this::onCompareClicked);
+        MonteCarloBtn.addActionListener(this::onMonteCarloClicked);
+        backBtn.addActionListener(this::onBackClicked);
     }
     public void setController(SingleStockController controller) {
         this.controller = controller;
@@ -241,6 +246,10 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
 
     }
 
+    private void onBackClicked(ActionEvent e) {
+
+    }
+
     @Override
     public void showAnalysis(AnalyzeSingleStockOutputData outputData) {
         infoArea.setText(outputData.getReport());
@@ -250,5 +259,15 @@ public class SingleStockView extends JPanel implements SingleStockViewInterface 
     public void showError(String message) {
         JOptionPane.showMessageDialog(this, message,
                 "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+
     }
 }

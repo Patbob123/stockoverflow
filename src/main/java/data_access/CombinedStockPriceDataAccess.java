@@ -24,7 +24,7 @@ public class CombinedStockPriceDataAccess implements StockPriceDataAccessInterfa
         try {
             first = primary.getDailySeries(ticker, maxDays);
         } catch (RuntimeException ex) {
-            first = List.of();
+            first = new ArrayList<>();
         }
 
         if (!first.isEmpty()) {

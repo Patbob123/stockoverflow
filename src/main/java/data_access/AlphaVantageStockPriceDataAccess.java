@@ -21,15 +21,15 @@ public class AlphaVantageStockPriceDataAccess implements StockPriceDataAccessInt
     private static final String BASE_URL = "https://www.alphavantage.co/query";
 
     private final OkHttpClient client = new OkHttpClient();
-    private final String apiKey;
+    private final String apiKey = "RM73FNUNQXWQ14SC";
 
     public AlphaVantageStockPriceDataAccess(String apiKey) {
-        this.apiKey = apiKey;
+
     }
 
     @Override
     public List<PriceBar> getDailySeries(String ticker, int maxDays) {
-        if (apiKey == null || apiKey.isBlank()) {
+        if (apiKey == null) {
             throw new RuntimeException("Alpha Vantage API key is missing.");
         }
 
