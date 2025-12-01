@@ -6,15 +6,19 @@ import entities.StatisticsCalculator;
 import entities.monte_carlo.MonteCarloSimulator;
 import interface_adapter.monte_carlo.MonteCarloController;
 import interface_adapter.monte_carlo.MonteCarloPresenter;
+import interface_adapter.show_graph.ShowGraphController;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockViewInterface;
 import interface_adapter.singlestock.SingleStockViewModel;
+import interface_adapter.singlestock.SingleStockController;
+import lombok.Setter;
 import use_case.monte_carlo.MonteCarloAnalysisInteractor;
 import use_case.monte_carlo.MonteCarloOutputBoundary;
 import use_case.singlestock.AnalyzeSingleStockOutputData;
 import view.monte_carlo.MonteCarloInputPanel;
 import view.monte_carlo.MonteCarloView;
 import view.monte_carlo.SwingMonteCarloView;
+
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -41,12 +45,14 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
     private final JButton ImportBtn  = new JButton("Import/Export");
     private final JButton HistoryBtn  = new JButton("History");
     private final JButton ExitBtn  = new JButton("Exit");
-
-
+    private final JButton graphBtn = new JButton("Show Graph");
 
     private final JTextArea infoArea = new JTextArea(18, 48);
 
+    @Setter
     private SingleStockController controller;
+    @Setter
+    private ShowGraphController showGraphController;
 
     public SingleStockView(SingleStockViewModel controller) {
         super(controller);
@@ -83,6 +89,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         buttons.add(analyzeBtn);
+        buttons.add(graphBtn);
         buttons.add(backBtn);
         buttons.add(FredApiBtn);//add later done
         buttons.add(CompareBtn);
@@ -107,6 +114,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
 
 
         analyzeBtn.addActionListener(this::onAnalyzeClicked);
+        graphBtn.addActionListener(this::onGraphClicked);
         backBtn.addActionListener(e ->
                 JOptionPane.showMessageDialog(this, "Back to main menu (hook up in MainMenuBuilder)."));
         //connecting fred api to the button compare is added
@@ -115,11 +123,9 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         MonteCarloBtn.addActionListener(this::onMonteCarloClicked);
         backBtn.addActionListener(this::onBackClicked);
     }
-    public void setController(SingleStockController controller) {
-        this.controller = controller;
-    }
+
     //when analyze button
-    private void onAnalyzeClicked(ActionEvent e) {//ERRROR HANDLE
+    private void onAnalyzeClicked(ActionEvent e) {  //ERROR HANDLE
         String tkr = tickerField.getText().trim().toUpperCase(Locale.ROOT);
         if (!tkr.matches("[A-Z0-9.]{1,10}")) {
             showError("Invalid ticker format.");
@@ -146,6 +152,29 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
             // show what went wrong (Stooq error, not enough data, etc.)
             showError(ex.getMessage());
             infoArea.setText("");  // clear the "Analyzing ..." text
+        }
+    }
+
+    private void onGraphClicked(ActionEvent e) {
+        String tkr = tickerField.getText().trim().toUpperCase(Locale.ROOT);
+        if (!tkr.matches("[A-Z0-9.]{1,10}")) {
+            showError("Invalid ticker format.");
+            return;
+        }
+
+        infoArea.setText("generating graph for" + tkr + "...");
+
+        try{
+            if(showGraphController != null){
+                showGraphController.execute(tkr, VIEW_NAME);
+            } else if(controller != null){
+                controller.showGraph(tkr);
+            } else {
+                showError("Controller not set.");
+            }
+        }catch(RuntimeException ex){
+            showError("Graph error: " + ex.getMessage());
+            infoArea.setText("");
         }
     }
     private void onCompareClicked(ActionEvent e) {

@@ -1,6 +1,8 @@
 package entities;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Stock {
 
@@ -19,6 +21,7 @@ public class Stock {
     // highest prise during period
     private Double low;
     // lowest
+    private Map<LocalDate, Double> historicalPrices = new HashMap<>();
 
     public Stock(String ticker, String name) {
         this.ticker = ticker;
@@ -69,7 +72,12 @@ public class Stock {
         this.low = low;
     }
     // we can get a price range for this quote aka high - low
-
+    public Map<LocalDate, Double> getHistoricalPrices() {
+        return historicalPrices;
+    }
+    public void setHistoricalPrices(Map<LocalDate, Double> historicalPrices) {
+        this.historicalPrices = historicalPrices;
+    }
     public double getDailyRange() {
         checkQuoteLoaded();
         return low - high;

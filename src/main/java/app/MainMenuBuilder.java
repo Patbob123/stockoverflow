@@ -39,6 +39,9 @@ import interface_adapter.mainmenu.MainMenuController;
 import interface_adapter.mainmenu.MainMenuPresenter;
 import interface_adapter.mainmenu.MainMenuViewModel;
 import interface_adapter.portfolio.PortfolioMenuViewModel;
+import interface_adapter.show_graph.ShowGraphController;
+import interface_adapter.show_graph.ShowGraphPresenter;
+import interface_adapter.show_graph.ShowGraphViewModel;
 import use_case.add_portfolio.AddPortfolioInteractor;
 import use_case.change_view.ChangeViewInputBoundary;
 import use_case.change_view.ChangeViewInteractor;
@@ -53,6 +56,9 @@ import use_case.singlestock.AnalyzeSingleStockInteractor;
 import use_case.singlestock.CompareTwoStocksInteractor;
 import use_case.singlestock.RiskFreeRateDataAccessInterface;
 import use_case.singlestock.StockPriceDataAccessInterface;
+import use_case.show_graph.ShowGraphInteractor;
+import use_case.show_graph.ShowGraphInputBoundary;
+import use_case.show_graph.ShowGraphOutputBoundary;
 import view.*;
 import app.wrapper.UseCaseWrapper;
 import app.wrapper.ViewViewModelBuilderWrapper;
@@ -62,6 +68,7 @@ public class MainMenuBuilder {
     private static final Dimension SCREENSIZE = Toolkit.getDefaultToolkit().getScreenSize();
     public static final double WIDTH = SCREENSIZE.getWidth();
     public static final double HEIGHT = SCREENSIZE.getHeight();
+    private ShowGraphController capturedShowGraphController;
 
     private final ArrayList<ViewViewModelBuilderWrapper<?, ?>> viewBuildInstruction = new ArrayList<>();
     private final ArrayList<UseCaseWrapper<?, ?, ?, ?, ?>> useCaseBuildInstruction = new ArrayList<>();
@@ -69,6 +76,7 @@ public class MainMenuBuilder {
     private Boolean addSingleStock = false;
     private Boolean addLogin = false;
     private Boolean addSignup = false;
+    private Boolean addShowGraph = false;
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -102,6 +110,9 @@ public class MainMenuBuilder {
 
     private final ViewViewModelBuilderWrapper<SignupViewModel, SignupView> signupView =
             new ViewViewModelBuilderWrapper<>(new SignupViewModel(), SignupView::new);
+
+    private final ViewViewModelBuilderWrapper<ShowGraphViewModel, ShowGraphView> showGraphMenu =
+            new ViewViewModelBuilderWrapper<>(new ShowGraphViewModel(), ShowGraphView::new);
 
     private final UseCaseWrapper<MainMenuInteractor,
             MainMenuPresenter,
@@ -151,6 +162,22 @@ public class MainMenuBuilder {
             AddStockMenuPresenter::new,
             AddStockMenuInteractor::new,
             AddStockMenuController::new, AddStockMenuView.VIEW_NAME);
+
+    private final UseCaseWrapper<ShowGraphInteractor,
+            ShowGraphPresenter,
+            ShowGraphController,
+            ShowGraphViewModel,
+            ShowGraphView> showGraphUseCase =
+            new UseCaseWrapper<>(viewManager,
+                    (viewModel) -> new ShowGraphPresenter(viewManagerModel, (ShowGraphViewModel) viewModel),
+                    (presenter) -> {
+                        return new ShowGraphInteractor(stockPriceDAO, presenter);
+                    },
+                    (interactor) -> {
+                        this.capturedShowGraphController = new ShowGraphController(interactor);
+                        return this.capturedShowGraphController;
+                    },
+                    ShowGraphView.VIEW_NAME);
 
 
     private PaddedView<?, ?> getView(String viewName) {
@@ -218,6 +245,17 @@ public class MainMenuBuilder {
 
     public MainMenuBuilder addSignupUseCase() {
         this.addSignup = true;
+        return this;
+    }
+
+    public MainMenuBuilder addShowGraphView(){
+        viewBuildInstruction.add(showGraphMenu);
+        return this;
+    }
+
+    public MainMenuBuilder addShowGraphUseCase() {
+        this.addShowGraph = true;
+        useCaseBuildInstruction.add(showGraphUseCase);
         return this;
     }
 
@@ -336,7 +374,9 @@ public class MainMenuBuilder {
                 .addAddPortfolioView()
                 .addStockMenuView()
                 .addSingleStockView()
+                .addShowGraphView()
                 .addChangeViewUseCase()
+                .addShowGraphUseCase()
                 .addMainViewUseCase()
                 .addPortfolioUseCase()
                 .addImportExportUseCase()
@@ -370,6 +410,13 @@ public class MainMenuBuilder {
         }
         for (UseCaseWrapper<?, ?, ?, ?, ?> usecaseBuilder : this.useCaseBuildInstruction) {
             usecaseBuilder.build(this);
+        }
+        if (this.capturedShowGraphController != null) {
+            SingleStockView singleStockView = (SingleStockView) getView(SingleStockView.VIEW_NAME);
+            if (singleStockView != null) {
+                singleStockView.setShowGraphController(this.capturedShowGraphController);
+                System.out.println("DEBUG: Connected ShowGraphController to SingleStockView");
+            }
         }
         useCaseBuildInstruction.clear();
         final JFrame frame = new JFrame();
