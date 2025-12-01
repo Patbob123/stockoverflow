@@ -114,6 +114,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         CompareBtn.addActionListener(this::onCompareClicked);
         MonteCarloBtn.addActionListener(this::onMonteCarloClicked);
         backBtn.addActionListener(this::onBackClicked);
+        ExitBtn.addActionListener(this::onExitClicked);
     }
     public void setController(SingleStockController controller) {
         this.controller = controller;
@@ -248,6 +249,10 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
 
     private void onBackClicked(ActionEvent e) {
 
+    }
+
+    private void onExitClicked(ActionEvent e) {
+        System.exit(0);
     }
 
     @Override
