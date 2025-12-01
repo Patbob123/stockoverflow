@@ -22,21 +22,25 @@ public class SingleStockView extends JPanel implements ActionListener, PropertyC
     private final ViewManagerModel viewManagerModel;
 
     // --- UI Components ---
-    private final JTextField tickerInputField = new JTextField(15);
-    private final JTextField riskFreeInputField = new JTextField(6);
-    private final JTextField fredApiKeyField = new JTextField(15);
-    private final JTextArea reportArea = new JTextArea(15, 50);
+    private final JTextField tickerInputField = new JTextField();
+    private final JTextField riskFreeInputField = new JTextField();
+    private final JTextField fredApiKeyField = new JTextField();
+    private final JTextArea reportArea = new JTextArea();
 
     // Buttons
     private final JButton analyzeButton;
     private final JButton compareButton;
     private final JButton monteCarloButton;
     private final JButton graphButton;
+
+    // Secondary Buttons (Tools)
     private final JButton fredButton;
-    private final JButton backButton;
     private final JButton scenarioButton;
     private final JButton importButton;
     private final JButton historyButton;
+
+    // Navigation
+    private final JButton backButton;
     private final JButton exitButton;
 
     public SingleStockView(SingleStockController controller,
@@ -51,116 +55,155 @@ public class SingleStockView extends JPanel implements ActionListener, PropertyC
         this.setLayout(new BorderLayout());
         this.setBackground(SingleStockViewModel.BG_COLOUR);
 
-        // --- Title ---
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        headerPanel.setBackground(SingleStockViewModel.BG_COLOUR);
+        headerPanel.setBorder(new EmptyBorder(20, 0, 10, 0));
+
         JLabel title = new JLabel("Stock Analysis Dashboard");
-        title.setFont(SingleStockViewModel.TITLE_FONT);
-        title.setForeground(SingleStockViewModel.TEXT_PRIMARY);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(SingleStockViewModel.BG_COLOUR);
-        titlePanel.add(title);
-        this.add(titlePanel, BorderLayout.NORTH);
+        title.setFont(SingleStockViewModel.TITLE_FONT.deriveFont(26f));
+        title.setForeground(SingleStockViewModel.SECONDARY_COLOUR);
+        headerPanel.add(title);
 
-        // --- Center ---
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBackground(SingleStockViewModel.BG_COLOUR);
-        centerPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        this.add(headerPanel, BorderLayout.NORTH);
 
-        // Inputs
-        JPanel inputPanel = new JPanel(new GridBagLayout());
-        inputPanel.setBackground(SingleStockViewModel.CARD_COLOUR);
-        inputPanel.setBorder(BorderFactory.createCompoundBorder(
+
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBackground(SingleStockViewModel.BG_COLOUR);
+        contentPanel.setBorder(new EmptyBorder(10, 40, 20, 40));
+
+
+        JPanel inputCard = new JPanel(new GridBagLayout());
+        inputCard.setBackground(SingleStockViewModel.CARD_COLOUR);
+        inputCard.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(SingleStockViewModel.BORDER_COLOUR, 1),
-                new EmptyBorder(15, 15, 15, 15)
+                new EmptyBorder(20, 30, 20, 30)
         ));
+        inputCard.setMaximumSize(new Dimension(1000, 120));
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(10, 15, 10, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Ticker Input
         gbc.gridx = 0; gbc.gridy = 0;
-        inputPanel.add(createStyledLabel(SingleStockViewModel.LABEL_TICKER), gbc);
-        gbc.gridx = 1;
+        inputCard.add(createStyledLabel("Ticker Symbol:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1.0;
         tickerInputField.setText(SingleStockViewModel.DEFAULT_TICKER);
-        inputPanel.add(tickerInputField, gbc);
+        styleTextField(tickerInputField);
+        inputCard.add(tickerInputField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        inputPanel.add(createStyledLabel(SingleStockViewModel.LABEL_RISK_FREE), gbc);
-        gbc.gridx = 1;
+        // Risk Free Input
+        gbc.gridx = 2;
+        inputCard.add(createStyledLabel("Risk-Free Rate:"), gbc);
+        gbc.gridx = 3; gbc.weightx = 0.5;
         riskFreeInputField.setText(SingleStockViewModel.DEFAULT_RISK_FREE_TXT);
-        inputPanel.add(riskFreeInputField, gbc);
+        styleTextField(riskFreeInputField);
+        inputCard.add(riskFreeInputField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
-        inputPanel.add(createStyledLabel(SingleStockViewModel.LABEL_FRED_API), gbc);
-        gbc.gridx = 1;
-        inputPanel.add(fredApiKeyField, gbc);
+        // Fred API Key
+        gbc.gridx = 4;
+        inputCard.add(createStyledLabel("Fred API Key:"), gbc);
+        gbc.gridx = 5; gbc.weightx = 0.8;
+        styleTextField(fredApiKeyField);
+        inputCard.add(fredApiKeyField, gbc);
 
-        centerPanel.add(inputPanel);
-        centerPanel.add(Box.createVerticalStrut(20));
+        contentPanel.add(inputCard);
+        contentPanel.add(Box.createVerticalStrut(20));
 
-        // Buttons Grid
-        JPanel buttonsPanel = new JPanel(new GridLayout(2, 4, 10, 10));
-        buttonsPanel.setBackground(SingleStockViewModel.BG_COLOUR);
+        JPanel primaryActionPanel = new JPanel(new GridLayout(1, 4, 20, 0));
+        primaryActionPanel.setBackground(SingleStockViewModel.BG_COLOUR);
+        primaryActionPanel.setMaximumSize(new Dimension(1000, 50));
 
         analyzeButton = createStyledButton(SingleStockViewModel.BUTTON_ANALYZE, SingleStockViewModel.PRIMARY_COLOUR);
-        compareButton = createStyledButton(SingleStockViewModel.BUTTON_COMPARE, SingleStockViewModel.SECONDARY_COLOUR);
-        monteCarloButton = createStyledButton(SingleStockViewModel.BUTTON_MONTECARLO, SingleStockViewModel.SECONDARY_COLOUR);
         graphButton = createStyledButton("Show Graph", SingleStockViewModel.SUCCESS_COLOUR);
-        fredButton = createStyledButton(SingleStockViewModel.BUTTON_FRED, SingleStockViewModel.SECONDARY_COLOUR);
-        scenarioButton = createStyledButton(SingleStockViewModel.BUTTON_SCENARIO, SingleStockViewModel.SECONDARY_COLOUR);
-        importButton = createStyledButton(SingleStockViewModel.BUTTON_IMPORT, SingleStockViewModel.SECONDARY_COLOUR);
-        historyButton = createStyledButton(SingleStockViewModel.BUTTON_HISTORY, SingleStockViewModel.SECONDARY_COLOUR);
+        compareButton = createStyledButton(SingleStockViewModel.BUTTON_COMPARE, SingleStockViewModel.SECONDARY_COLOUR);
+        monteCarloButton = createStyledButton("Monte Carlo", SingleStockViewModel.SECONDARY_COLOUR);
 
-        buttonsPanel.add(analyzeButton);
-        buttonsPanel.add(compareButton);
-        buttonsPanel.add(monteCarloButton);
-        buttonsPanel.add(graphButton);
-        buttonsPanel.add(fredButton);
-        buttonsPanel.add(scenarioButton);
-        buttonsPanel.add(importButton);
-        buttonsPanel.add(historyButton);
+        primaryActionPanel.add(analyzeButton);
+        primaryActionPanel.add(graphButton);
+        primaryActionPanel.add(compareButton);
+        primaryActionPanel.add(monteCarloButton);
 
-        centerPanel.add(buttonsPanel);
-        centerPanel.add(Box.createVerticalStrut(20));
+        contentPanel.add(primaryActionPanel);
+        contentPanel.add(Box.createVerticalStrut(15));
 
-        // Report Area
-        JLabel reportLabel = createStyledLabel("Analysis Report:");
-        reportLabel.setForeground(SingleStockViewModel.TEXT_SECONDARY);
-        JPanel labelWrapper = new JPanel(new BorderLayout());
-        labelWrapper.setBackground(SingleStockViewModel.BG_COLOUR);
-        labelWrapper.add(reportLabel, BorderLayout.WEST);
-        centerPanel.add(labelWrapper);
-        centerPanel.add(Box.createVerticalStrut(5));
+        JPanel toolActionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        toolActionPanel.setBackground(SingleStockViewModel.BG_COLOUR);
+        toolActionPanel.setMaximumSize(new Dimension(1000, 40));
+
+        Color toolBtnColor = new Color(120, 130, 140);
+        fredButton = createStyledButton("Update Fred", toolBtnColor);
+        historyButton = createStyledButton("History", toolBtnColor);
+        scenarioButton = createStyledButton("Scenario", toolBtnColor);
+        importButton = createStyledButton("Import", toolBtnColor);
+
+        Font toolFont = SingleStockViewModel.BASE_FONT.deriveFont(12f);
+        fredButton.setFont(toolFont);
+        historyButton.setFont(toolFont);
+        scenarioButton.setFont(toolFont);
+        importButton.setFont(toolFont);
+
+        toolActionPanel.add(new JLabel("Tools: "));
+        toolActionPanel.add(fredButton);
+        toolActionPanel.add(historyButton);
+        toolActionPanel.add(scenarioButton);
+        toolActionPanel.add(importButton);
+
+        contentPanel.add(toolActionPanel);
+        contentPanel.add(Box.createVerticalStrut(15));
+
+        JPanel reportContainer = new JPanel(new BorderLayout());
+        reportContainer.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(SingleStockViewModel.BORDER_COLOUR), " Analysis Output "
+        ));
+        reportContainer.setBackground(SingleStockViewModel.BG_COLOUR);
 
         reportArea.setEditable(false);
-        reportArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        reportArea.setBackground(new Color(240, 240, 240));
+        reportArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        reportArea.setBackground(new Color(35, 39, 42));
+        reportArea.setForeground(new Color(230, 230, 230));
+        reportArea.setMargin(new Insets(15, 15, 15, 15));
         reportArea.setLineWrap(true);
         reportArea.setWrapStyleWord(true);
+
         JScrollPane scrollPane = new JScrollPane(reportArea);
-        scrollPane.setBorder(BorderFactory.createLineBorder(SingleStockViewModel.BORDER_COLOUR));
-        scrollPane.setPreferredSize(new Dimension(600, 300));
-        centerPanel.add(scrollPane);
+        scrollPane.setBorder(null);
 
-        this.add(centerPanel, BorderLayout.CENTER);
+        reportContainer.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(reportContainer);
 
-        // --- Bottom ---
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        this.add(contentPanel, BorderLayout.CENTER);
+
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 15));
         bottomPanel.setBackground(SingleStockViewModel.BG_COLOUR);
 
+        backButton = createStyledButton(SingleStockViewModel.BUTTON_BACK, Color.GRAY);
         exitButton = createStyledButton(SingleStockViewModel.BUTTON_EXIT, new Color(180, 60, 60));
-        backButton = createStyledButton(SingleStockViewModel.BUTTON_BACK, SingleStockViewModel.SECONDARY_COLOUR);
 
-        bottomPanel.add(exitButton);
         bottomPanel.add(backButton);
+        bottomPanel.add(exitButton);
         this.add(bottomPanel, BorderLayout.SOUTH);
     }
 
+    // ================= UI Helpers =================
+
     private JLabel createStyledLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(SingleStockViewModel.BASE_FONT);
-        label.setForeground(SingleStockViewModel.TEXT_PRIMARY);
+        label.setFont(SingleStockViewModel.BASE_FONT.deriveFont(Font.BOLD));
+        label.setForeground(SingleStockViewModel.TEXT_SECONDARY);
         return label;
+    }
+
+    private void styleTextField(JTextField field) {
+        field.setFont(SingleStockViewModel.BASE_FONT.deriveFont(14f));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
+        field.setBackground(new Color(245, 245, 245));
+        field.setPreferredSize(new Dimension(field.getPreferredSize().width, 35));
     }
 
     private JButton createStyledButton(String text, Color bg) {
@@ -169,11 +212,19 @@ public class SingleStockView extends JPanel implements ActionListener, PropertyC
         button.setBackground(bg);
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) { button.setBackground(bg.brighter()); }
+            public void mouseExited(java.awt.event.MouseEvent evt) { button.setBackground(bg); }
+        });
+
         button.addActionListener(this);
         return button;
     }
+
+    // ================= Action Handling =================
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -199,7 +250,7 @@ public class SingleStockView extends JPanel implements ActionListener, PropertyC
                     JOptionPane.showMessageDialog(this, "Invalid Risk Free Rate.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Enter two tickers (e.g., AAPL MSFT)", "Input Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Please enter two tickers separated by space or comma (e.g., AAPL MSFT)", "Input Error", JOptionPane.WARNING_MESSAGE);
             }
         } else if (source == monteCarloButton) {
             String ticker = tickerInputField.getText().trim().toUpperCase();

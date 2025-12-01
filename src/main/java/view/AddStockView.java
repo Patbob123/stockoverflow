@@ -104,7 +104,7 @@ public class AddStockView extends JPanel implements ActionListener, PropertyChan
 
         JLabel holdingsTitle = new JLabel("My Holdings");
         holdingsTitle.setFont(SingleStockViewModel.BASE_FONT.deriveFont(Font.BOLD, 18f));
-        holdingsTitle.setForeground(SingleStockViewModel.SUCCESS_COLOUR); // 绿色标题
+        holdingsTitle.setForeground(SingleStockViewModel.SUCCESS_COLOUR);
         holdingsTitle.setBorder(new EmptyBorder(0, 0, 15, 0));
 
 
@@ -112,7 +112,7 @@ public class AddStockView extends JPanel implements ActionListener, PropertyChan
         JScrollPane holdingsScroll = new JScrollPane(currentHoldingsList);
         holdingsScroll.setBorder(BorderFactory.createLineBorder(SingleStockViewModel.BORDER_COLOUR));
 
-        removeButton = createStyledButton("Remove Selected", new Color(180, 60, 60)); // 红色按钮
+        removeButton = createStyledButton("Remove Selected", new Color(180, 60, 60));
         JPanel leftBtnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         leftBtnPanel.setBackground(SingleStockViewModel.CARD_COLOUR);
         leftBtnPanel.add(removeButton);
@@ -126,7 +126,7 @@ public class AddStockView extends JPanel implements ActionListener, PropertyChan
 
         JLabel searchTitle = new JLabel("Add New Stock");
         searchTitle.setFont(SingleStockViewModel.BASE_FONT.deriveFont(Font.BOLD, 18f));
-        searchTitle.setForeground(SingleStockViewModel.PRIMARY_COLOUR); // 橙色标题
+        searchTitle.setForeground(SingleStockViewModel.PRIMARY_COLOUR);
 
 
         JPanel searchBox = new JPanel(new BorderLayout(10, 0));
@@ -140,7 +140,7 @@ public class AddStockView extends JPanel implements ActionListener, PropertyChan
         ));
 
         searchButton = createStyledButton("Search", SingleStockViewModel.SECONDARY_COLOUR);
-        searchButton.setPreferredSize(new Dimension(90, 35)); // 稍微调小一点搜索按钮
+        searchButton.setPreferredSize(new Dimension(90, 35));
 
         searchBox.add(searchInputField, BorderLayout.CENTER);
         searchBox.add(searchButton, BorderLayout.EAST);
@@ -205,13 +205,12 @@ public class AddStockView extends JPanel implements ActionListener, PropertyChan
 
     private void styleDarkList(JList<String> list, DefaultListModel<String> model) {
         list.setModel(model);
-        // 比卡片背景稍亮一点的灰色，形成层次感
         list.setBackground(new Color(60, 64, 66));
         list.setForeground(Color.WHITE);
         list.setFont(SingleStockViewModel.BASE_FONT.deriveFont(14f));
         list.setSelectionBackground(SingleStockViewModel.PRIMARY_COLOUR);
         list.setSelectionForeground(Color.WHITE);
-        list.setFixedCellHeight(30); // 增加行高，更易点击
+        list.setFixedCellHeight(30);
     }
 
 
@@ -237,13 +236,12 @@ public class AddStockView extends JPanel implements ActionListener, PropertyChan
             String query = searchInputField.getText().trim();
             if (!query.isEmpty()) {
                 searchModel.clear();
-                // 显示加载状态
                 searchModel.addElement("Searching...");
                 new SwingWorker<List<String>, Void>() {
                     @Override protected List<String> doInBackground() { return apiDataAccess.searchSymbols(query); }
                     @Override protected void done() {
                         try {
-                            searchModel.clear(); // 清除 "Searching..."
+                            searchModel.clear();
                             List<String> results = get();
                             if (results == null || results.isEmpty()) searchModel.addElement("No results found.");
                             else for (String s : results) searchModel.addElement(s);
@@ -297,7 +295,7 @@ public class AddStockView extends JPanel implements ActionListener, PropertyChan
 
         // 7. Back
         backButton.addActionListener(e -> {
-            viewManagerModel.setActiveView("create portfolio"); // 返回 Portfolio 列表
+            viewManagerModel.setActiveView("create portfolio");
             viewManagerModel.firePropertyChanged();
         });
     }

@@ -22,7 +22,6 @@ public class SearchInteractor implements SearchInputBoundary {
         }
 
         try {
-            // 使用 DAO 的 searchSymbols 方法 (连接 AlphaVantage)
             List<String> results = apiDataAccessObject.searchSymbols(query);
 
             if (results.isEmpty()) {

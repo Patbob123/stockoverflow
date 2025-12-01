@@ -29,7 +29,7 @@ import java.util.*;
 public class StockDataAccessObject implements APIDataAccessInterface {
 
     // --- API Keys ---
-    private static final String ALPHA_VANTAGE_KEY = "YOUR_ALPHA_VANTAGE_KEY";
+    private static final String ALPHA_VANTAGE_KEY = "RM73FNUNQXWQ14SC";
     private String fredApiKey = "YOUR_FRED_API_KEY";
 
     // --- URLs ---
@@ -126,7 +126,12 @@ public class StockDataAccessObject implements APIDataAccessInterface {
 
         List<String> results = new ArrayList<>();
         try {
+            System.out.println("DEBUG: Sending request to: " + ALPHA_VANTAGE_URL + "?function=" + function + "&keywords=" + query);
             String jsonResponse = makeJSONCall(urlString);
+
+            System.out.println("DEBUG: API Response: " + jsonResponse);
+            // -------------------------------------
+
             JSONObject jsonObject = new JSONObject(jsonResponse);
 
             if (jsonObject.has("bestMatches")) {
@@ -138,6 +143,15 @@ public class StockDataAccessObject implements APIDataAccessInterface {
                     results.add(symbol + " - " + name);
                 }
             }
+            else if (jsonObject.has("Note")) {
+                System.err.println("DEBUG: API Limit Hit! " + jsonObject.getString("Note"));
+
+            }
+
+            else if (jsonObject.has("Error Message")) {
+                System.err.println("DEBUG: API Error! " + jsonObject.getString("Error Message"));
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

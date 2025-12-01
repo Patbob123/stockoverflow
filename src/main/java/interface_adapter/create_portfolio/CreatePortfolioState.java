@@ -19,7 +19,6 @@ public class CreatePortfolioState {
     public String getError() { return error; }
     public void setError(String error) { this.error = error; }
 
-    // 新增 Getter 和 Setter
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 }

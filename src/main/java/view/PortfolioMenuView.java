@@ -50,11 +50,11 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
         this.mainMenuController = mainMenuController;
         this.viewModel.addPropertyChangeListener(this);
 
-        // 1. 整体布局
+
         this.setLayout(new BorderLayout());
         this.setBackground(SingleStockViewModel.BG_COLOUR);
 
-        // --- 顶部 Header ---
+
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 40, 20));
         headerPanel.setBackground(SingleStockViewModel.BG_COLOUR);
         JLabel title = new JLabel("My Portfolios");
@@ -63,12 +63,12 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
         headerPanel.add(title);
         this.add(headerPanel, BorderLayout.NORTH);
 
-        // --- 中间内容区 (左：创建，右：列表) ---
+
         JPanel contentPanel = new JPanel(new GridLayout(1, 2, 40, 0));
         contentPanel.setBackground(SingleStockViewModel.BG_COLOUR);
         contentPanel.setBorder(new EmptyBorder(0, 40, 40, 40));
 
-        // === 左侧卡片：创建新组合 ===
+
         JPanel createCard = createCardPanel();
 
         JLabel createTitle = new JLabel("Create New Portfolio");
@@ -98,9 +98,9 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
         createCard.add(nameInputField);
         createCard.add(Box.createVerticalStrut(20));
         createCard.add(createButton);
-        createCard.add(Box.createVerticalGlue()); // 推到底部
+        createCard.add(Box.createVerticalGlue());
 
-        // === 右侧卡片：已有的组合列表 ===
+
         JPanel listCard = createCardPanel();
         listCard.setLayout(new BorderLayout());
 
@@ -111,10 +111,10 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
 
         portfolioListPanel = new JPanel();
         portfolioListPanel.setLayout(new BoxLayout(portfolioListPanel, BoxLayout.Y_AXIS));
-        portfolioListPanel.setBackground(SingleStockViewModel.CARD_COLOUR); // 与卡片同色
+        portfolioListPanel.setBackground(SingleStockViewModel.CARD_COLOUR);
 
         JScrollPane scrollPane = new JScrollPane(portfolioListPanel);
-        scrollPane.setBorder(null); // 无边框，融合背景
+        scrollPane.setBorder(null);
         scrollPane.getViewport().setBackground(SingleStockViewModel.CARD_COLOUR);
 
         listCard.add(listTitle, BorderLayout.NORTH);
@@ -124,20 +124,18 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
         contentPanel.add(listCard);
         this.add(contentPanel, BorderLayout.CENTER);
 
-        // --- 底部：返回按钮 ---
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 40, 20));
         bottomPanel.setBackground(SingleStockViewModel.BG_COLOUR);
         backButton = createStyledButton("Back to Dashboard", SingleStockViewModel.SECONDARY_COLOUR);
         bottomPanel.add(backButton);
         this.add(bottomPanel, BorderLayout.SOUTH);
 
-        // --- 事件监听 ---
         createButton.addActionListener(evt -> {
             CreatePortfolioState currentState = viewModel.getState();
             String currentUser = currentState.getUsername();
             if (currentUser != null && !currentUser.isEmpty()) {
                 controller.execute(currentUser, currentState.getPortfolioName());
-                nameInputField.setText(""); // 清空输入
+                nameInputField.setText("");
             } else {
                 JOptionPane.showMessageDialog(this, "Error: No user logged in.");
             }
@@ -168,10 +166,9 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
             User user = userDataAccess.get(currentUsername);
             if (user != null && user.getPortfolioList() != null) {
                 for (Portfolio p : user.getPortfolioList()) {
-                    // 创建看起来像列表项的按钮
                     JButton pButton = new JButton(p.getName());
                     pButton.setFont(SingleStockViewModel.BASE_FONT.deriveFont(16f));
-                    pButton.setBackground(new Color(60, 64, 66)); // 稍亮的深色
+                    pButton.setBackground(new Color(60, 64, 66));
                     pButton.setForeground(Color.WHITE);
                     pButton.setFocusPainted(false);
                     pButton.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -191,7 +188,7 @@ public class PortfolioMenuView extends JPanel implements ActionListener, Propert
                     pButton.addActionListener(e -> mainMenuController.goToAddStock(p.getName(), currentUsername));
 
                     portfolioListPanel.add(pButton);
-                    portfolioListPanel.add(Box.createVerticalStrut(10)); // 间距
+                    portfolioListPanel.add(Box.createVerticalStrut(10));
                 }
             }
         }
