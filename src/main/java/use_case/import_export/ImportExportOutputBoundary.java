@@ -7,6 +7,6 @@ import entities.Simulation;
 import use_case.OutputBoundary;
 
 public interface ImportExportOutputBoundary extends OutputBoundary {
-    void prepareSuccessView(String message);
+    void prepareSuccessView(Portfolio portfolio);
 
 }

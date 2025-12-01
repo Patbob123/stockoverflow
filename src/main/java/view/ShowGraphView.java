@@ -17,7 +17,7 @@ import java.beans.PropertyChangeListener;
 
 public class ShowGraphView extends PaddedView<ShowGraphViewModel, ShowGraphController> implements ActionListener, PropertyChangeListener {
 
-    public static final String VIEW_NAME = "show graph";
+    public static final String VIEW_NAME = "ShowGraphMenu";
 
     @Setter
     private ShowGraphController controller;

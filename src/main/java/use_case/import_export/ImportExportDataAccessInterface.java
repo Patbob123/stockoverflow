@@ -11,7 +11,7 @@ public interface ImportExportDataAccessInterface {
     void savePortfolio(PortfolioList portfolioList, String filePath);
     void saveSimulation(String filePath);
     void saveCurrentSession(String filePath);
-    PortfolioList loadPortfolios(String filePath);
+    Portfolio loadPortfolios(String filePath);
 
     List<Portfolio> getAllPortfolios();
     List<MonteCarloSimulation> getAllSimulations();

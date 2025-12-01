@@ -8,6 +8,9 @@ import javax.swing.*;
 
 import data_access.*;
 import entities.CommonUserFactory;
+import interface_adapter.create_portfolio.CreatePortfolioController;
+import interface_adapter.create_portfolio.CreatePortfolioPresenter;
+import interface_adapter.create_portfolio.CreatePortfolioViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
@@ -25,6 +28,7 @@ import interface_adapter.singlestock.SingleStockPresenter;
 import interface_adapter.singlestock.SingleStockViewInterface;
 import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.UserDataAccessInterface;
+import use_case.create_portfolio.CreatePortfolioInteractor;
 import use_case.import_export.ImportExportDataAccessInterface;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
@@ -77,7 +81,6 @@ public class AppBuilder {
     private Boolean addSingleStock = false;
     private Boolean addLogin = false;
     private Boolean addSignup = false;
-    private Boolean addShowGraph = false;
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -112,8 +115,11 @@ public class AppBuilder {
     private final ViewViewModelBuilderWrapper<SignupViewModel, SignupView> signupView =
             new ViewViewModelBuilderWrapper<>(new SignupViewModel(), SignupView::new);
 
-    private final ViewViewModelBuilderWrapper<ShowGraphViewModel, ShowGraphView> showGraphMenu =
+    private final ViewViewModelBuilderWrapper<ShowGraphViewModel, ShowGraphView> showGraphView =
             new ViewViewModelBuilderWrapper<>(new ShowGraphViewModel(), ShowGraphView::new);
+
+    private final ViewViewModelBuilderWrapper<CreatePortfolioViewModel, CreatePortfolioMenuView> createPortfolioMenu =
+            new ViewViewModelBuilderWrapper<>(new CreatePortfolioViewModel(), CreatePortfolioMenuView::new);
 
     private final UseCaseWrapper<MainMenuInteractor,
             MainMenuPresenter,
@@ -131,7 +137,12 @@ public class AppBuilder {
             ImportExportViewModel,
             ImportExportView> importExportUsecase =
             new UseCaseWrapper<>(viewManager,
-            ImportExportPresenter::new, presenter -> new ImportExportInteractor(presenter, importExportDAO),
+                    viewModel -> new ImportExportPresenter(
+                    (ImportExportViewModel) viewModel,
+                    portFolioMenu.getViewModel(),
+                    viewManagerModel
+            ),
+          presenter -> new ImportExportInteractor(presenter, importExportDAO),
             ImportExportController::new, ImportExportView.VIEW_NAME);
 
     private final UseCaseWrapper<AddPortfolioInteractor,
@@ -181,6 +192,17 @@ public class AppBuilder {
                     ShowGraphView.VIEW_NAME);
 
 
+    private final UseCaseWrapper<CreatePortfolioInteractor,
+            CreatePortfolioPresenter,
+            CreatePortfolioController,
+            CreatePortfolioViewModel,
+            CreatePortfolioMenuView> createPortfolioMenuUsecase =
+            new UseCaseWrapper<>(viewManager,
+                    CreatePortfolioPresenter::new,
+                    presenter -> new CreatePortfolioInteractor(userDAO, presenter),
+                    CreatePortfolioController::new,
+                    CreatePortfolioMenuView.VIEW_NAME);
+
     private PaddedView<?, ?> getView(String viewName) {
         return viewManager.getViews().get(viewName);
     }
@@ -229,6 +251,16 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addShowGraphView(){
+        viewBuildInstruction.add(showGraphView);
+        return this;
+    }
+
+    public AppBuilder addCreatePortfolioView(){
+        viewBuildInstruction.add(createPortfolioMenu);
+        return this;
+    }
+
     public AppBuilder addSingleStockUseCase() {
         this.addSingleStock = true;
         return this;
@@ -249,16 +281,9 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addShowGraphView(){
-        viewBuildInstruction.add(showGraphMenu);
-        return this;
-    }
 
-    public AppBuilder addShowGraphUseCase() {
-        this.addShowGraph = true;
-        useCaseBuildInstruction.add(showGraphUseCase);
-        return this;
-    }
+
+
 
     private void addSignUpUseCaseDirectly() {
         final SignupView view = (SignupView) getView(SignupView.VIEW_NAME);
@@ -312,8 +337,9 @@ public class AppBuilder {
         getView(AddStockMenuView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(LoginView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(SignupView.VIEW_NAME).setChangeViewController(changeViewController);
-        getView(SingleStockView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(ShowGraphView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(SingleStockView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(CreatePortfolioMenuView.VIEW_NAME).setChangeViewController(changeViewController);
     }
 
     public AppBuilder addMainViewUseCase() {
@@ -338,6 +364,16 @@ public class AppBuilder {
 
     public AppBuilder addStockMenuUseCase() {
         useCaseBuildInstruction.add(addStockMenuUsecase);
+        return this;
+    }
+
+    public AppBuilder addShowGraphUseCase() {
+        useCaseBuildInstruction.add(showGraphUseCase);
+        return this;
+    }
+
+    public AppBuilder addCreatePortfolioUseCase() {
+        useCaseBuildInstruction.add(createPortfolioMenuUsecase);
         return this;
     }
 
@@ -382,10 +418,12 @@ public class AppBuilder {
                 .addPortfolioMenuView()
                 .addAddPortfolioView()
                 .addStockMenuView()
-                .addSingleStockView()
                 .addShowGraphView()
+                .addCreatePortfolioView()
+                .addSingleStockView()
                 .addChangeViewUseCase()
                 .addShowGraphUseCase()
+                .addCreatePortfolioUseCase()
                 .addMainViewUseCase()
                 .addPortfolioUseCase()
                 .addImportExportUseCase()
@@ -405,6 +443,8 @@ public class AppBuilder {
         for (ViewViewModelBuilderWrapper<?, ?> viewBuilder : this.viewBuildInstruction) {
             viewBuilder.addView(this, cardPanel, viewManager);
         }
+        System.out.println("All registered views: " + viewManager.getViews().keySet());
+        System.out.println("ShowGraphView registered: " + viewManager.getViews().containsKey(ShowGraphView.VIEW_NAME));
         viewBuildInstruction.clear();
         if (addChangeView) {
             this.addChangeViewUseCaseDirectly();
