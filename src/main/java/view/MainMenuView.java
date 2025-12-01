@@ -118,12 +118,12 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         headerPanel.setBorder(new EmptyBorder(40, 50, 20, 50));
 
         JLabel titleLabel = new JLabel("Stock Overflow Dashboard");
-        titleLabel.setFont(SingleStockViewModel.TITLE_FONT.deriveFont(36f));
+        titleLabel.setFont(MainMenuViewModel.TITLE_FONT.deriveFont(36f));
         titleLabel.setForeground(Color.WHITE);
 
         usernameLabel = new JLabel("Welcome, " + viewModel.getState().getUsername());
-        usernameLabel.setFont(SingleStockViewModel.BASE_FONT.deriveFont(Font.BOLD, 18f));
-        usernameLabel.setForeground(SingleStockViewModel.PRIMARY_COLOUR);
+        usernameLabel.setFont(MainMenuViewModel.BASE_FONT.deriveFont(Font.BOLD, 18f));
+        usernameLabel.setForeground(MainMenuViewModel.PRIMARY_COLOUR);
 
         headerPanel.add(titleLabel, BorderLayout.NORTH);
         headerPanel.add(usernameLabel, BorderLayout.SOUTH);
@@ -133,8 +133,8 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         JPanel cardsPanel = new JPanel(new GridLayout(1, 2, 40, 0));
         cardsPanel.setBorder(new EmptyBorder(20, 50, 50, 50));
 
-        portfolioCard = createDashboardCard("My Portfolios", "Manage holdings", "P", SingleStockViewModel.SUCCESS_COLOUR);
-        singleStockCard = createDashboardCard("Market Analysis", "Analyze stocks", "A", SingleStockViewModel.PRIMARY_COLOUR);
+        portfolioCard = createDashboardCard("My Portfolios", "Manage holdings", "P", MainMenuViewModel.SUCCESS_COLOUR, AddPortfolioView.VIEW_NAME);
+        singleStockCard = createDashboardCard("Market Analysis", "Analyze stocks", "A", MainMenuViewModel.PRIMARY_COLOUR, SingleStockView.VIEW_NAME);
 
         cardsPanel.add(portfolioCard);
         cardsPanel.add(singleStockCard);
@@ -145,7 +145,7 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         footerPanel.setBorder(new EmptyBorder(0, 0, 30, 50));
 
         logoutButton = new JButton("Log Out");
-        logoutButton.setFont(SingleStockViewModel.BUTTON_PRIMARY_FONT);
+        logoutButton.setFont(MainMenuViewModel.BUTTON_PRIMARY_FONT);
         logoutButton.setBackground(new Color(200, 60, 60));
         logoutButton.setForeground(Color.WHITE);
         logoutButton.setFocusPainted(false);
@@ -160,10 +160,10 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
 //        logoutButton.addActionListener(e -> mainMenuController.executeLogout());
     }
 
-    private JButton createDashboardCard(String title, String subtitle, String iconText, Color accentColor) {
+    private JButton createDashboardCard(String title, String subtitle, String iconText, Color accentColor, String view) {
         JButton card = new JButton();
         card.setLayout(new BorderLayout());
-        card.setBackground(SingleStockViewModel.CARD_COLOUR);
+        card.setBackground(MainMenuViewModel.CARD_COLOUR);
         card.setBorder(BorderFactory.createMatteBorder(0, 6, 0, 0, accentColor));
         card.setFocusPainted(false);
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -179,13 +179,13 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         iconLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(SingleStockViewModel.TITLE_FONT.deriveFont(26f));
+        titleLabel.setFont(MainMenuViewModel.TITLE_FONT.deriveFont(26f));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel subLabel = new JLabel(subtitle);
-        subLabel.setFont(SingleStockViewModel.BASE_FONT.deriveFont(14f));
-        subLabel.setForeground(SingleStockViewModel.TEXT_SECONDARY);
+        subLabel.setFont(MainMenuViewModel.BASE_FONT.deriveFont(14f));
+        subLabel.setForeground(MainMenuViewModel.TEXT_SECONDARY);
         subLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         contentPanel.add(iconLabel);
@@ -199,12 +199,16 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         // Hover effect
         card.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
-                card.setBackground(SingleStockViewModel.CARD_COLOUR.brighter());
+                card.setBackground(MainMenuViewModel.CARD_COLOUR.brighter());
                 card.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, accentColor));
             }
             public void mouseExited(MouseEvent e) {
-                card.setBackground(SingleStockViewModel.CARD_COLOUR);
+                card.setBackground(MainMenuViewModel.CARD_COLOUR);
                 card.setBorder(BorderFactory.createMatteBorder(0, 6, 0, 0, accentColor));
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                changeViewController.changeView(view);
             }
         });
 
