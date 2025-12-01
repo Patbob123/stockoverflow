@@ -9,6 +9,9 @@ import data_access.AlphaVantageStockPriceDataAccess;
 import data_access.CombinedStockPriceDataAccess;
 import data_access.FredRiskFreeRateDataAccess;
 import data_access.StooqStockDataAccess;
+import interface_adapter.login.LoginController;
+import interface_adapter.login.LoginPresenter;
+import interface_adapter.login.LoginViewModel;
 import interface_adapter.portfolio.PortfolioMenuController;
 import interface_adapter.portfolio.PortfolioMenuPresenter;
 import interface_adapter.portfolio.addStock.AddStockMenuController;
@@ -38,6 +41,7 @@ import use_case.change_view.ChangeViewInputBoundary;
 import use_case.change_view.ChangeViewInteractor;
 import use_case.change_view.ChangeViewOutputBoundary;
 import use_case.import_export.ImportExportInteractor;
+import use_case.login.LoginInteractor;
 import use_case.mainmenu.MainMenuInteractor;
 import use_case.portfolio.PortfolioMenuInteractor;
 import use_case.portfolio.addStock.AddStockMenuInteractor;
@@ -85,6 +89,9 @@ public class MainMenuBuilder {
 
     private final ViewViewModelBuilderWrapper<SingleStockViewModel, SingleStockView> singleStockMenu =
             new ViewViewModelBuilderWrapper<>(new SingleStockViewModel(), SingleStockView::new);
+
+    private final ViewViewModelBuilderWrapper<LoginViewModel, LoginView> loginView =
+            new ViewViewModelBuilderWrapper<>(new LoginViewModel(), LoginView::new);
 
     private final UseCaseWrapper<MainMenuInteractor,
             MainMenuPresenter,
@@ -134,6 +141,16 @@ public class MainMenuBuilder {
             AddStockMenuPresenter::new,
             AddStockMenuInteractor::new,
             AddStockMenuController::new, AddStockMenuView.VIEW_NAME);
+
+    private final UseCaseWrapper<LoginInteractor,
+            LoginPresenter,
+            LoginController,
+            LoginViewModel,
+            LoginView> loginUseCase =
+            new UseCaseWrapper<>(viewManager,
+            LoginPresenter::new,
+            LoginInteractor::new,
+            LoginController::new, LoginView.VIEW_NAME);
 
     private PaddedView<?, ?> getView(String viewName) {
         return viewManager.getViews().get(viewName);
