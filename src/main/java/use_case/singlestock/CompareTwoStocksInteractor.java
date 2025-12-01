@@ -1,6 +1,7 @@
 package use_case.singlestock;
 
 import entities.PriceBar;
+import entities.Stock;
 
 import java.util.List;
 import java.util.Locale;
@@ -43,7 +44,8 @@ public class CompareTwoStocksInteractor implements CompareTwoStocksInputBoundary
     }
 
     private StockMetrics analyzeOne(String ticker, double rfAnnual) {
-        List<PriceBar> series = priceGateway.getDailySeries(ticker, 400);
+        Stock stock = priceGateway.getDailySeries(ticker, 400);
+        List<PriceBar> series = stock.getPriceHistory();
 
         if (series.isEmpty()) {
             throw new RuntimeException(
@@ -155,10 +157,12 @@ public class CompareTwoStocksInteractor implements CompareTwoStocksInputBoundary
         if (m1.sharpeAnnual > m2.sharpeAnnual) {
             better = m1.ticker + String.format(" (%.3f vs %.3f)",
                     m1.sharpeAnnual, m2.sharpeAnnual);
-        } else if (m2.sharpeAnnual > m1.sharpeAnnual) {
+        }
+        else if (m2.sharpeAnnual > m1.sharpeAnnual) {
             better = m2.ticker + String.format(" (%.3f vs %.3f)",
                     m2.sharpeAnnual, m1.sharpeAnnual);
-        } else {
+        }
+        else {
             better = "Tie (both Sharpe = " +
                     String.format(Locale.US, "%.3f", m1.sharpeAnnual) + ")";
         }

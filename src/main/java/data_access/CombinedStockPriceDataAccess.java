@@ -1,6 +1,7 @@
 package data_access;
 
 import entities.PriceBar;
+import entities.Stock;
 import use_case.singlestock.StockPriceDataAccessInterface;
 
 
@@ -19,26 +20,26 @@ public class CombinedStockPriceDataAccess implements StockPriceDataAccessInterfa
     }
 
     @Override
-    public List<PriceBar> getDailySeries(String ticker, int maxDays) {
-        List<PriceBar> first;
+    public Stock getDailySeries(String ticker, int maxDays) {
+        Stock first;
         try {
             first = primary.getDailySeries(ticker, maxDays);
         } catch (RuntimeException ex) {
-            first = new ArrayList<>();
+            first = new Stock(ticker);
         }
 
-        if (!first.isEmpty()) {
-            return new ArrayList<>(first);
+        if (!first.getPriceHistory().isEmpty()) {
+            return first;
         }
 
         // primary gave nothing → try fallback
-        List<PriceBar> second;
+        final Stock second;
         try {
             second = fallback.getDailySeries(ticker, maxDays);
         } catch (RuntimeException ex) {
             throw new RuntimeException("Both price providers failed for " + ticker + ": " + ex.getMessage(), ex);
         }
 
-        return new ArrayList<>(second);
+        return second;
     }
 }

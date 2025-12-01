@@ -1,13 +1,17 @@
 package entities;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Locale;
 
 public class Stock {
 
     private final String ticker;
     // our tickers aka "APPL"
-    private String name;
-    // naem aka Apple
     private LocalDate lastUpdated;
     // just date
 
@@ -20,22 +24,23 @@ public class Stock {
     private Double low;
     // lowest
 
-    public Stock(String ticker, String name) {
+    @Getter
+    @Setter
+    private List<PriceBar> priceHistory;
+    private LocalTime time;
+
+    public Stock(String ticker) {
         this.ticker = ticker;
-        this.name = name;
+    }
+    public Stock(String ticker, List<PriceBar> priceHistory) {
+        this.time = LocalTime.now();
+        this.ticker = ticker;
+        this.priceHistory = priceHistory;
     }
     // normal getters setters not  that lombok
 
     public String getTicker() {
         return ticker;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public LocalDate getLastUpdated() {

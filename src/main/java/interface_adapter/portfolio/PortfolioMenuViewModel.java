@@ -22,5 +22,9 @@ public class PortfolioMenuViewModel extends ViewModel<PortfolioMenuState> {
         super(PortfolioMenuView.VIEW_NAME);
         setState(new PortfolioMenuState());
     }
+    public PortfolioMenuViewModel(PortfolioMenuState portfolioMenuState) {
+        super(PortfolioMenuView.VIEW_NAME);
+        setState(portfolioMenuState);
+    }
 
 }

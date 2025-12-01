@@ -13,6 +13,7 @@ import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.portfolio.PortfolioMenuController;
 import interface_adapter.portfolio.PortfolioMenuPresenter;
+import interface_adapter.portfolio.PortfolioMenuState;
 import interface_adapter.portfolio.addStock.AddStockMenuController;
 import interface_adapter.portfolio.addStock.AddStockMenuPresenter;
 import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
@@ -85,8 +86,8 @@ public class MainMenuBuilder {
     private final ViewViewModelBuilderWrapper<ImportExportViewModel, ImportExportView> importExportMenu =
             new ViewViewModelBuilderWrapper<>(new ImportExportViewModel(), ImportExportView::new);
 
-    private final ViewViewModelBuilderWrapper<PortfolioMenuViewModel, PortfolioMenuView> portFolioMenu =
-            new ViewViewModelBuilderWrapper<>(new PortfolioMenuViewModel(), PortfolioMenuView::new);
+    private ViewViewModelBuilderWrapper<PortfolioMenuViewModel, PortfolioMenuView> portFolioMenu =
+            new ViewViewModelBuilderWrapper<>(new PortfolioMenuViewModel(new PortfolioMenuState()), PortfolioMenuView::new);
 
     private final ViewViewModelBuilderWrapper<AddPortfolioViewModel, AddPortfolioView> addPortfolioMenu =
             new ViewViewModelBuilderWrapper<>(new AddPortfolioViewModel(), AddPortfolioView::new);
@@ -300,14 +301,14 @@ public class MainMenuBuilder {
     }
 
     public MainMenuBuilder addSingleStockDAO() {
-        String alphaKey = "YOUR_ALPHA_KEY_HERE"; // or System.getenv("ALPHAVANTAGE_API_KEY");
+        String alphaKey = "7d3793701beaa71a8263c3ae2d4a508b"; // or System.getenv("ALPHAVANTAGE_API_KEY");
 
         final StockPriceDataAccessInterface stooqGateway =
                 new StooqStockDataAccess();
         final StockPriceDataAccessInterface alphaGateway =
                 new AlphaVantageStockPriceDataAccess(alphaKey);
 
-        String fredKey = System.getenv("FRED_API_KEY");
+        String fredKey = System.getenv("7d3793701beaa71a8263c3ae2d4a508b");
 
 
         stockPriceDAO = new CombinedStockPriceDataAccess(stooqGateway, alphaGateway);
@@ -378,6 +379,11 @@ public class MainMenuBuilder {
         frame.setSize((int) WIDTH, (int) HEIGHT);
 
         frame.add(cardPanel);
+
+        if (viewManager.getViews().containsKey(PortfolioMenuView.VIEW_NAME)) {
+            ((PortfolioMenuState) viewManager.getViews().get(PortfolioMenuView.VIEW_NAME)
+                    .getViewModel().getState()).setStockPriceDataAccess(stockPriceDAO);
+        }
 
         viewManagerModel.setActiveView(getView(LoginView.VIEW_NAME).getViewName());
         viewManagerModel.firePropertyChange();

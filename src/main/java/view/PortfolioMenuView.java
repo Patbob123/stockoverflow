@@ -107,7 +107,8 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
                     if (evt.getSource().equals(removeButton)) {
                         for (JCheckBox checkBox : checkBoxTranslator.keySet()) {
                             if (checkBox.getModel().isSelected()) {
-                                this.getViewModel().getState().getPortfolio().removeStock(checkBoxTranslator.get(checkBox));
+                                this.getViewModel().getState().getPortfolio()
+                                        .removeStock(checkBoxTranslator.get(checkBox));
                                 buttonMap.remove(checkBoxTranslator.get(checkBox));
                                 checkBoxTranslator.remove(checkBox);
                                 checkBoxPanel.remove(jPanelMap.get(checkBox));
@@ -212,7 +213,7 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
         for (String ticker : portfolio.getVisualStocks()) {
             final JPanel tickerPanel = new JPanel();
             final JCheckBox checkBox = new JCheckBox();
-            final JButton button = new JButton(portfolio.getStock(ticker).getName());
+            final JButton button = new JButton(portfolio.getStock(ticker).getTicker());
             button.addActionListener(
                     evt -> {
                         if (evt.getSource().equals(button)) {

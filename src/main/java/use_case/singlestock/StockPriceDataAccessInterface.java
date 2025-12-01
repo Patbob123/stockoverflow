@@ -2,9 +2,10 @@
 package use_case.singlestock;
 
 import entities.PriceBar;
+import entities.Stock;
 
 import java.util.List;
 
 public interface StockPriceDataAccessInterface {
-    List<PriceBar> getDailySeries(String ticker, int maxDays);
+    Stock getDailySeries(String ticker, int maxDays);
 }

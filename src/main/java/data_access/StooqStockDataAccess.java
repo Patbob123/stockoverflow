@@ -1,6 +1,7 @@
 package data_access;
 
 import entities.PriceBar;
+import entities.Stock;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -20,7 +21,7 @@ public class StooqStockDataAccess implements StockPriceDataAccessInterface {
     private final OkHttpClient client = new OkHttpClient();
 
     @Override
-    public List<PriceBar> getDailySeries(String ticker, int maxDays) {
+    public Stock getDailySeries(String ticker, int maxDays) {
         // Stooq uses suffixes, e.g. AAPL.US; you can adjust this if needed
         String stooqSymbol = ticker.trim().toLowerCase();
         if (!stooqSymbol.contains(".")) {//now if you write appl-> appl.us as a format,but handles appl.to
@@ -83,9 +84,9 @@ public class StooqStockDataAccess implements StockPriceDataAccessInterface {
             bars.sort(Comparator.comparing(PriceBar::getDate).reversed());
 
             if (bars.size() > maxDays) {
-                return new ArrayList<>(bars.subList(0, maxDays));
+                return new Stock(ticker, new ArrayList<>(bars.subList(0, maxDays)));
             }
-            return bars;
+            return new Stock(ticker, bars);
 
         } catch (IOException e) {
             throw new RuntimeException("Error calling Stooq", e);
