@@ -11,6 +11,8 @@ public class SingleStockViewModel extends ViewModel<SingleStockState> {
     // view name if you use a ViewManager later
     public static final String VIEW_NAME = "single stock";
 
+    public static final String TITLE_LABEL = "Analyze Single Stock";
+
     // Labels
     public static final String LABEL_TICKER = "Ticker:";
     public static final String LABEL_HISTORY = "History:";

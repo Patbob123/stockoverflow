@@ -1,6 +1,6 @@
 package app.wrapper;
 
-import app.MainMenuBuilder;
+import app.AppBuilder;
 import interface_adapter.ViewModel;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +20,7 @@ public class ViewViewModelBuilderWrapper<T extends ViewModel<?>, P extends Padde
         this.view = factory.create(viewModel);
     }
 
-    public MainMenuBuilder addView(MainMenuBuilder builder, JPanel cardPanel, ViewManager viewManager) {
+    public AppBuilder addView(AppBuilder builder, JPanel cardPanel, ViewManager viewManager) {
         cardPanel.add(view, viewModel.getViewName());
         viewManager.addView(view.getViewName(), view);
         return builder;

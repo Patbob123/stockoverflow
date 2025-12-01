@@ -47,14 +47,11 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
 
     // Buttons (maybe more )
     private final JButton analyzeBtn;
-    private final JButton backBtn;
     private final JButton FredApiBtn;
     private final JButton CompareBtn;
     private final JButton ScenarioBtn;
     private final JButton MonteCarloBtn;
     private final JButton ImportBtn;
-    private final JButton HistoryBtn;
-    private final JButton ExitBtn;
     private final JButton backButton = createTextButton(ImportExportViewModel.BACK_BUTTON_LABEL);
 
     //now lets add history
@@ -71,6 +68,8 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         super(viewModel);
         this.viewModel = viewModel;
 
+
+
         // Initialize text fields using ViewModel defaults
         this.tickerField = new JTextField(
                 SingleStockViewModel.DEFAULT_TICKER,
@@ -86,18 +85,14 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
 
         // Initialize buttons using ViewModel labels
         this.analyzeBtn    = new JButton(SingleStockViewModel.BUTTON_ANALYZE);
-        this.backBtn       = new JButton(SingleStockViewModel.BUTTON_BACK);
         this.FredApiBtn    = new JButton(SingleStockViewModel.BUTTON_FRED);
         this.CompareBtn    = new JButton(SingleStockViewModel.BUTTON_COMPARE);
         this.ScenarioBtn   = new JButton(SingleStockViewModel.BUTTON_SCENARIO);
         this.MonteCarloBtn = new JButton(SingleStockViewModel.BUTTON_MONTECARLO);
         this.ImportBtn     = new JButton(SingleStockViewModel.BUTTON_IMPORT);
-        this.HistoryBtn    = new JButton(SingleStockViewModel.BUTTON_HISTORY);
-        this.ExitBtn       = new JButton(SingleStockViewModel.BUTTON_EXIT);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(screenSize);
         setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(10, 10, 10, 10));
 
         JPanel inputs = new JPanel(new GridBagLayout());
         GridBagConstraints g = new GridBagConstraints();
@@ -132,14 +127,11 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         buttons.add(analyzeBtn);
-        buttons.add(backBtn);
         buttons.add(FredApiBtn);//add later done
         buttons.add(CompareBtn);
         buttons.add(ScenarioBtn);
         buttons.add(MonteCarloBtn);
         buttons.add(ImportBtn);
-        buttons.add(HistoryBtn);
-        buttons.add(ExitBtn);
 
 
         g.gridx = 0; g.gridy = y;
@@ -151,8 +143,33 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         infoArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         JScrollPane infoScroll = new JScrollPane(infoArea);
 
-        add(inputs, BorderLayout.NORTH);
-        add(infoScroll, BorderLayout.CENTER);
+        add(inputs, BorderLayout.CENTER);
+        add(infoScroll, BorderLayout.SOUTH);
+
+        final JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(SingleStockViewModel.CARD_COLOUR);
+        topPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, SingleStockViewModel.BORDER_COLOUR),
+                new EmptyBorder(20, 30, 20, 30)
+        ));
+
+        topPanel.add(backButton, BorderLayout.WEST);
+
+        final JLabel title = new JLabel(SingleStockViewModel.TITLE_LABEL, SwingConstants.CENTER);
+        title.setFont(SingleStockViewModel.TITLE_FONT);
+        title.setForeground(SingleStockViewModel.TEXT_PRIMARY);
+        topPanel.add(title, BorderLayout.CENTER);
+
+        final JPanel spacer = new JPanel();
+        spacer.setOpaque(false);
+        spacer.setPreferredSize(new Dimension(100, 0));
+        topPanel.add(spacer, BorderLayout.EAST);
+
+        add(topPanel, BorderLayout.NORTH);
+
+        backButton.addActionListener(evt -> {
+            this.getChangeViewController().backView();
+        });
 
         loadHistoryFromDisk();
 
@@ -166,14 +183,11 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         });
 
         analyzeBtn.addActionListener(this::onAnalyzeClicked);
-        backBtn.addActionListener(e ->
-                JOptionPane.showMessageDialog(this, "Back to main menu (hook up in MainMenuBuilder)."));
         //connecting fred api to the button compare is added
         FredApiBtn.addActionListener(this::onFredApiClicked);
         CompareBtn.addActionListener(this::onCompareClicked);
         ScenarioBtn.addActionListener(this::onScenarioClicked);
         MonteCarloBtn.addActionListener(this::onMonteCarloClicked);
-        ExitBtn.addActionListener(this::onExitClicked);
     }
 
     //lets save history after we closed the app

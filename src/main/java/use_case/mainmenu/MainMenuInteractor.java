@@ -13,19 +13,8 @@ public class MainMenuInteractor implements MainMenuInputBoundary {
     }
 
     @Override
-    public void executeAnaylzePortfolio() {
-        mainMenuOutputBoundary.prepareSuccessView("we went to different view");
-    }
-
-    @Override
-    public void executeAnaylzeStock() {
-        mainMenuOutputBoundary.prepareSuccessView("we went to different view");
-    }
-
-
-    @Override
-    public void executeLoadStock() {
-        mainMenuOutputBoundary.prepareSuccessView("we went to different view");
+    public void executeLogout() {
+        mainMenuOutputBoundary.prepareLoginView();
     }
 
     @Override

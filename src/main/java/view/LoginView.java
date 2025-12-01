@@ -4,6 +4,7 @@ import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.mainmenu.MainMenuState;
 import interface_adapter.singlestock.SingleStockViewModel;
 
 import javax.swing.*;
@@ -74,7 +75,10 @@ public class LoginView extends PaddedView<LoginViewModel, LoginController> imple
 
         logInButton.addActionListener(evt -> {
             LoginState currentState = this.getViewModel().getState();
-            this.getController().execute(currentState.getUsername(), currentState.getPassword());
+            if (this.getController().execute(currentState.getUsername(), currentState.getPassword())) {
+                ((MainMenuState) this.getChangeViewController().getViewModel(MainMenuView.VIEW_NAME).getState()).setLoginViewModel(getViewModel());
+                this.getChangeViewController().changeView(MainMenuView.VIEW_NAME);
+            };
         });
 
         addInputListeners();
@@ -139,5 +143,7 @@ public class LoginView extends PaddedView<LoginViewModel, LoginController> imple
         if (state.getUsernameError() != null) {
             JOptionPane.showMessageDialog(this, state.getUsernameError());
         }
+        passwordInputField.setText(state.getPassword());
+
     }
 }

@@ -23,9 +23,6 @@ import java.beans.PropertyChangeListener;
 
 public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuController> implements ActionListener, PropertyChangeListener {
 
-    @Setter
-    private ChangeViewController changeViewController;
-
     private final JButton stockButton = new JButton(MainMenuViewModel.STOCK_BUTTON_LABEL);
     private final JButton analyzePortfolioButton = new JButton(MainMenuViewModel.PORTFOLIO_BUTTON_LABEL);
     private final JButton createPortfolioButton = new JButton(MainMenuViewModel.CREATE_PORTFOLIO_BUTTON_LABEL);
@@ -44,9 +41,6 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         super(viewModel);
         //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
         this.getViewModel().addPropertyChangeListener(this);
-        this.changeViewController = null;
-
-
 
 
         final JPanel buttons = new JPanel();
@@ -59,7 +53,7 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         stockButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(stockButton)) {
-                        changeViewController.changeView("SingleStockMenu");
+                        this.getChangeViewController().changeView("SingleStockMenu");
 
                     }
                 }
@@ -70,11 +64,11 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
                     if (evt.getSource().equals(analyzePortfolioButton)) {
                         final Portfolio portfolio = portfolioFactory.createPortfolio("Untitled");
                         final PortfolioMenuViewModel portfolioViewModel =
-                                (PortfolioMenuViewModel) changeViewController
+                                (PortfolioMenuViewModel) this.getChangeViewController()
                                         .getViewModel(PortfolioMenuView.VIEW_NAME);
                         portfolioViewModel.getState().setPortfolio(portfolio);
                         portfolioViewModel.firePropertyChange();
-                        changeViewController.changeView("PortfolioMenu");
+                        this.getChangeViewController().changeView("PortfolioMenu");
                     }
                 }
         );
@@ -82,7 +76,7 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         createPortfolioButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(createPortfolioButton)) {
-                        changeViewController.changeView("AddPortfolioMenu");
+                        this.getChangeViewController().changeView("AddPortfolioMenu");
 
                     }
                 }
@@ -157,7 +151,12 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
         // Listeners
 //        portfolioCard.addActionListener(e -> mainMenuController.switchToPortfolioView());
 //        singleStockCard.addActionListener(e -> mainMenuController.switchToSingleStockView());
-//        logoutButton.addActionListener(e -> mainMenuController.executeLogout());
+        logoutButton.addActionListener(e -> {
+                    this.getController().executeLogout();
+                    this.getChangeViewController().changeView(LoginView.VIEW_NAME);
+                }
+
+        );
     }
 
     private JButton createDashboardCard(String title, String subtitle, String iconText, Color accentColor, String view) {
@@ -202,13 +201,14 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
                 card.setBackground(MainMenuViewModel.CARD_COLOUR.brighter());
                 card.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, accentColor));
             }
+
             public void mouseExited(MouseEvent e) {
                 card.setBackground(MainMenuViewModel.CARD_COLOUR);
                 card.setBorder(BorderFactory.createMatteBorder(0, 6, 0, 0, accentColor));
             }
 
             public void mouseClicked(MouseEvent e) {
-                changeViewController.changeView(view);
+                getChangeViewController().changeView(view);
             }
         });
 

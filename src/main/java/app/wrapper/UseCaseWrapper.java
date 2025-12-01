@@ -1,6 +1,6 @@
 package app.wrapper;
 
-import app.MainMenuBuilder;
+import app.AppBuilder;
 import interface_adapter.AbsController;
 import interface_adapter.ViewModel;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class UseCaseWrapper<I extends InputBoundary,
     private final DirectlyCreateFactory<C, I> controllerWrapper;
     private final String viewName;
 
-    public MainMenuBuilder build(MainMenuBuilder mainMenuBuilder) {
+    public AppBuilder build(AppBuilder mainMenuBuilder) {
         final P menuView = (P) viewManager.getViews().get(viewName);
         final O outputBoundary = presenterWrapper.create(menuView.getViewModel());
         final I inputBoundary = interactorWrapper.create(outputBoundary);

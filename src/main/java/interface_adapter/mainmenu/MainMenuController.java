@@ -21,4 +21,8 @@ public class MainMenuController extends AbsController {
         }
 
     }
+
+    public void executeLogout() {
+        mainMenuInteractor.executeLogout();
+    }
 }

@@ -11,8 +11,8 @@ public class LoginController extends AbsController {
         this.loginUseCaseInteractor = loginUseCaseInteractor;
     }
 
-    public void execute(String username, String password) {
+    public boolean execute(String username, String password) {
         LoginInputData loginInputData = new LoginInputData(username, password);
-        loginUseCaseInteractor.execute(loginInputData);
+        return loginUseCaseInteractor.execute(loginInputData);
     }
 }

@@ -21,7 +21,6 @@ import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockPresenter;
-import interface_adapter.singlestock.SingleStockViewInterface;
 import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.UserDataAccessInterface;
 import use_case.import_export.ImportExportDataAccessInterface;
@@ -57,7 +56,7 @@ import view.*;
 import app.wrapper.UseCaseWrapper;
 import app.wrapper.ViewViewModelBuilderWrapper;
 
-public class MainMenuBuilder {
+public class AppBuilder {
 
     private static final Dimension SCREENSIZE = Toolkit.getDefaultToolkit().getScreenSize();
     public static final double WIDTH = SCREENSIZE.getWidth();
@@ -157,66 +156,66 @@ public class MainMenuBuilder {
         return viewManager.getViews().get(viewName);
     }
 
-    public MainMenuBuilder() {
+    public AppBuilder() {
         cardPanel.setLayout(cardLayout);
     }
 
-    public MainMenuBuilder addMainView() {
+    public AppBuilder addMainView() {
         viewBuildInstruction.add(mainMenu);
         return this;
     }
 
-    public MainMenuBuilder addImportExportView() {
+    public AppBuilder addImportExportView() {
         viewBuildInstruction.add(importExportMenu);
         return this;
     }
 
-    public MainMenuBuilder addPortfolioMenuView() {
+    public AppBuilder addPortfolioMenuView() {
         viewBuildInstruction.add(portFolioMenu);
         return this;
     }
 
-    public MainMenuBuilder addAddPortfolioView() {
+    public AppBuilder addAddPortfolioView() {
         viewBuildInstruction.add(addPortfolioMenu);
         return this;
     }
 
-    public MainMenuBuilder addStockMenuView() {
+    public AppBuilder addStockMenuView() {
         viewBuildInstruction.add(addStockMenu);
         return this;
     }
 
-    public MainMenuBuilder addSingleStockView() {
+    public AppBuilder addSingleStockView() {
         viewBuildInstruction.add(singleStockMenu);
         return this;
     }
 
-    public MainMenuBuilder addLoginView() {
+    public AppBuilder addLoginView() {
         viewBuildInstruction.add(loginView);
         return this;
     }
 
-    public MainMenuBuilder addSignupView() {
+    public AppBuilder addSignupView() {
         viewBuildInstruction.add(signupView);
         return this;
     }
 
-    public MainMenuBuilder addSingleStockUseCase() {
+    public AppBuilder addSingleStockUseCase() {
         this.addSingleStock = true;
         return this;
     }
 
-    public MainMenuBuilder addLoginUseCase() {
+    public AppBuilder addLoginUseCase() {
         this.addLogin = true;
         return this;
     }
 
-    public MainMenuBuilder addChangeViewUseCase() {
+    public AppBuilder addChangeViewUseCase() {
         this.addChangeView = true;
         return this;
     }
 
-    public MainMenuBuilder addSignupUseCase() {
+    public AppBuilder addSignupUseCase() {
         this.addSignup = true;
         return this;
     }
@@ -272,34 +271,36 @@ public class MainMenuBuilder {
         getView(PortfolioMenuView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(AddStockMenuView.VIEW_NAME).setChangeViewController(changeViewController);
         getView(LoginView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(SignupView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(SingleStockView.VIEW_NAME).setChangeViewController(changeViewController);
     }
 
-    public MainMenuBuilder addMainViewUseCase() {
+    public AppBuilder addMainViewUseCase() {
         useCaseBuildInstruction.add(mainmenuUsecase);
         return this;
     }
 
-    public MainMenuBuilder addImportExportUseCase() {
+    public AppBuilder addImportExportUseCase() {
         useCaseBuildInstruction.add(importExportUsecase);
         return this;
     }
 
-    public MainMenuBuilder addPortfolioUseCase() {
+    public AppBuilder addPortfolioUseCase() {
         useCaseBuildInstruction.add(addPortfolioUsecase);
         return this;
     }
 
-    public MainMenuBuilder addPortfolioMenuUseCase() {
+    public AppBuilder addPortfolioMenuUseCase() {
         useCaseBuildInstruction.add(portfolioMenuUsecase);
         return this;
     }
 
-    public MainMenuBuilder addStockMenuUseCase() {
+    public AppBuilder addStockMenuUseCase() {
         useCaseBuildInstruction.add(addStockMenuUsecase);
         return this;
     }
 
-    public MainMenuBuilder addSingleStockDAO() {
+    public AppBuilder addSingleStockDAO() {
         String alphaKey = "YOUR_ALPHA_KEY_HERE"; // or System.getenv("ALPHAVANTAGE_API_KEY");
 
         final StockPriceDataAccessInterface stooqGateway =
@@ -316,7 +317,7 @@ public class MainMenuBuilder {
         return this;
     }
 
-    public MainMenuBuilder addUserDAO() {
+    public AppBuilder addUserDAO() {
         try {
             userDAO = new FileUserDataAccessObject("./users.csv", new CommonUserFactory());
         }

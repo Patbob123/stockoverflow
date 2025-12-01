@@ -20,8 +20,6 @@ import lombok.Setter;
 
 public class ImportExportView extends PaddedView<ImportExportViewModel, ImportExportController> implements ActionListener, PropertyChangeListener {
     public static final String VIEW_NAME = "ImportExportMenu";
-    @Setter
-    private ChangeViewController changeViewController;
 
     private final JButton currentSessionButton = createPrimaryButton(ImportExportViewModel.CURRENT_SESSION_BUTTON_LABEL);
     private final JButton exportPortfolioButton = createSecondaryButton(ImportExportViewModel.EXPORT_PORTFOLIO_BUTTON_LABEL);
@@ -36,7 +34,6 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
     public ImportExportView(ImportExportViewModel importExportViewModel) {
         super(importExportViewModel);
         this.getViewModel().addPropertyChangeListener(this);
-        this.changeViewController = null;
         createView();
     }
 
@@ -368,7 +365,7 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         });
 
         backButton.addActionListener(evt -> {
-            changeViewController.backView();
+            this.getChangeViewController().backView();
         });
     }
 
