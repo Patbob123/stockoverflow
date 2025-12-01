@@ -1,11 +1,11 @@
 package interface_adapter.import_export;
 
-import entities.Portfolio.Portfolio;
 import entities.PortfolioList;
 import entities.Simulation;
+import interface_adapter.AbsController;
 import use_case.import_export.ImportExportInputBoundary;
 
-public class ImportExportController {
+public class ImportExportController extends AbsController {
     private final ImportExportInputBoundary importExportInputBoundary;
 
     public ImportExportController(ImportExportInputBoundary importExportInputBoundary) {

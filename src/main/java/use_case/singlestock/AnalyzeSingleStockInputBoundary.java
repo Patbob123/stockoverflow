@@ -1,5 +1,7 @@
 package use_case.singlestock;
 
-public interface AnalyzeSingleStockInputBoundary {
+import use_case.InputBoundary;
+
+public interface AnalyzeSingleStockInputBoundary extends InputBoundary {
     void execute(AnalyzeSingleStockInputData inputData);
 }

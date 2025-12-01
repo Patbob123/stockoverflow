@@ -38,10 +38,15 @@ public class MainMenu {
                 .addImportExportView()
                 .addPortfolioMenuView()
                 .addAddPortfolioView()
+                .addStockMenuView()
                 .addChangeViewUseCase()
                 .addMainViewUseCase()
-                .addAddPortfolioUseCase()
+                .addPortfolioUseCase()
                 .addImportExportUseCase()
+                .addPortfolioMenuUseCase()
+                .addStockMenuUseCase()
+                .addSingleStockView()
+                .addSingleStockMenuUseCase()
                 .build();
 
         application.setExtendedState(JFrame.MAXIMIZED_BOTH);

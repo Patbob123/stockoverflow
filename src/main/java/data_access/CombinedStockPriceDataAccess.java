@@ -3,6 +3,7 @@ package data_access;
 import entities.PriceBar;
 import use_case.singlestock.StockPriceDataAccessInterface;
 
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -11,31 +11,30 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import entities.Portfolio.Portfolio;
+import entities.Portfolio.PortfolioFactory;
 import interface_adapter.ViewModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
 import interface_adapter.add_portfolio.AddPortfolioViewModel;
 import interface_adapter.change_view.ChangeViewController;
+import interface_adapter.portfolio.PortfolioMenuViewModel;
 import lombok.Getter;
 import lombok.Setter;
 
-public class AddPortfolioView extends PaddedView implements ActionListener, PropertyChangeListener {
-    @Getter
-    private final String viewName = "AddPortfolioMenu";
-    private final AddPortfolioViewModel addPortfolioViewModel;
-    @Setter
-    private AddPortfolioController addPortfolioController;
+public class AddPortfolioView
+        extends PaddedView<AddPortfolioViewModel, AddPortfolioController> {
+    public static final String VIEW_NAME = "AddPortfolioMenu";
     @Setter
     private ChangeViewController changeViewController;
+    private final PortfolioFactory portfolioFactory = new PortfolioFactory();
 
     private final JButton createButton;
     private final JButton importButton;
     private final JButton backButton = createTextButton(AddPortfolioViewModel.BACK_BUTTON_LABEL);
 
-    public AddPortfolioView(AddPortfolioViewModel addPortfolioViewModel) {
-        super(AddPortfolioViewModel.PADDING);
-        this.addPortfolioViewModel = addPortfolioViewModel;
-        this.addPortfolioViewModel.addPropertyChangeListener(this);
-        this.changeViewController = null;
+    public AddPortfolioView(AddPortfolioViewModel viewModel) {
+        super(viewModel);
+        this.getViewModel().addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
 
@@ -93,25 +92,26 @@ public class AddPortfolioView extends PaddedView implements ActionListener, Prop
         add(mainPanel, BorderLayout.CENTER);
 
         createButton.addActionListener(evt -> {
-            if (addPortfolioController != null) {
-                changeViewController.changeView("CreatePortfolioMenu");
+            if (this.getController() != null) {
+                final Portfolio portfolio = portfolioFactory.createPortfolio("Untitled");
+                final PortfolioMenuViewModel portfolioViewModel =
+                        (PortfolioMenuViewModel) changeViewController.getViewModel(PortfolioMenuView.VIEW_NAME);
+                portfolioViewModel.getState().setPortfolio(portfolio);
+                portfolioViewModel.firePropertyChange();
+                changeViewController.changeView("PortfolioMenu");
             }
         });
 
         importButton.addActionListener(evt -> {
-            if (addPortfolioController != null) {
-                changeViewController.changeView("ImportExportMenu");
+            if (this.getController() != null) {
+                changeViewController.changeView(ImportExportView.VIEW_NAME);
             }
         });
 
         backButton.addActionListener(evt -> {
-            changeViewController.changeView("MainMenu");
+            changeViewController.changeView(MainMenuView.VIEW_NAME);
         });
 
-    }
-
-    public ViewModel getViewModel() {
-        return addPortfolioViewModel;
     }
 
     @Override

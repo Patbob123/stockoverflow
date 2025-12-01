@@ -2,13 +2,11 @@ package use_case.portfolio.addStock;
 
 import entities.Portfolio.Portfolio;
 
-public class AddStockMenuInteractor implements AddstockMenuInputBoundary{
+public class AddStockMenuInteractor implements AddstockMenuInputBoundary {
 
-    private Portfolio portfolio;
     private AddStockMenuOutputBoundary addStockMenuPresenter;
 
-    public AddStockMenuInteractor(Portfolio portfolio, AddStockMenuOutputBoundary output) {
-        this.portfolio = portfolio;
+    public AddStockMenuInteractor(AddStockMenuOutputBoundary output) {
         this.addStockMenuPresenter = output;
     }
 

@@ -1,9 +1,10 @@
 package interface_adapter.portfolio;
 
+import interface_adapter.AbsController;
 import lombok.Getter;
 import use_case.portfolio.PortfolioMenuInputBoundary;
 
-public class PortfolioMenuController {
+public class PortfolioMenuController extends AbsController {
     @Getter
     private final PortfolioMenuInputBoundary portfolioMenuInputBoundary;
 

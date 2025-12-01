@@ -1,8 +1,9 @@
 package interface_adapter.mainmenu;
 
+import interface_adapter.AbsController;
 import use_case.mainmenu.MainMenuInputBoundary;
 
-public class MainMenuController {
+public class MainMenuController extends AbsController {
     private final MainMenuInputBoundary mainMenuInteractor;
     public MainMenuController(MainMenuInputBoundary mainMenuInteractor) {
         this.mainMenuInteractor = mainMenuInteractor;

@@ -1,8 +1,6 @@
 package view;
 
-import interface_adapter.ViewModel;
 import interface_adapter.change_view.ChangeViewController;
-import interface_adapter.portfolio.PortfolioMenuController;
 import interface_adapter.portfolio.PortfolioMenuViewModel;
 import interface_adapter.portfolio.addStock.AddStockMenuController;
 import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
@@ -14,25 +12,42 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 
-public class AddStockMenuView extends PaddedView implements ActionListener, PropertyChangeListener {
+public class AddStockMenuView extends PaddedView<AddStockMenuViewModel, AddStockMenuController> {
 
-    @Getter
-    private final String viewName = "Add Stock";
+    public static final String VIEW_NAME = "Add Stock";
 
-    @Setter
-    private ChangeViewController changeViewController;
+    private final JPanel tickerPanel = new JPanel();
+    private final JButton addStockButton = new JButton(AddStockMenuViewModel.ADDSTOCK_BUTTON_LABEL);
+    private final JButton backToPortfolio = new JButton(AddStockMenuViewModel.BACK_TO_PORTFOLIO);
 
-    private final AddStockMenuViewModel addStockMenuViewModel;
-    private final AddStockMenuController addStockMenuController;
+    public AddStockMenuView(AddStockMenuViewModel viewModel) {
+        super(viewModel);
+        this.getViewModel().addPropertyChangeListener(this);
+        tickerPanel.setLayout(new BoxLayout(tickerPanel, BoxLayout.Y_AXIS));
+        tickerPanel.add(addStockButton);
+        tickerPanel.add(backToPortfolio);
 
-    public AddStockMenuView(AddStockMenuViewModel addStockMenuViewModel) {
-        this.addStockMenuViewModel = addStockMenuViewModel;
-        this.addStockMenuViewModel.addPropertyChangeListener(this);
-        this.addStockMenuController = null;
+        addStockButton.addActionListener(
+                evt -> {
+                    if(evt.getSource().equals(addStockButton)) {
+                        //
+                    }
+                }
+        );
+        backToPortfolio.addActionListener(
+                evt -> {
+                    if(evt.getSource().equals(backToPortfolio)) {
+                        final PortfolioMenuViewModel portfolioViewModel =
+                                (PortfolioMenuViewModel) this.getChangeViewController()
+                                        .getViewModel(PortfolioMenuView.VIEW_NAME);
+                        portfolioViewModel.firePropertyChange();
+                        this.getChangeViewController().changeView(PortfolioMenuView.VIEW_NAME);
+                    }
+                }
+        );
+
+        this.add(tickerPanel);
     }
 
     @Override
@@ -43,10 +58,5 @@ public class AddStockMenuView extends PaddedView implements ActionListener, Prop
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
-    }
-
-    @Override
-    public ViewModel<?> getViewModel() {
-        return null;
     }
 }

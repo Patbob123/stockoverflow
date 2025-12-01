@@ -9,6 +9,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import use_case.singlestock.StockPriceDataAccessInterface;
 
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;

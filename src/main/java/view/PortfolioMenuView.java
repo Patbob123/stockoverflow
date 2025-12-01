@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Comparator;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,46 +13,46 @@ import javax.swing.*;
 import entities.Portfolio.Portfolio;
 import interface_adapter.ViewModel;
 import interface_adapter.portfolio.PortfolioMenuController;
-import interface_adapter.portfolio.PortfolioMenuState;
 import interface_adapter.portfolio.PortfolioMenuViewModel;
 import interface_adapter.change_view.ChangeViewController;
+import interface_adapter.portfolio.addStock.AddStockMenuState;
 import lombok.Getter;
 import lombok.Setter;
 
-public class PortfolioMenuView extends PaddedView implements ActionListener, PropertyChangeListener {
-    @Getter
-    private final String viewName = "PortfolioMenu";
+public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, PortfolioMenuController> {
 
     @Setter
     private ChangeViewController changeViewController;
 
-    private final String[] sortmethod = {"by name", "by price", "by amount of stock"};
-    private final Map<String, Comparator> portfolioSort = new HashMap<>();
+    public static final String VIEW_NAME = "PortfolioMenu";
 
-    private final PortfolioMenuViewModel portfolioMenuViewModel;
-    private final PortfolioMenuController portfolioMenuController;
+    private final String[] sortmethod = Portfolio.PORTFOLIO_SORT;
 
     private final JButton addButton = new JButton(PortfolioMenuViewModel.ADD_BUTTON_LABEL);
     private final JButton removeButton = new JButton(PortfolioMenuViewModel.REMOVE_BUTTON_LABEL);
     private final JButton simulationButton = new JButton(PortfolioMenuViewModel.SIMULATION_BUTTON_LABEL);
     private final JButton selectAllButton = new JButton(PortfolioMenuViewModel.SELECT_ALL_BUTTON_LABEL);
     private final JButton clearSelectionButton = new JButton(PortfolioMenuViewModel.CLEAR_SELECTION_BUTTON_LABEL);
-    private final JButton savePortfolioButton =  new JButton(PortfolioMenuViewModel.SAVE_PORTFOLIO_BUTTON_LABEL);
+    private final JButton savePortfolioJSONButton =
+            new JButton(PortfolioMenuViewModel.SAVE_PORTFOLIO_JSON_BUTTON_LABEL);
+    private final JButton savePortfolioDatabaseButton =
+            new JButton(PortfolioMenuViewModel.SAVE_PORTFOLIO_DATABASE_BUTTON_LABEL);
     private final JButton exitButton = new JButton(PortfolioMenuViewModel.EXIT_BUTTON_LABEL);
+    private final JButton changeNameButton = new JButton(PortfolioMenuViewModel.CHANGE_NAME_LABEL);
     @Getter
     private final JPanel checkBoxPanel = new JPanel();
+    private final JLabel portfolioName = new JLabel("");
+
+    private final JTextField nameField = new JTextField(15);
     private final Map<String, JButton> buttonMap = new HashMap<String, JButton>();
     private final Map<JCheckBox, String> checkBoxTranslator = new HashMap<JCheckBox, String>();
     private final Map<JCheckBox, JPanel> jPanelMap = new HashMap<JCheckBox, JPanel>();
 
-    public PortfolioMenuView(PortfolioMenuViewModel portfolioMenuViewModel) {
-        super();
-        //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
-        this.portfolioMenuViewModel = portfolioMenuViewModel;
-        this.portfolioMenuViewModel.addPropertyChangeListener(this);
-        this.portfolioMenuController = null;
+    public PortfolioMenuView(PortfolioMenuViewModel viewModel) {
+        super(viewModel);
+        //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TO
 
-
+        this.getViewModel().addPropertyChangeListener(this);
 
         final JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
@@ -61,31 +61,44 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
         buttons.add(simulationButton);
         buttons.add(selectAllButton);
         buttons.add(clearSelectionButton);
-        buttons.add(savePortfolioButton);
+        buttons.add(savePortfolioJSONButton);
+        buttons.add(savePortfolioDatabaseButton);
         buttons.add(exitButton);
 
+        final JPanel changeNameBox = new JPanel();
+
+        changeNameBox.add(nameField);
+        changeNameBox.add(changeNameButton);
+
+        buttons.add(changeNameBox);
+
         checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
-        JScrollPane scrollPane = new JScrollPane(checkBoxPanel);
-        JPanel stocksPanel = new JPanel();
-        JPanel sortbyPanel = new JPanel();
-        JLabel sortbyLabel = new JLabel("Sort by:");
+        final JPanel portfolioStockBox = new JPanel();
+        portfolioStockBox.add(portfolioName);
+        final JScrollPane scrollPane = new JScrollPane(checkBoxPanel);
+        final JPanel stocksPanel = new JPanel();
+        final JPanel sortbyPanel = new JPanel();
+        final JLabel sortbyLabel = new JLabel("Sort by:");
 
-        JComboBox<String> sortbyComboBox = new JComboBox<>(sortmethod);
-
-        sortbyPanel.add(sortbyLabel);
-        sortbyPanel.add(sortbyComboBox);
+        final JComboBox<String> sortbyComboBox = new JComboBox<>(sortmethod);
 
         stocksPanel.setLayout(new BoxLayout(stocksPanel, BoxLayout.Y_AXIS));
+        sortbyPanel.add(sortbyLabel);
+        sortbyPanel.add(sortbyComboBox);
         stocksPanel.add(scrollPane);
         stocksPanel.add(sortbyPanel);
-
 
         addButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(addButton)) {
                         //MainMenuController.execute(noteInputField.getText());
-                        this.portfolioMenuController.getPortfolioMenuInputBoundary().executeAddStock();
-                        changeViewController.changeView("");
+                        final String addStockViewName = AddStockMenuView.VIEW_NAME;
+                        final ViewModel<AddStockMenuState> addStockMenuViewModel =
+                                (ViewModel<AddStockMenuState>) changeViewController.getViewModel(
+                                        addStockViewName);
+                        this.getController().getPortfolioMenuInputBoundary().executeAddStock(addStockMenuViewModel);
+
+                        changeViewController.changeView(addStockViewName);
                     }
                 }
         );
@@ -95,7 +108,7 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
                     if (evt.getSource().equals(removeButton)) {
                         for (JCheckBox checkBox : checkBoxTranslator.keySet()) {
                             if (checkBox.getModel().isSelected()) {
-                                portfolioMenuViewModel.getState().getPortfolio().removeStock(checkBoxTranslator.get(checkBox));
+                                this.getViewModel().getState().getPortfolio().removeStock(checkBoxTranslator.get(checkBox));
                                 buttonMap.remove(checkBoxTranslator.get(checkBox));
                                 checkBoxTranslator.remove(checkBox);
                                 checkBoxPanel.remove(jPanelMap.get(checkBox));
@@ -133,20 +146,56 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
                 }
         );
 
-        savePortfolioButton.addActionListener(
+        savePortfolioJSONButton.addActionListener(
                 evt -> {
-                    if (evt.getSource().equals(savePortfolioButton)) {
+                    if (evt.getSource().equals(savePortfolioJSONButton)) {
+                        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+                        portfolio.saveStockByJSON();
+                    }
+                }
+        );
 
+        savePortfolioDatabaseButton.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(savePortfolioDatabaseButton)) {
+                        //
                     }
                 }
         );
 
         sortbyComboBox.addActionListener(
-                evt ->{
-                    if(evt.getSource().equals(sortbyComboBox)){
-                        String method = (String) sortbyComboBox.getSelectedItem();
-                        Portfolio portfolio = this.portfolioMenuViewModel.getState().getPortfolio();
+                evt -> {
+                    if (evt.getSource().equals(sortbyComboBox)) {
+                        final String method = (String) sortbyComboBox.getSelectedItem();
+                        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+                        portfolio.sortStockBy(portfolio.getPortfolioSortMap().get(method));
                         // portfolio.sortStockBy();
+                    }
+                }
+        );
+
+        changeNameButton.addActionListener(
+                evt -> {
+                    if(evt.getSource().equals(changeNameButton)) {
+                        final String name = nameField.getText();
+                        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+                        if (name.isEmpty()) {
+                            System.out.println(portfolio.getName());
+                        }
+                        else {
+                            portfolio.setName(name);
+                            this.refresh();
+                            System.out.println(portfolio.getName());
+                        }
+                        // portfolio.sortStockBy();
+                    }
+                }
+        );
+
+        exitButton.addActionListener(
+                evt -> {
+                    if(evt.getSource().equals(exitButton)) {
+                        changeViewController.changeView(MainMenuView.VIEW_NAME);
                     }
                 }
         );
@@ -154,25 +203,29 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         //this.add(noteName);
-        this.add(scrollPane);
+        portfolioStockBox.add(stocksPanel);
+        this.add(portfolioStockBox);
         this.add(buttons);
     }
 
-    private void checkBoxConfigure(Boolean bool){
+    private void checkBoxConfigure(Boolean bool) {
         for(JCheckBox checkBox : checkBoxTranslator.keySet()) {
             checkBox.setSelected(bool);
         }
     }
 
-    public void refreshCheckBoxPanel(Portfolio portfolio){
+    public void refreshCheckBoxPanel(Portfolio portfolio) {
         buttonMap.clear();
         checkBoxTranslator.clear();
         jPanelMap.clear();
+        nameField.setText("");
+        portfolioName.setText(portfolio.getName());
+        checkBoxPanel.removeAll();
 
         for (String ticker : portfolio.getVisualStocks()) {
-            JPanel tickerPanel = new JPanel();
-            JCheckBox checkBox = new JCheckBox();
-            JButton button = new JButton(portfolio.getStock(ticker).getName());
+            final JPanel tickerPanel = new JPanel();
+            final JCheckBox checkBox = new JCheckBox();
+            final JButton button = new JButton(portfolio.getStock(ticker).getName());
             button.addActionListener(
                     evt -> {
                         if (evt.getSource().equals(button)) {
@@ -190,8 +243,10 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
         }
     }
 
-    public ViewModel<PortfolioMenuState> getViewModel() {
-        return portfolioMenuViewModel;
+    public void refresh() {
+        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+        this.getController().getPortfolioMenuInputBoundary().executeUpdatePortfolio(portfolio);
+        this.refreshCheckBoxPanel(portfolio);
     }
 
     @Override
@@ -201,8 +256,6 @@ public class PortfolioMenuView extends PaddedView implements ActionListener, Pro
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        Portfolio portfolio = portfolioMenuViewModel.getState().getPortfolio();
-        this.portfolioMenuController.getPortfolioMenuInputBoundary().executeUpdatePortfolio(portfolio);
-        this.refreshCheckBoxPanel(portfolio);
+        refresh();
     }
 }

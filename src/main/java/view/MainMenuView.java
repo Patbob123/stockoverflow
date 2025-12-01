@@ -1,29 +1,23 @@
 package view;
 
+import entities.Portfolio.Portfolio;
+import entities.Portfolio.PortfolioFactory;
 import interface_adapter.ViewModel;
 import interface_adapter.change_view.ChangeViewController;
-import interface_adapter.import_export.ImportExportViewModel;
 import interface_adapter.mainmenu.MainMenuController;
-import interface_adapter.mainmenu.MainMenuState;
 import interface_adapter.mainmenu.MainMenuViewModel;
+import interface_adapter.portfolio.PortfolioMenuViewModel;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class MainMenuView extends PaddedView implements ActionListener, PropertyChangeListener {
+public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuController> {
 
-    @Getter
-    private final String viewName = "MainMenu";
-    private final MainMenuViewModel mainMenuViewModel;
-
-    @Setter
-    private MainMenuController mainMenuController;
     @Setter
     private ChangeViewController changeViewController;
 
@@ -32,13 +26,14 @@ public class MainMenuView extends PaddedView implements ActionListener, Property
     private final JButton createPortfolioButton = new JButton(MainMenuViewModel.CREATE_PORTFOLIO_BUTTON_LABEL);
     private final JButton historyStockButton = new JButton(MainMenuViewModel.HISTORY_BUTTON_LABEL);
     private final JButton exitButton = new JButton(MainMenuViewModel.EXIT_BUTTON_LABEL);
+    private final PortfolioFactory portfolioFactory = new PortfolioFactory();
 
-    public MainMenuView(MainMenuViewModel mainMenuViewModel) {
-        super(MainMenuViewModel.PADDING);
+    public static final String VIEW_NAME = "MainMenu";
+
+    public MainMenuView(MainMenuViewModel viewModel) {
+        super(viewModel);
         //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
-        this.mainMenuViewModel = mainMenuViewModel;
-        this.mainMenuViewModel.addPropertyChangeListener(this);
-        this.mainMenuController = null;
+        this.getViewModel().addPropertyChangeListener(this);
         this.changeViewController = null;
 
         final JPanel buttons = new JPanel();
@@ -52,7 +47,7 @@ public class MainMenuView extends PaddedView implements ActionListener, Property
                 evt -> {
                     if (evt.getSource().equals(stockButton)) {
                         //MainMenuController.execute(noteInputField.getText());
-
+                        changeViewController.changeView(SingleStockView.VIEW_NAME);
                     }
                 }
         );
@@ -60,6 +55,12 @@ public class MainMenuView extends PaddedView implements ActionListener, Property
         analyzePortfolioButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(analyzePortfolioButton)) {
+                        final Portfolio portfolio = portfolioFactory.createPortfolio("Untitled");
+                        final PortfolioMenuViewModel portfolioViewModel =
+                                (PortfolioMenuViewModel) changeViewController
+                                        .getViewModel(PortfolioMenuView.VIEW_NAME);
+                        portfolioViewModel.getState().setPortfolio(portfolio);
+                        portfolioViewModel.firePropertyChange();
                         changeViewController.changeView("PortfolioMenu");
                     }
                 }
@@ -86,7 +87,7 @@ public class MainMenuView extends PaddedView implements ActionListener, Property
         exitButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(exitButton)) {
-                        mainMenuController.execute("exit"); //fix this later
+                        this.getController().execute("exit"); //fix this later
 
                     }
                 }
@@ -96,10 +97,6 @@ public class MainMenuView extends PaddedView implements ActionListener, Property
 
         //this.add(noteName);
         this.add(buttons);
-    }
-
-    public ViewModel<MainMenuState> getViewModel() {
-        return mainMenuViewModel;
     }
 
     @Override

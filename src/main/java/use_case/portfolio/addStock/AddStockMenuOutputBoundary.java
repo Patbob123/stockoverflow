@@ -1,6 +1,8 @@
 package use_case.portfolio.addStock;
 
-public interface AddStockMenuOutputBoundary {
+import use_case.OutputBoundary;
+
+public interface AddStockMenuOutputBoundary extends OutputBoundary {
 
     void prepareSuccessView(String portfolioName, String stockticker);
 

@@ -1,5 +1,7 @@
 package use_case.singlestock;
 
-public interface CompareTwoStocksOutputBoundary {
+import use_case.OutputBoundary;
+
+public interface CompareTwoStocksOutputBoundary extends OutputBoundary {
     void present(CompareTwoStocksOutputData outputData);
 }

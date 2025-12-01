@@ -13,22 +13,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import entities.Portfolio.Portfolio;
 import entities.PortfolioList;
 import entities.Simulation;
-import interface_adapter.ViewModel;
 import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.import_export.ImportExportController;
-import interface_adapter.import_export.ImportExportState;
 import interface_adapter.import_export.ImportExportViewModel;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ImportExportView extends PaddedView implements ActionListener, PropertyChangeListener {
-
-    @Getter
-    private final String viewName = "ImportExportMenu";
-    private final ImportExportViewModel importExportViewModel;
-
-    @Setter
-    private ImportExportController importExportController;
+public class ImportExportView extends PaddedView<ImportExportViewModel, ImportExportController> {
+    public static final String VIEW_NAME = "ImportExportMenu";
     @Setter
     private ChangeViewController changeViewController;
 
@@ -43,10 +35,8 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
     private final JComboBox<Simulation> simulationDropdown = new JComboBox<>();
 
     public ImportExportView(ImportExportViewModel importExportViewModel) {
-        super(ImportExportViewModel.PADDING);
-        this.importExportViewModel = importExportViewModel;
-        this.importExportViewModel.addPropertyChangeListener(this);
-        this.importExportController = null;
+        super(importExportViewModel);
+        this.getViewModel().addPropertyChangeListener(this);
         this.changeViewController = null;
         createView();
     }
@@ -335,7 +325,7 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
         importPortfolioButton.addActionListener(evt -> {
             final String path = getCsvFilePath();
             if (path != null) {
-                importExportController.importPortfolio(path);
+                this.getController().importPortfolio(path);
             }
         });
 
@@ -345,7 +335,7 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
                 errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
                 return;
             }
-            importExportController.exportCurrentSession(path);
+            this.getController().exportCurrentSession(path);
         });
 
         exportPortfolioButton.addActionListener(e -> {
@@ -361,7 +351,7 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
                 errorLabel.setText(ImportExportViewModel.ERROR_NO_PORTFOLIO);
                 return;
             }
-            importExportController.exportPortfolio(portfolioList, path);
+            this.getController().exportPortfolio(portfolioList, path);
         });
 
         selectSimDataButton.addActionListener(e -> {
@@ -375,16 +365,12 @@ public class ImportExportView extends PaddedView implements ActionListener, Prop
                 errorLabel.setText(ImportExportViewModel.ERROR_NO_SIMULATION);
                 return;
             }
-            importExportController.exportSimData(selected, path);
+            this.getController().exportSimData(selected, path);
         });
 
         backButton.addActionListener(evt -> {
             changeViewController.backView();
         });
-    }
-
-    public ViewModel<ImportExportState> getViewModel() {
-        return importExportViewModel;
     }
 
     @Override

@@ -2,6 +2,7 @@ package view;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.ViewModel;
+import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,8 +19,8 @@ public class ViewManager implements PropertyChangeListener {
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
     private final ViewManagerModel viewManagerModel;
-
-    private final Map<String, PaddedView> views = new HashMap<>();
+    @Getter
+    private final Map<String, PaddedView<?, ?>> views = new HashMap<>();
 
     public ViewManager(JPanel mainPanel, CardLayout cardLayout, ViewManagerModel viewManagerModel) {
         this.mainPanel = mainPanel;
@@ -28,7 +29,7 @@ public class ViewManager implements PropertyChangeListener {
         this.viewManagerModel.addPropertyChangeListener(this);
     }
 
-    public void addView(String name, PaddedView panel) {
+    public void addView(String name, PaddedView<?, ?> panel) {
         views.put(name, panel);
         mainPanel.add(panel, name);
     }
@@ -39,7 +40,7 @@ public class ViewManager implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("state")) {
+        if (evt.getPropertyName().equals(ViewModel.getDEFAULT_PROPERTY_NAME())) {
             final String viewModelName = (String) evt.getNewValue();
             if(views.containsKey(viewModelName)){
                 cardLayout.show(mainPanel, viewModelName);
@@ -48,7 +49,7 @@ public class ViewManager implements PropertyChangeListener {
             }
 
         }
-        else if (evt.getPropertyName().equals("getViewModel")) {
+        else if (evt.getPropertyName().equals(ViewManagerModel.GET_VIEW_MODEL_NAME)) {
             final String viewModelName = (String) evt.getNewValue();
             if(views.containsKey(viewModelName)){
                 this.viewManagerModel.setFormativeViewModel(getViewModel(viewModelName));

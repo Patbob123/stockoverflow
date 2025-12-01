@@ -8,15 +8,15 @@ import use_case.singlestock.CompareTwoStocksOutputData;
 public class SingleStockPresenter
         implements AnalyzeSingleStockOutputBoundary, CompareTwoStocksOutputBoundary {
 
-    private final SingleStockViewInterface view;
+    private final SingleStockViewModel viewModel;
 
-    public SingleStockPresenter(SingleStockViewInterface view) {
-        this.view = view;
+    public SingleStockPresenter(SingleStockViewModel viewModel) {
+        this.viewModel = viewModel;
     }
 
     @Override
     public void present(AnalyzeSingleStockOutputData outputData) {
-        view.showAnalysis(outputData);
+        viewModel.showAnalysis(outputData);
     }
 
     @Override
@@ -31,11 +31,11 @@ public class SingleStockPresenter
                         outputData.getRiskFreeAnnual(),
                         outputData.getReport()
                 );
-        view.showAnalysis(wrapped);
+        viewModel.showAnalysis(wrapped);
     }
 
     //@Override
     public void presentError(String message) {
-        view.showError(message);
+        viewModel.showError(message);
     }
 }

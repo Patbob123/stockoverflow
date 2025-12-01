@@ -1,9 +1,18 @@
 package app;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
+import interface_adapter.portfolio.PortfolioMenuController;
+import interface_adapter.portfolio.PortfolioMenuPresenter;
+import interface_adapter.portfolio.addStock.AddStockMenuController;
+import interface_adapter.portfolio.addStock.AddStockMenuPresenter;
+import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
+import interface_adapter.singlestock.SingleStockController;
+import interface_adapter.singlestock.SingleStockPresenter;
+import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.import_export.ImportExportDataAccessInterface;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.add_portfolio.AddPortfolioController;
@@ -19,129 +28,253 @@ import interface_adapter.mainmenu.MainMenuController;
 import interface_adapter.mainmenu.MainMenuPresenter;
 import interface_adapter.mainmenu.MainMenuViewModel;
 import interface_adapter.portfolio.PortfolioMenuViewModel;
-import use_case.add_portfolio.AddPortfolioInputBoundary;
 import use_case.add_portfolio.AddPortfolioInteractor;
-import use_case.add_portfolio.AddPortfolioOutputBoundary;
 import use_case.change_view.ChangeViewInputBoundary;
 import use_case.change_view.ChangeViewInteractor;
 import use_case.change_view.ChangeViewOutputBoundary;
-import use_case.import_export.ImportExportInputBoundary;
 import use_case.import_export.ImportExportInteractor;
-import use_case.import_export.ImportExportOutputBoundary;
-import use_case.mainmenu.MainMenuInputBoundary;
 import use_case.mainmenu.MainMenuInteractor;
-import use_case.mainmenu.MainMenuOutputBoundary;
-import view.AddPortfolioView;
-import view.ImportExportView;
-import view.MainMenuView;
-import view.PortfolioMenuView;
-import view.ViewManager;
+import use_case.portfolio.PortfolioMenuInteractor;
+import use_case.portfolio.addStock.AddStockMenuInteractor;
+import use_case.singlestock.AnalyzeSingleStockInteractor;
+import use_case.singlestock.CompareTwoStocksInteractor;
+import view.*;
+import app.wrapper.UseCaseWrapper;
+import app.wrapper.ViewViewModelBuilderWrapper;
 
 public class MainMenuBuilder {
+
     private static final Dimension SCREENSIZE = Toolkit.getDefaultToolkit().getScreenSize();
     public static final double WIDTH = SCREENSIZE.getWidth();
     public static final double HEIGHT = SCREENSIZE.getHeight();
 
+    private final ArrayList<ViewViewModelBuilderWrapper<?, ?>> viewBuildInstruction = new ArrayList<>();
+    private final ArrayList<UseCaseWrapper<?, ?, ?, ?, ?>> useCaseBuildInstruction = new ArrayList<>();
+    private Boolean addChangeView = false;
+    private final Boolean clearCacheAfterBuild = true;
+
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
-    private ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
-    private MainMenuViewModel mainMenuViewModel;
-    private MainMenuView mainMenuView;
-    private ImportExportViewModel importExportViewModel;
-    private ImportExportView importExportView;
-    private PortfolioMenuViewModel portfolioMenuViewModel;
-    private PortfolioMenuView portfolioMenuView;
-    private AddPortfolioViewModel addPortfolioViewModel;
-    private AddPortfolioView addPortfolioView;
-
+    private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
     private ImportExportDataAccessInterface importExportDAO;
+
+    private final ViewViewModelBuilderWrapper<MainMenuViewModel, MainMenuView> mainMenu =
+            new ViewViewModelBuilderWrapper<>(new MainMenuViewModel(), MainMenuView::new);
+
+    private final ViewViewModelBuilderWrapper<ImportExportViewModel, ImportExportView> importExportMenu =
+            new ViewViewModelBuilderWrapper<>(new ImportExportViewModel(), ImportExportView::new);
+
+    private final ViewViewModelBuilderWrapper<PortfolioMenuViewModel, PortfolioMenuView> portFolioMenu =
+            new ViewViewModelBuilderWrapper<>(new PortfolioMenuViewModel(), PortfolioMenuView::new);
+
+    private final ViewViewModelBuilderWrapper<AddPortfolioViewModel, AddPortfolioView> addPortfolioMenu =
+            new ViewViewModelBuilderWrapper<>(new AddPortfolioViewModel(), AddPortfolioView::new);
+
+    private final ViewViewModelBuilderWrapper<AddStockMenuViewModel, AddStockMenuView> addStockMenu =
+            new ViewViewModelBuilderWrapper<>(new AddStockMenuViewModel(), AddStockMenuView::new);
+
+    private final ViewViewModelBuilderWrapper<SingleStockViewModel, SingleStockView> singleStockMenu =
+            new ViewViewModelBuilderWrapper<>(new SingleStockViewModel(), SingleStockView::new);
+
+    private final UseCaseWrapper<MainMenuInteractor,
+            MainMenuPresenter,
+            MainMenuController,
+            MainMenuViewModel,
+            MainMenuView> mainmenuUsecase =
+            new UseCaseWrapper<>(viewManager,
+            MainMenuPresenter::new,
+            MainMenuInteractor::new,
+            MainMenuController::new, MainMenuView.VIEW_NAME);
+
+    private final UseCaseWrapper<ImportExportInteractor,
+            ImportExportPresenter,
+            ImportExportController,
+            ImportExportViewModel,
+            ImportExportView> importExportUsecase =
+            new UseCaseWrapper<>(viewManager,
+            ImportExportPresenter::new, presenter -> new ImportExportInteractor(presenter, importExportDAO),
+            ImportExportController::new, ImportExportView.VIEW_NAME);
+
+    private final UseCaseWrapper<AddPortfolioInteractor,
+            AddPortfolioPresenter,
+            AddPortfolioController,
+            AddPortfolioViewModel,
+            AddPortfolioView> addPortfolioUsecase =
+            new UseCaseWrapper<>(viewManager,
+            AddPortfolioPresenter::new,
+            AddPortfolioInteractor::new,
+            AddPortfolioController::new, AddPortfolioView.VIEW_NAME);
+
+    private final UseCaseWrapper<PortfolioMenuInteractor,
+            PortfolioMenuPresenter,
+            PortfolioMenuController,
+            PortfolioMenuViewModel,
+            PortfolioMenuView> portfolioMenuUsecase =
+            new UseCaseWrapper<>(viewManager,
+            PortfolioMenuPresenter::new,
+            PortfolioMenuInteractor::new,
+            PortfolioMenuController::new, PortfolioMenuView.VIEW_NAME);
+
+    private final UseCaseWrapper<AddStockMenuInteractor,
+            AddStockMenuPresenter,
+            AddStockMenuController,
+            AddStockMenuViewModel,
+            AddStockMenuView> addStockMenuUsecase =
+            new UseCaseWrapper<>(viewManager,
+            AddStockMenuPresenter::new,
+            AddStockMenuInteractor::new,
+            AddStockMenuController::new, AddStockMenuView.VIEW_NAME);
+
+    private PaddedView<?, ?> getView(String viewName) {
+        return viewManager.getViews().get(viewName);
+    }
 
     public MainMenuBuilder() {
         cardPanel.setLayout(cardLayout);
     }
 
     public MainMenuBuilder addMainView() {
-        mainMenuViewModel = new MainMenuViewModel();
-        mainMenuView = new MainMenuView(mainMenuViewModel);
-        cardPanel.add(mainMenuView, mainMenuView.getViewName());
-        viewManager.addView(mainMenuView.getViewName(), mainMenuView);
-
+        viewBuildInstruction.add(mainMenu);
         return this;
     }
 
     public MainMenuBuilder addImportExportView() {
-        importExportViewModel = new ImportExportViewModel();
-        importExportView = new ImportExportView(importExportViewModel);
-        cardPanel.add(importExportView, importExportView.getViewName());
-        viewManager.addView(importExportView.getViewName(), importExportView);
-
+        viewBuildInstruction.add(importExportMenu);
         return this;
     }
 
     public MainMenuBuilder addPortfolioMenuView() {
-        portfolioMenuViewModel = new PortfolioMenuViewModel();
-        portfolioMenuView = new PortfolioMenuView(portfolioMenuViewModel);
-        cardPanel.add(portfolioMenuView, portfolioMenuView.getViewName());
-        viewManager.addView(portfolioMenuView.getViewName(), portfolioMenuView);
-
+        viewBuildInstruction.add(portFolioMenu);
         return this;
     }
 
     public MainMenuBuilder addAddPortfolioView() {
-        addPortfolioViewModel = new AddPortfolioViewModel();
-        addPortfolioView = new AddPortfolioView(addPortfolioViewModel);
-        cardPanel.add(addPortfolioView, addPortfolioView.getViewName());
-        viewManager.addView(addPortfolioView.getViewName(), addPortfolioView);
-
+        viewBuildInstruction.add(addPortfolioMenu);
         return this;
     }
 
-    public MainMenuBuilder addMainViewUseCase() {
-        final MainMenuOutputBoundary mainMenuOutputBoundary = new MainMenuPresenter(mainMenuViewModel);
-        final MainMenuInputBoundary mainMenuInteractor = new MainMenuInteractor(mainMenuOutputBoundary);
+    public MainMenuBuilder addStockMenuView() {
+        viewBuildInstruction.add(addStockMenu);
+        return this;
+    }
 
-        final MainMenuController mainMenuController = new MainMenuController(mainMenuInteractor);
-        mainMenuView.setMainMenuController(mainMenuController);
+    public MainMenuBuilder addSingleStockView() {
+        viewBuildInstruction.add(singleStockMenu);
         return this;
     }
 
     public MainMenuBuilder addChangeViewUseCase() {
+        this.addChangeView = true;
+        return this;
+    }
+
+    private void addChangeViewUseCaseDirectly() {
         final ChangeViewState changeViewState = new ChangeViewState();
         final ChangeViewOutputBoundary changeViewOutputBoundary = new ChangeViewPresenter(viewManagerModel);
         final ChangeViewInputBoundary changeViewInteractor = new ChangeViewInteractor(changeViewOutputBoundary, changeViewState);
 
         final ChangeViewController changeViewController = new ChangeViewController(changeViewInteractor);
 
-        mainMenuView.setChangeViewController(changeViewController);
-        importExportView.setChangeViewController(changeViewController);
-        addPortfolioView.setChangeViewController(changeViewController);
-        portfolioMenuView.setChangeViewController(changeViewController);
+        getView(MainMenuView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(ImportExportView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(AddPortfolioView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(PortfolioMenuView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(AddStockMenuView.VIEW_NAME).setChangeViewController(changeViewController);
+        getView(SingleStockView.VIEW_NAME).setChangeViewController(changeViewController);
+    }
 
+    public MainMenuBuilder addMainViewUseCase() {
+        useCaseBuildInstruction.add(mainmenuUsecase);
         return this;
     }
 
     public MainMenuBuilder addImportExportUseCase() {
-        final ImportExportOutputBoundary importExportOutputBoundary = new ImportExportPresenter(importExportViewModel);
-        final ImportExportInputBoundary importExportInteractor = new ImportExportInteractor(importExportOutputBoundary, importExportDAO);
-
-        final ImportExportController importExportController = new ImportExportController(importExportInteractor);
-        importExportView.setImportExportController(importExportController);
-
+        useCaseBuildInstruction.add(importExportUsecase);
         return this;
     }
 
-    public MainMenuBuilder addAddPortfolioUseCase() {
-        final AddPortfolioOutputBoundary addPortfolioOutputBoundary = new AddPortfolioPresenter(addPortfolioViewModel);
-        final AddPortfolioInputBoundary addPortfolioInteractor = new AddPortfolioInteractor(addPortfolioOutputBoundary);
-
-        final AddPortfolioController addPortfolioController = new AddPortfolioController(addPortfolioInteractor);
-        addPortfolioView.setAddPortfolioController(addPortfolioController);
-
+    public MainMenuBuilder addPortfolioUseCase() {
+        useCaseBuildInstruction.add(addPortfolioUsecase);
         return this;
+    }
+
+    public MainMenuBuilder addPortfolioMenuUseCase() {
+        useCaseBuildInstruction.add(portfolioMenuUsecase);
+        return this;
+    }
+
+    public MainMenuBuilder addStockMenuUseCase() {
+        useCaseBuildInstruction.add(addStockMenuUsecase);
+        return this;
+    }
+
+    public MainMenuBuilder addSingleStockMenuUseCase() {
+        final UseCaseWrapper<AnalyzeSingleStockInteractor,
+                SingleStockPresenter,
+                SingleStockController,
+                SingleStockViewModel,
+                SingleStockView> singleStockAnalyzeUsecase =
+                new UseCaseWrapper<>(viewManager,
+                        SingleStockPresenter::new,
+                        AnalyzeSingleStockInteractor::new,
+                        null,
+                        SingleStockView.VIEW_NAME);
+
+        final UseCaseWrapper<CompareTwoStocksInteractor,
+                SingleStockPresenter,
+                SingleStockController,
+                SingleStockViewModel,
+                SingleStockView> compareStockUsecase =
+                new UseCaseWrapper<>(viewManager,
+                        viewModel -> {
+                            return singleStockAnalyzeUsecase
+                                    .makePresenter((SingleStockView) viewManager.getViews()
+                                            .get(SingleStockView.VIEW_NAME));
+                    },
+                        CompareTwoStocksInteractor::new,
+                        interactor -> {
+                            return new SingleStockController(
+                                    singleStockAnalyzeUsecase.getInteractor(
+                                            (SingleStockView) viewManager
+                                                    .getViews().get(SingleStockView.VIEW_NAME)), interactor);
+                        },
+                        SingleStockView.VIEW_NAME);
+        useCaseBuildInstruction.add(compareStockUsecase);
+        return this;
+    }
+
+    public JFrame autoBuild() {
+        return this.addMainView()
+                    .addImportExportView()
+                    .addPortfolioMenuView()
+                    .addAddPortfolioView()
+                    .addStockMenuView()
+                    .addChangeViewUseCase()
+                    .addMainViewUseCase()
+                    .addPortfolioUseCase()
+                    .addImportExportUseCase()
+                    .addPortfolioMenuUseCase()
+                    .addStockMenuUseCase()
+                    .addSingleStockMenuUseCase()
+                    .addSingleStockView()
+                    .build();
     }
 
     public JFrame build() {
+
+        for (ViewViewModelBuilderWrapper<?, ?> viewBuilder : this.viewBuildInstruction) {
+            viewBuilder.addView(this, cardPanel, viewManager);
+        }
+        viewBuildInstruction.clear();
+        if (addChangeView) {
+            this.addChangeViewUseCaseDirectly();
+        }
+        for (UseCaseWrapper<?, ?, ?, ?, ?> usecaseBuilder : this.useCaseBuildInstruction) {
+            usecaseBuilder.build(this);
+        }
+        useCaseBuildInstruction.clear();
+
         final JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setTitle("Stockoverflow");
@@ -149,9 +282,9 @@ public class MainMenuBuilder {
 
         frame.add(cardPanel);
 
-        viewManagerModel.setActiveView(mainMenuView.getViewName());
+        viewManagerModel.setActiveView(getView(MainMenuView.VIEW_NAME).getViewName());
         viewManagerModel.firePropertyChange();
-
+        
         return frame;
     }
 }

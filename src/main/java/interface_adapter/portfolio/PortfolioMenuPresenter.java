@@ -1,6 +1,9 @@
 package interface_adapter.portfolio;
 
 import entities.Portfolio.Portfolio;
+import interface_adapter.ViewModel;
+import interface_adapter.portfolio.addStock.AddStockMenuState;
+import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
 import use_case.portfolio.PortfolioMenuOutputBoundary;
 
 public class PortfolioMenuPresenter implements PortfolioMenuOutputBoundary {
@@ -11,8 +14,9 @@ public class PortfolioMenuPresenter implements PortfolioMenuOutputBoundary {
     }
 
     @Override
-    public void prepareAddStockView(Portfolio portfolio) {
-
+    public void prepareAddStockView(ViewModel<AddStockMenuState> addStockMenuViewModel) {
+        addStockMenuViewModel.getState().setPortfolio(
+                this.portfolioMenuViewModel.getState().getPortfolio());
     }
 
     @Override

@@ -9,6 +9,7 @@ import javax.swing.*;
 import entities.PortfolioList;
 import entities.Simulation;
 import interface_adapter.ViewModel;
+import view.ImportExportView;
 
 public class ImportExportViewModel extends ViewModel<ImportExportState> {
 
@@ -99,7 +100,7 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
     private List<Simulation> simulations = new ArrayList<>();
 
     public ImportExportViewModel() {
-        super("ImportExportMenu");
+        super(ImportExportView.VIEW_NAME);
         setState(new ImportExportState());
     }
 

@@ -1,6 +1,7 @@
 package interface_adapter.mainmenu;
 
 import interface_adapter.ViewModel;
+import view.MainMenuView;
 
 public class MainMenuViewModel extends ViewModel<MainMenuState> {
 
@@ -15,10 +16,8 @@ public class MainMenuViewModel extends ViewModel<MainMenuState> {
 
     public static final String EXIT_BUTTON_LABEL = "QUIT";
 
-
-
     public MainMenuViewModel() {
-        super("MainMenu");
+        super(MainMenuView.VIEW_NAME);
         setState(new MainMenuState());
     }
 }

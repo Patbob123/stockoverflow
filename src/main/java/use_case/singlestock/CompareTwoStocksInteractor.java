@@ -1,6 +1,7 @@
 package use_case.singlestock;
 
 import entities.PriceBar;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Locale;
@@ -9,15 +10,13 @@ public class CompareTwoStocksInteractor implements CompareTwoStocksInputBoundary
 
     private static final int TRADING_DAYS = 252;
 
-    private final StockPriceDataAccessInterface priceGateway;
-    private final RiskFreeRateDataAccessInterface riskFreeGateway;
+    @Setter
+    private StockPriceDataAccessInterface priceGateway;
+    @Setter
+    private RiskFreeRateDataAccessInterface riskFreeGateway;
     private final CompareTwoStocksOutputBoundary outputBoundary;
 
-    public CompareTwoStocksInteractor(StockPriceDataAccessInterface priceGateway,
-                                      RiskFreeRateDataAccessInterface riskFreeGateway,
-                                      CompareTwoStocksOutputBoundary outputBoundary) {
-        this.priceGateway = priceGateway;
-        this.riskFreeGateway = riskFreeGateway;
+    public CompareTwoStocksInteractor(CompareTwoStocksOutputBoundary outputBoundary) {
         this.outputBoundary = outputBoundary;
     }
 

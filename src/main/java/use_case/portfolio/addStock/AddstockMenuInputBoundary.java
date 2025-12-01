@@ -1,6 +1,8 @@
 package use_case.portfolio.addStock;
 
-public interface AddstockMenuInputBoundary {
+import use_case.InputBoundary;
+
+public interface AddstockMenuInputBoundary extends InputBoundary {
 
     void executeAddstock(String stockticker);
 
