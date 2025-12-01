@@ -1,11 +1,21 @@
 package view;
 
+import data_access.FileMonteCarloDataAccess;
 import data_access.FredRiskFreeRateDataAccess;
+import data_access.StooqStockDataAccess;
+import entities.StatisticsCalculator;
+import entities.monte_carlo.MonteCarloSimulator;
 import interface_adapter.import_export.ImportExportViewModel;
+import interface_adapter.monte_carlo.MonteCarloController;
+import interface_adapter.monte_carlo.MonteCarloPresenter;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockViewInterface;
 import interface_adapter.singlestock.SingleStockViewModel;
+import use_case.monte_carlo.MonteCarloAnalysisInteractor;
+import use_case.monte_carlo.MonteCarloOutputBoundary;
 import use_case.singlestock.AnalyzeSingleStockOutputData;
+import view.monte_carlo.MonteCarloInputPanel;
+import view.monte_carlo.SwingMonteCarloView;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -253,27 +263,30 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
     }
 
     private void onMonteCarloClicked(ActionEvent e) {
-        String tkr = tickerField.getText().trim().toUpperCase(Locale.ROOT);
+        String tkr =  tickerField.getText().trim().toUpperCase(Locale.ROOT);
+
         if (!tkr.matches("[A-Z0-9.]{1,10}")) {
-            showError("Invalid ticker format.");
+            showError("Invalid base ticker format.");
             return;
         }
+        JFrame frame = new JFrame("Monte Carlo Simulation Input for " + tkr);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        double rf;
-        try {
-            rf = Double.parseDouble(rfField.getText().trim());
-        } catch (NumberFormatException ex) {
-            showError("Invalid risk-free rate.");
-            return;
-        }
+        SwingMonteCarloView view =  new SwingMonteCarloView();
+        MonteCarloAnalysisInteractor interactor = new MonteCarloAnalysisInteractor(new StooqStockDataAccess(),
+                new MonteCarloSimulator(),
+                new StatisticsCalculator(),
+                new MonteCarloPresenter(view),
+                new FileMonteCarloDataAccess());
+        MonteCarloInputPanel panel = new MonteCarloInputPanel(tkr, new MonteCarloController(interactor));
 
-        if (this.getController() == null) {
-            showError("Controller not set.");
-            return;
-        }
+        frame.add(panel);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
 
-        // TODO:implement this in controller for monte carlo ALI!
-        this.getController().runMonteCarlo(tkr, rf);
+
+
     }
 
     //when analyze button
