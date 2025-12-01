@@ -5,7 +5,6 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.ViewModel;
 import interface_adapter.singlestock.SingleStockController;
 import interface_adapter.singlestock.SingleStockPresenter;
-import interface_adapter.singlestock.SingleStockViewInterface;
 import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.singlestock.AnalyzeSingleStockOutputData;
 

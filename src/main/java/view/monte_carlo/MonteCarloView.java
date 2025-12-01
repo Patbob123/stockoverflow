@@ -3,7 +3,7 @@ package view.monte_carlo;
 import interface_adapter.monte_carlo.MonteCarloViewModel;
 
 public interface MonteCarloView {
-
+    public static String VIEW_NAME = "Monte Carlo View";
     /**
      * Shows the results of a successful simulation by passing a single
      * formatted ViewModel object that contains all display data.

@@ -1,12 +1,15 @@
 package interface_adapter.monte_carlo;
 
+import interface_adapter.ViewModel;
+import view.monte_carlo.MonteCarloView;
+
 /**
  * The ViewModel (Presentation Model) that contains all data and state
  * required by the MonteCarloView to render the success screen.
  * This object is highly tailored for the UI and contains formatted strings
  * and data models ready for immediate display.
  */
-public class MonteCarloViewModel {
+public class MonteCarloViewModel extends ViewModel<MonteCarloState> {
 
     // 1. Data for the Chart (raw simulation results)
     private final double[][] simulationPaths;
@@ -20,6 +23,7 @@ public class MonteCarloViewModel {
     public MonteCarloViewModel(double[][] simulationPaths, String chartTitle,
                                String initialPrice, String meanTerminalPrice,
                                int pathsToShow) {
+        super(MonteCarloView.VIEW_NAME);
         this.simulationPaths = simulationPaths;
         this.chartTitle = chartTitle;
         this.initialPrice = initialPrice;
