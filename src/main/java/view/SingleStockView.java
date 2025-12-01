@@ -51,6 +51,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
     private final JButton CompareBtn;
     private final JButton ScenarioBtn;
     private final JButton MonteCarloBtn;
+    private final JButton MonteCarloHistoryBtn;
     private final JButton ImportBtn;
     private final JButton backButton = createTextButton(ImportExportViewModel.BACK_BUTTON_LABEL);
 
@@ -89,6 +90,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         this.CompareBtn    = new JButton(SingleStockViewModel.BUTTON_COMPARE);
         this.ScenarioBtn   = new JButton(SingleStockViewModel.BUTTON_SCENARIO);
         this.MonteCarloBtn = new JButton(SingleStockViewModel.BUTTON_MONTECARLO);
+        this.MonteCarloHistoryBtn = new JButton(SingleStockViewModel.BUTTON_MONTECARLOHISTORY);
         this.ImportBtn     = new JButton(SingleStockViewModel.BUTTON_IMPORT);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(screenSize);
@@ -131,6 +133,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         buttons.add(CompareBtn);
         buttons.add(ScenarioBtn);
         buttons.add(MonteCarloBtn);
+        buttons.add(MonteCarloHistoryBtn);
         buttons.add(ImportBtn);
 
 
@@ -188,6 +191,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
         CompareBtn.addActionListener(this::onCompareClicked);
         ScenarioBtn.addActionListener(this::onScenarioClicked);
         MonteCarloBtn.addActionListener(this::onMonteCarloClicked);
+        MonteCarloHistoryBtn.addActionListener(this::onMonteCarloHistoryClicked);
     }
 
     //lets save history after we closed the app

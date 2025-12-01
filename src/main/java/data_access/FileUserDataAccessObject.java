@@ -1,6 +1,7 @@
 package data_access;
 
 import entities.Portfolio.Portfolio;
+import entities.Portfolio.PortfolioFactory;
 import entities.User;
 import entities.UserFactory;
 import use_case.UserDataAccessInterface;
@@ -17,6 +18,7 @@ public class FileUserDataAccessObject implements UserDataAccessInterface {
     private final Map<String, User> accounts = new HashMap<>();
 
     private UserFactory userFactory;
+    private PortfolioFactory portfolioFactory = new PortfolioFactory();
 
     public FileUserDataAccessObject(String csvPath, UserFactory userFactory) throws IOException {
         this.userFactory = userFactory;
@@ -90,7 +92,7 @@ public class FileUserDataAccessObject implements UserDataAccessInterface {
                     String[] names = portfolioNames.split(";");
                     for (String name : names) {
                         if (!name.trim().isEmpty()) {
-                            user.getPortfolioList().addPortfolio(new Portfolio(name));
+                            user.getPortfolioList().addPortfolio(portfolioFactory.createPortfolio(name));
                         }
                     }
                 }

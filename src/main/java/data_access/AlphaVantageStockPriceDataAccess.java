@@ -3,6 +3,7 @@ package data_access;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import entities.PriceBar;
+import entities.Stock;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -28,7 +29,7 @@ public class AlphaVantageStockPriceDataAccess implements StockPriceDataAccessInt
     }
 
     @Override
-    public List<PriceBar> getDailySeries(String ticker, int maxDays) {
+    public Stock getDailySeries(String ticker, int maxDays) {
         if (apiKey == null) {
             throw new RuntimeException("Alpha Vantage API key is missing.");
         }
@@ -97,11 +98,12 @@ public class AlphaVantageStockPriceDataAccess implements StockPriceDataAccessInt
             bars.sort(Comparator.comparing(PriceBar::getDate).reversed());
 
             if (bars.size() > maxDays) {
-                return new ArrayList<>(bars.subList(0, maxDays));
+                return new Stock(ticker, new ArrayList<>(bars.subList(0, maxDays)));
             }
-            return bars;
+            return new Stock(ticker, bars);
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException("Error calling Alpha Vantage", e);
         }
     }

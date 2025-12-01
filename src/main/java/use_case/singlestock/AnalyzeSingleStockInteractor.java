@@ -2,6 +2,7 @@
 package use_case.singlestock;
 
 import entities.PriceBar;
+import entities.Stock;
 
 import java.util.List;
 import java.util.Locale;
@@ -33,7 +34,8 @@ public class AnalyzeSingleStockInteractor implements AnalyzeSingleStockInputBoun
         }
 
         // get price history from Stooq (through the interface)
-        List<PriceBar> series = priceGateway.getDailySeries(ticker, 400);
+        Stock stock = priceGateway.getDailySeries(ticker, 400);
+        List<PriceBar> series = stock.getPriceHistory();
         if (series.size() < 2) {
             throw new RuntimeException("Not enough data: " + series.size() + " days.");
         }
