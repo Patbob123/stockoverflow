@@ -99,7 +99,7 @@ public class AddPortfolioView
                         (PortfolioMenuViewModel) changeViewController.getViewModel(PortfolioMenuView.VIEW_NAME);
                 portfolioViewModel.getState().setPortfolio(portfolio);
                 portfolioViewModel.firePropertyChange();
-                changeViewController.changeView(PortfolioMenuView.VIEW_NAME);
+                changeViewController.changeView("PortfolioMenu");
             }
         });
 

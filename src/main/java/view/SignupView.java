@@ -3,6 +3,7 @@ package view;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupState;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.ViewManagerModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,6 +25,7 @@ public class SignupView extends PaddedView<SignupViewModel, SignupController> im
 
     private final JButton signUp;
     private final JButton cancel;
+    private ViewManagerModel viewManagerModel = new ViewManagerModel();
 
     public SignupView(SignupViewModel signupViewModel) {
         super(signupViewModel);

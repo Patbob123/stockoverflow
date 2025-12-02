@@ -3,6 +3,7 @@ package view;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.ViewManagerModel;
 import interface_adapter.mainmenu.MainMenuState;
 import interface_adapter.singlestock.SingleStockViewModel;
 

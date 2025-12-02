@@ -254,6 +254,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
                 }
             }
         } catch (IOException e) {
+            // Don't crash the app because of history; just log
             System.err.println("Could not load history: " + e.getMessage());
         }
     }
@@ -268,6 +269,7 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
             }
             Files.write(HISTORY_FILE, lines);
         } catch (IOException e) {
+            // Again, don't annoy user; just log
             System.err.println("Could not save history: " + e.getMessage());
         }
     }
@@ -323,9 +325,11 @@ public class SingleStockView extends PaddedView<SingleStockViewModel, SingleStoc
                 Dialog.ModalityType.APPLICATION_MODAL // Blocks interaction with parent until dismissed
         );
 
-
+        // --- CLOSING BUG FIX ---
+        // This tells the dialog to just close and dispose of itself, NOT the entire application.
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
+        // 4. Display the Dialog
         dialog.getContentPane().add(panel);
         dialog.pack();
         dialog.setLocationRelativeTo(this);

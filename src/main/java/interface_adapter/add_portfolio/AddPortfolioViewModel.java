@@ -47,7 +47,7 @@ public class AddPortfolioViewModel extends ViewModel<AddPortfolioState> {
     // Labels
     public static final String TITLE_LABEL = "Add Portfolio";
     public static final String SUBTITLE_LABEL = "Please select method to create portfolio";
-    public static final String CREATE_BUTTON_LABEL = "Analyze Portfolio";
+    public static final String CREATE_BUTTON_LABEL = "I'll just do this myself";
     public static final String IMPORT_BUTTON_LABEL = "Import Portfolio";
     public static final String BACK_BUTTON_LABEL = "← Main";
 

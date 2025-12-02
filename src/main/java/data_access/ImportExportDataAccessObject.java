@@ -1,10 +1,8 @@
 package data_access;
 
 import entities.Portfolio.Portfolio;
-import entities.Portfolio.PortfolioFactory;
 import entities.Portfolio.PortfolioList;
 import entities.Simulation;
-import entities.Stock;
 import entities.monte_carlo.MonteCarloSimulation;
 import interface_adapter.singlestock.SingleStockViewModel;
 import use_case.import_export.ImportExportDataAccessInterface;
@@ -23,40 +21,14 @@ public class ImportExportDataAccessObject implements ImportExportDataAccessInter
     }
 
     @Override
-    public Portfolio loadPortfolios(String filePath) {
+    public PortfolioList loadPortfolios(String filePath) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            Portfolio portfolio = null;
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-
-                if (line.startsWith("Portfolio:")) {
-                    String portfolioName = line.substring("Portfolio:".length()).trim();
-                    PortfolioFactory portfolioFactory = new PortfolioFactory();
-                    portfolio = portfolioFactory.createPortfolio(portfolioName);
-                }
-                else if (line.startsWith("Ticker,")) {
-                }
-
-                else if (!line.isEmpty() && portfolio != null) {
-                    String[] parts = line.split(",");
-                    if (parts.length >= 4) {
-                        String ticker = parts[0].trim();
-                        int shares = Integer.parseInt(parts[1].trim());
-
-                        Stock stock = new Stock(ticker);
-                        portfolio.addStock(stock, shares);
-                    }
-                }
-            }
-
+            final BufferedReader reader = new BufferedReader(new FileReader(filePath));
             reader.close();
-            return portfolio;
-
-        } catch (IOException exception) {
-            throw new RuntimeException("failed to load portfolio: " + exception.getMessage(), exception);
+            return null; // TODO: implement CSV parsing
+        }
+        catch (IOException exception) {
+            throw new RuntimeException("died: " + exception.getMessage(), exception);
         }
     }
 
@@ -112,7 +84,6 @@ public class ImportExportDataAccessObject implements ImportExportDataAccessInter
             throw new RuntimeException("save failed: " + exception.getMessage(), exception);
         }
     }
-
 
     @Override
     public List<Portfolio> getAllPortfolios() {

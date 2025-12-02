@@ -1,7 +1,6 @@
 package use_case.import_export;
 
 import entities.Portfolio.Portfolio;
-import entities.Portfolio.PortfolioFactory;
 import entities.Portfolio.PortfolioList;
 import entities.Simulation;
 
@@ -17,21 +16,30 @@ public class ImportExportInteractor implements ImportExportInputBoundary {
         this.importExportDAO = importExportDAO;
     }
 
+    @Override
     public void executeImport(String filePath) {
-        try {
-            Portfolio portfolio = importExportDAO.loadPortfolios(filePath);
-            importExportOutputBoundary.prepareSuccessView(portfolio);
-        } catch (Exception e) {
-            PortfolioFactory portfolioFactory = new PortfolioFactory();
-            importExportOutputBoundary.prepareSuccessView(portfolioFactory.createPortfolio("error"));
+        if (filePath == null || filePath.isEmpty()) {
+            importExportOutputBoundary.prepareSuccessView("Import cancelled");
+            return;
         }
+
+        // TODO: I GOT RID OF ALL THE TRY CATCHES I GOTTA ADD THEM BACK
+//        try {
+
+            System.out.println("we find and import the thing at "+filePath);
+            importExportOutputBoundary.prepareSuccessView("Imported portfolio from: " + filePath);
+//        }
+//        catch (IOException ioException)  {
+//            importExportOutputBoundary.prepareSuccessView("IO Excetpion at: " + ioException.getMessage());
+//
+//        }
     }
 
     @Override
     public void executeExportPortfolio(PortfolioList portfolioList, String filePath) {
 //        try {
             importExportDAO.savePortfolio(portfolioList, filePath);
-            //importExportOutputBoundary.prepareSuccessView("we find and exp[ort the port at " + filePath);
+            importExportOutputBoundary.prepareSuccessView("we find and exp[ort the port at " + filePath);
 
 //        }
 //        catch (IOException ioException) {
@@ -43,9 +51,8 @@ public class ImportExportInteractor implements ImportExportInputBoundary {
     @Override
     public void executeExportCurrentSession(String filePath) {
 //        try {
-        PortfolioFactory portfolioFactory = new PortfolioFactory();
             importExportDAO.saveCurrentSession(filePath);
-            importExportOutputBoundary.prepareSuccessView(portfolioFactory.createPortfolio("a"));
+            importExportOutputBoundary.prepareSuccessView("we find and exp[ort the ses at: " + filePath);
 
 //        }
 //        catch (IOException ioException) {
@@ -57,9 +64,8 @@ public class ImportExportInteractor implements ImportExportInputBoundary {
     @Override
     public void executeExportSimData(String filePath) {
 //        try {
-        PortfolioFactory portfolioFactory = new PortfolioFactory();
             importExportDAO.saveSimulation(filePath);
-            importExportOutputBoundary.prepareSuccessView(portfolioFactory.createPortfolio("b"));
+            importExportOutputBoundary.prepareSuccessView("Exported simulation to: " + filePath);
 
 //        }
 //        catch (IOException ioException) {

@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.swing.*;
 
-import entities.Portfolio.Portfolio;
 import entities.Portfolio.PortfolioList;
 import entities.Simulation;
 import interface_adapter.ViewModel;
@@ -97,7 +96,7 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
     public static final Font ERROR_FONT = BASE_FONT.deriveFont(Font.PLAIN, 24f);
     public static final Font DROPDOWN_FONT = BASE_FONT.deriveFont(Font.PLAIN, 13f);
 
-    private List<Portfolio> portfolios = new ArrayList<>();
+    private PortfolioList portfolioList = new PortfolioList();
     private List<Simulation> simulations = new ArrayList<>();
 
     public ImportExportViewModel() {
@@ -105,8 +104,8 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
         setState(new ImportExportState());
     }
 
-    public void setPortfolio(List<Portfolio> portfolios) {
-        this.portfolios = portfolios;
+    public void setPortfolios(PortfolioList portfolioList){
+        this.portfolioList = portfolioList;
     }
 
     public void setSimulation(List<Simulation> simulations) {

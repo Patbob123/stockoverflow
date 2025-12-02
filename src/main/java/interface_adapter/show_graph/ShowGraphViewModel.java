@@ -1,7 +1,6 @@
 package interface_adapter.show_graph;
 
 import interface_adapter.ViewModel;
-import view.ShowGraphView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -88,7 +87,7 @@ public class ShowGraphViewModel extends ViewModel<ShowGraphState> {
     public static final String BACK_BUTTON_LABEL = "Back";
 
     public ShowGraphViewModel() {
-        super(ShowGraphView.VIEW_NAME);
+        super("show graph");
         this.setState(new ShowGraphState());
     }
 }
