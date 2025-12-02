@@ -3,6 +3,8 @@ package interface_adapter.portfolio;
 import interface_adapter.AbsController;
 import lombok.Getter;
 import use_case.portfolio.PortfolioMenuInputBoundary;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PortfolioMenuController extends AbsController {
     @Getter
@@ -12,8 +14,17 @@ public class PortfolioMenuController extends AbsController {
         this.portfolioMenuInputBoundary = portfolioMenuInputBoundary;
     }
 
+    public void executeGraph(List<String> tickers) {
+        portfolioMenuInputBoundary.executeGraph(tickers);
+    }
+
+    public void executeAnalysis(int days) {
+        portfolioMenuInputBoundary.executeHistoricalAnalysis(days);
+    }
+}
+
     /**
      * Executes the Note related Use Cases.
      * @param note the note to be recorded
      */
-}
+
