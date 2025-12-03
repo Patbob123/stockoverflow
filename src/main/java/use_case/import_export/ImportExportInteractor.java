@@ -1,7 +1,7 @@
 package use_case.import_export;
 
 /**
- * Interactor for Import/Export use case
+ * Interactor for Import/Export use case.
  */
 public class ImportExportInteractor implements ImportExportInputBoundary {
 
@@ -30,25 +30,25 @@ public class ImportExportInteractor implements ImportExportInputBoundary {
     public void execute(String operation, String filePath) {
         if (operation == null || operation.isEmpty()) {
             importExportOutputBoundary.prepareSuccessView("ERROR: No operation");
-            return;
         }
-
-        switch (operation.toLowerCase()) {
-            case "import":
-                importPortfolio(filePath);
-                break;
-            case "export_portfolio":
-                exportPortfolio(filePath);
-                break;
-            case "export_session":
-                exportCurrentSession(filePath);
-                break;
-            case "export_simulation":
-                exportSimData(filePath);
-                break;
-            default:
-                importExportOutputBoundary.prepareSuccessView("???: " + operation);
-                break;
+        else {
+            switch (operation.toLowerCase()) {
+                case "import":
+                    importPortfolio(filePath);
+                    break;
+                case "export_portfolio":
+                    exportPortfolio(filePath);
+                    break;
+                case "export_session":
+                    exportCurrentSession(filePath);
+                    break;
+                case "export_simulation":
+                    exportSimData(filePath);
+                    break;
+                default:
+                    importExportOutputBoundary.prepareSuccessView("???: " + operation);
+                    break;
+            }
         }
     }
 
@@ -60,10 +60,11 @@ public class ImportExportInteractor implements ImportExportInputBoundary {
     public void importPortfolio(String filePath) {
         if (filePath.isEmpty()) {
             importExportOutputBoundary.prepareSuccessView("Import cancelled");
-            return;
+        }
+        else {
+            importExportOutputBoundary.prepareSuccessView("Imported portfolio from: " + filePath);
         }
 
-        importExportOutputBoundary.prepareSuccessView("Imported portfolio from: " + filePath);
     }
 
     /**

@@ -1,19 +1,18 @@
 package interface_adapter.import_export;
 
 import entities.Portfolio.PortfolioList;
-import entities.Simulation;
 import interface_adapter.AbsController;
 import use_case.import_export.ImportExportInputBoundary;
 
 /**
- * Controller for the Import/Export use case
+ * Controller for the Import/Export use case.
  */
 public class ImportExportController extends AbsController {
 
     private final ImportExportInputBoundary importExportInputBoundary;
 
     /**
-     * Constructor for ImportExportController
+     * Constructor for ImportExportController.
      *
      * @param importExportInputBoundary the input boundary
      */
@@ -22,7 +21,7 @@ public class ImportExportController extends AbsController {
     }
 
     /**
-     * Imports a portfolio from file path
+     * Imports a portfolio from file path.
      *
      * @param filepath path to the CSV file to import
      */
@@ -31,7 +30,7 @@ public class ImportExportController extends AbsController {
     }
 
     /**
-     * Exports the search history (yeah not renaming it) to file path
+     * Exports the search history (yeah not renaming it) to file path.
      *
      * @param filepath path to save the current session
      */
@@ -40,7 +39,7 @@ public class ImportExportController extends AbsController {
     }
 
     /**
-     * Exports the given portfolio list to file path
+     * Exports the given portfolio list to file path.
      *
      * @param portfolioList the portfolios to export
      * @param filepath path to save the exported portfolios
@@ -50,7 +49,7 @@ public class ImportExportController extends AbsController {
     }
 
     /**
-     * Exports simulation data to file path
+     * Exports simulation data to file path.
      *
      * @param filepath path to save the simulation data
      */

@@ -1,16 +1,17 @@
 package use_case.import_export;
 
-import entities.Portfolio.PortfolioList;
-import entities.Simulation;
 import use_case.InputBoundary;
 
 /**
- * Input boundary for Import/Export use case
+ * Input boundary for Import/Export use case.
  */
 public interface ImportExportInputBoundary extends InputBoundary {
 
     /**
-     * execute function for Import/Export use case
+     * Execute function for Import/Export use case.
+     *
+     * @param operation operation.
+     * @param filePath filePath.
      */
     void execute(String operation, String filePath);
 }

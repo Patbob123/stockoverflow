@@ -9,7 +9,7 @@ public class ImportExportPresenter implements ImportExportOutputBoundary {
     private final ImportExportViewModel importExportViewModel;
 
     /**
-     * Constructor for ImportExportPresenter
+     * Constructor for ImportExportPresenter.
      *
      * @param importExportViewModel   view model for import and export
      */
@@ -18,7 +18,7 @@ public class ImportExportPresenter implements ImportExportOutputBoundary {
     }
 
     /**
-     * Creates a view when anything is exported or imported
+     * Creates a view when anything is exported or imported.
      *
      * @param message       The message to the user
      */

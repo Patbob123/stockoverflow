@@ -1,10 +1,10 @@
 package interface_adapter.import_export;
 
-import java.awt.*;
-import java.util.ArrayList;
+import java.awt.Color;
+import java.awt.Font;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.UIManager;
 
 import entities.Portfolio.PortfolioList;
 import entities.Simulation;
@@ -12,7 +12,7 @@ import interface_adapter.ViewModel;
 import view.ImportExportView;
 
 /**
- * ViewModel for Import/Export view
+ * ViewModel for Import/Export view.
  */
 public class ImportExportViewModel extends ViewModel<ImportExportState> {
 
@@ -54,6 +54,28 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
     public static final int DROPDOWN_WIDTH = 200;
     public static final int DROPDOWN_HEIGHT = 25;
 
+    // Numeric constants
+    public static final int ZERO = 0;
+    public static final int ONE = 1;
+    public static final int TEN = 10;
+    public static final int FIFTEEN = 15;
+    public static final int TWENTY = 20;
+    public static final int THIRTY = 30;
+    public static final int HUNDRED = 100;
+    public static final double WEIGHT_ONE = 1.0;
+
+    // Button dimensions
+    public static final int PRIMARY_BUTTON_HEIGHT = 45;
+    public static final int IMPORT_BUTTON_WIDTH = 280;
+    public static final int IMPORT_BUTTON_HEIGHT = 50;
+
+    // Dropdown dimensions
+    public static final int DROPDOWN_PADDING_VERTICAL = 8;
+    public static final int DROPDOWN_PADDING_HORIZONTAL = 12;
+
+    // Card padding
+    public static final int CARD_PADDING = 25;
+
     // Labels
     public static final String TITLE_LABEL = "Import & Export";
     public static final String IMPORT_TITLE_LABEL = "Import";
@@ -65,9 +87,9 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
     public static final String BACK_BUTTON_LABEL = "<- Back";
 
     // Titles I SWEAR THIS IS NOT AI GENERATED I DONT WANT TO USE SVGS
-    public static final String CURRENT_SESSION_TITLE = "⌚ Current Session";
-    public static final String PORTFOLIO_TITLE = "📂 Portfolio";
-    public static final String SIMULATION_TITLE = "📈 Simulation";
+    public static final String CURRENT_SESSION_TITLE = "Current Session";
+    public static final String PORTFOLIO_TITLE = "Portfolio";
+    public static final String SIMULATION_TITLE = "Simulation";
     public static final String IMPORT_HINT = "Select a CSV file to import";
 
     // Error messages
@@ -82,28 +104,53 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
     public static final String CSV_EXTENSION = "csv";
 
     public static final String FONT_NAME = "defaultFont";
-    public static final String FONT_FAMILY = UIManager.getFont(FONT_NAME) != null
-            ? UIManager.getFont(FONT_NAME).getFamily()
-            : "SansSerif";
-    public static final Font BASE_FONT = UIManager.getFont(FONT_NAME) != null
-            ? UIManager.getFont(FONT_NAME)
-            : new Font("SansSerif", Font.PLAIN, 14);
+    public static final String FONT_FAMILY;
+    public static final Font BASE_FONT;
 
-    public static final Font TITLE_FONT = BASE_FONT.deriveFont(Font.BOLD, 28f);
-    public static final Font HEADER_FONT = BASE_FONT.deriveFont(Font.BOLD, 20f);
-    public static final Font ICON_FONT = BASE_FONT.deriveFont(Font.PLAIN, 24f);
-    public static final Font SECTION_TITLE_FONT = BASE_FONT.deriveFont(Font.BOLD, (float) SECTION_FONT_SIZE);
-    public static final Font BUTTON_PRIMARY_FONT = BASE_FONT.deriveFont(Font.BOLD, (float) NORMAL_FONT_SIZE);
-    public static final Font BUTTON_SECONDARY_FONT = BASE_FONT.deriveFont(Font.PLAIN, (float) NORMAL_FONT_SIZE);
-    public static final Font HINT_FONT = BASE_FONT.deriveFont(Font.PLAIN, 13f);
-    public static final Font ERROR_FONT = BASE_FONT.deriveFont(Font.PLAIN, 24f);
-    public static final Font DROPDOWN_FONT = BASE_FONT.deriveFont(Font.PLAIN, 13f);
+    public static final Font TITLE_FONT;
+    public static final Font HEADER_FONT;
+    public static final Font ICON_FONT;
+    public static final Font SECTION_TITLE_FONT;
+    public static final Font BUTTON_PRIMARY_FONT;
+    public static final Font BUTTON_SECONDARY_FONT;
+    public static final Font HINT_FONT;
+    public static final Font ERROR_FONT;
+    public static final Font DROPDOWN_FONT;
 
-    private PortfolioList portfolioList = new PortfolioList();
-    private List<Simulation> simulations = new ArrayList<>();
+    static {
+        final Font defaultFont = UIManager.getFont(FONT_NAME);
+        final int fourteen = 14;
+        final float titleFontSize = 28f;
+        final float headerFontSize = 20f;
+        final float iconFontSize = 24f;
+        final float sectionTitleFontSize = (float) SECTION_FONT_SIZE;
+        final float buttonPrimaryFontSize = (float) NORMAL_FONT_SIZE;
+        final float buttonSecondaryFontSize = (float) NORMAL_FONT_SIZE;
+        final float hintFontSize = 13f;
+        final float errorFontSize = 24f;
+        final float dropdownFontSize = 13f;
+        if (defaultFont != null) {
+            FONT_FAMILY = defaultFont.getFamily();
+            BASE_FONT = defaultFont;
+        }
+        else {
+            FONT_FAMILY = "SansSerif";
+            BASE_FONT = new Font("SansSerif", Font.PLAIN, fourteen);
+        }
+
+        TITLE_FONT = BASE_FONT.deriveFont(Font.BOLD, titleFontSize);
+        HEADER_FONT = BASE_FONT.deriveFont(Font.BOLD, headerFontSize);
+        ICON_FONT = BASE_FONT.deriveFont(Font.PLAIN, iconFontSize);
+        SECTION_TITLE_FONT = BASE_FONT.deriveFont(Font.BOLD, sectionTitleFontSize);
+        BUTTON_PRIMARY_FONT = BASE_FONT.deriveFont(Font.BOLD, buttonPrimaryFontSize);
+        BUTTON_SECONDARY_FONT = BASE_FONT.deriveFont(Font.PLAIN, buttonSecondaryFontSize);
+        HINT_FONT = BASE_FONT.deriveFont(Font.PLAIN, hintFontSize);
+        ERROR_FONT = BASE_FONT.deriveFont(Font.PLAIN, errorFontSize);
+        DROPDOWN_FONT = BASE_FONT.deriveFont(Font.PLAIN, dropdownFontSize);
+    }
 
     /**
-     * Constructor for an ImportExportViewModel and set init state
+     * Constructor for an ImportExportViewModel and set init state.
      */
     public ImportExportViewModel() {
         super(ImportExportView.VIEW_NAME);
@@ -111,16 +158,20 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
     }
 
     /**
-     * Sets the list of portfolios available for import/export
+     * Sets the list of portfolios available for import/export.
+     *
+     * @param portfolioList List of portfolios
      */
-    public void setPortfolios(PortfolioList portfolioList){
-        this.portfolioList = portfolioList;
+    public void setPortfolios(PortfolioList portfolioList) {
+        getState().setPortfolios(portfolioList.getPortfolios());
     }
 
     /**
-     * Sets the list of simulations available for import/export
+     * Sets the list of simulations available for import/export.
+     *
+     * @param simulations simulations.
      */
     public void setSimulation(List<Simulation> simulations) {
-        this.simulations = simulations;
+        getState().setSimData(simulations);
     }
 }

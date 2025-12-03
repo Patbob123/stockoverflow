@@ -1,36 +1,69 @@
 package view;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import entities.Portfolio.Portfolio;
 import entities.Portfolio.PortfolioList;
-import entities.Simulation;
-import interface_adapter.change_view.ChangeViewController;
 import interface_adapter.import_export.ImportExportController;
 import interface_adapter.import_export.ImportExportViewModel;
-import lombok.Setter;
 
-public class ImportExportView extends PaddedView<ImportExportViewModel, ImportExportController> implements ActionListener, PropertyChangeListener {
+/**
+ * The ImportExportView represents the graphical interface for importing and exporting
+ * portfolios, current session data, and simulation data.
+ */
+public class ImportExportView extends PaddedView<ImportExportViewModel, ImportExportController>
+        implements ActionListener, PropertyChangeListener {
+
+    /**
+     * The name identifier for this view.
+     */
     public static final String VIEW_NAME = "ImportExportMenu";
 
-    private final JButton currentSessionButton = createPrimaryButton(ImportExportViewModel.CURRENT_SESSION_BUTTON_LABEL);
-    private final JButton exportPortfolioButton = createSecondaryButton(ImportExportViewModel.EXPORT_PORTFOLIO_BUTTON_LABEL);
-    private final JButton selectSimDataButton = createSecondaryButton(ImportExportViewModel.SELECT_SIMDATA_BUTTON_LABEL);
-    private final JButton importPortfolioButton = createSuccessButton(ImportExportViewModel.IMPORT_PORTFOLIO_BUTTON_LABEL);
-    private final JButton backButton = createTextButton(ImportExportViewModel.BACK_BUTTON_LABEL);
+    private final JButton currentSessionButton = createPrimaryButton(
+            ImportExportViewModel.CURRENT_SESSION_BUTTON_LABEL);
+    private final JButton exportPortfolioButton = createSecondaryButton(
+            ImportExportViewModel.EXPORT_PORTFOLIO_BUTTON_LABEL);
+    private final JButton selectSimDataButton = createSecondaryButton(
+            ImportExportViewModel.SELECT_SIMDATA_BUTTON_LABEL);
+    private final JButton importPortfolioButton = createSuccessButton(
+            ImportExportViewModel.IMPORT_PORTFOLIO_BUTTON_LABEL);
+    private final JButton backButton = createTextButton(
+            ImportExportViewModel.BACK_BUTTON_LABEL);
     private final JLabel errorLabel = new JLabel();
 
     private final JComboBox<Portfolio> portfolioDropdown = new JComboBox<>();
     private final JComboBox<String> simulationDropdown = new JComboBox<>(new String[]{"Bulk"});
 
+    /**
+     * Constructs an ImportExportView with the specified view model.
+     *
+     * @param importExportViewModel the view model for this view
+     */
     public ImportExportView(ImportExportViewModel importExportViewModel) {
         super(importExportViewModel);
         this.getViewModel().addPropertyChangeListener(this);
@@ -38,90 +71,143 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
     }
 
     private void createView() {
-
         setLayout(new BorderLayout());
+        add(createTopPanel(), BorderLayout.NORTH);
+        add(createMainPanel(), BorderLayout.CENTER);
+        add(createErrorPanel(), BorderLayout.SOUTH);
+        setupListeners();
+    }
 
+    private JPanel createTopPanel() {
         final JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(ImportExportViewModel.CARD_COLOUR);
         topPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ImportExportViewModel.BORDER_COLOUR),
-                new EmptyBorder(20, 30, 20, 30)
+                BorderFactory.createMatteBorder(ImportExportViewModel.ZERO,
+                        ImportExportViewModel.ZERO,
+                        ImportExportViewModel.ONE,
+                        ImportExportViewModel.ZERO,
+                        ImportExportViewModel.BORDER_COLOUR),
+                new EmptyBorder(ImportExportViewModel.TWENTY,
+                        ImportExportViewModel.THIRTY,
+                        ImportExportViewModel.TWENTY,
+                        ImportExportViewModel.THIRTY)
         ));
 
         topPanel.add(backButton, BorderLayout.WEST);
+        topPanel.add(createTitleLabel(), BorderLayout.CENTER);
+        topPanel.add(createSpacer(), BorderLayout.EAST);
 
+        return topPanel;
+    }
+
+    private JLabel createTitleLabel() {
         final JLabel title = new JLabel(ImportExportViewModel.TITLE_LABEL, SwingConstants.CENTER);
         title.setFont(ImportExportViewModel.TITLE_FONT);
         title.setForeground(ImportExportViewModel.TEXT_PRIMARY);
-        topPanel.add(title, BorderLayout.CENTER);
+        return title;
+    }
 
+    private JPanel createSpacer() {
         final JPanel spacer = new JPanel();
         spacer.setOpaque(false);
-        spacer.setPreferredSize(new Dimension(100, 0));
-        topPanel.add(spacer, BorderLayout.EAST);
+        spacer.setPreferredSize(new Dimension(ImportExportViewModel.HUNDRED,
+                ImportExportViewModel.ZERO));
+        return spacer;
+    }
 
-        add(topPanel, BorderLayout.NORTH);
-
-        // main panel
+    private JPanel createMainPanel() {
         final JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(new EmptyBorder(30, 30, 30, 30));
+        mainPanel.setBorder(new EmptyBorder(ImportExportViewModel.THIRTY,
+                ImportExportViewModel.THIRTY,
+                ImportExportViewModel.THIRTY,
+                ImportExportViewModel.THIRTY));
 
-        GridBagConstraints gbc = new GridBagConstraints();
+        final GridBagConstraints gbc = createGridBagConstraints();
+
+        gbc.gridx = ImportExportViewModel.ZERO;
+        mainPanel.add(createExportPanel(), gbc);
+
+        gbc.gridx = ImportExportViewModel.ONE;
+        mainPanel.add(createImportPanel(), gbc);
+
+        return mainPanel;
+    }
+
+    private GridBagConstraints createGridBagConstraints() {
+        final GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(0, 10, 0, 10);
+        gbc.weighty = ImportExportViewModel.WEIGHT_ONE;
+        gbc.weightx = ImportExportViewModel.WEIGHT_ONE;
+        gbc.insets = new Insets(ImportExportViewModel.ZERO,
+                ImportExportViewModel.TEN,
+                ImportExportViewModel.ZERO,
+                ImportExportViewModel.TEN);
+        return gbc;
+    }
 
-        // EXPORT PANEL
+    private JPanel createExportPanel() {
         final JPanel exportPanel = createModernCard();
         exportPanel.setLayout(new BoxLayout(exportPanel, BoxLayout.Y_AXIS));
 
-        // the text + the icons, also no more settings who needs that
-        final JPanel exportHeader = getJpanel();
-        exportPanel.add(exportHeader);
-        exportPanel.add(Box.createVerticalStrut(20));
+        exportPanel.add(createExportHeader());
+        exportPanel.add(Box.createVerticalStrut(ImportExportViewModel.TWENTY));
+        exportPanel.add(createCurrentSessionSection());
+        exportPanel.add(Box.createVerticalStrut(ImportExportViewModel.FIFTEEN));
+        exportPanel.add(createPortfolioSection());
+        exportPanel.add(Box.createVerticalStrut(ImportExportViewModel.FIFTEEN));
+        exportPanel.add(createSimulationSection());
+        exportPanel.add(Box.createVerticalGlue());
 
-        //  Cur session
-        final JPanel sessionSection = createSection(ImportExportViewModel.CURRENT_SESSION_TITLE);
+        return exportPanel;
+    }
+
+    private JPanel createCurrentSessionSection() {
+        final JPanel sessionSection = createSection(
+                ImportExportViewModel.CURRENT_SESSION_TITLE);
         currentSessionButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         sessionSection.add(currentSessionButton);
-        exportPanel.add(sessionSection);
-        exportPanel.add(Box.createVerticalStrut(15));
+        return sessionSection;
+    }
 
-        // portfolio
+    private JPanel createPortfolioSection() {
         final JPanel portfolioSection = createSection(ImportExportViewModel.PORTFOLIO_TITLE);
         styleDropdown(portfolioDropdown);
         portfolioDropdown.setAlignmentX(Component.LEFT_ALIGNMENT);
         portfolioSection.add(portfolioDropdown);
-        portfolioSection.add(Box.createVerticalStrut(10));
+        portfolioSection.add(Box.createVerticalStrut(ImportExportViewModel.TEN));
         exportPortfolioButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         portfolioSection.add(exportPortfolioButton);
-        exportPanel.add(portfolioSection);
-        exportPanel.add(Box.createVerticalStrut(15));
+        return portfolioSection;
+    }
 
-        // simulation
-        final JPanel simulationSection = createSection(ImportExportViewModel.SIMULATION_TITLE);
+    private JPanel createSimulationSection() {
+        final JPanel simulationSection = createSection(
+                ImportExportViewModel.SIMULATION_TITLE);
         styleDropdown(simulationDropdown);
         simulationDropdown.setAlignmentX(Component.LEFT_ALIGNMENT);
         simulationSection.add(simulationDropdown);
-        simulationSection.add(Box.createVerticalStrut(10));
+        simulationSection.add(Box.createVerticalStrut(ImportExportViewModel.TEN));
         selectSimDataButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         simulationSection.add(selectSimDataButton);
-        exportPanel.add(simulationSection);
+        return simulationSection;
+    }
 
-        exportPanel.add(Box.createVerticalGlue());
-
-        gbc.gridx = 0;
-        mainPanel.add(exportPanel, gbc);
-
-        // IMPORT PANEL
-        JPanel importPanel = createModernCard();
+    private JPanel createImportPanel() {
+        final JPanel importPanel = createModernCard();
         importPanel.setLayout(new BoxLayout(importPanel, BoxLayout.Y_AXIS));
 
-        // copy paste from above
-        JPanel importHeader = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        importPanel.add(createImportHeader());
+        importPanel.add(Box.createVerticalGlue());
+        importPanel.add(createImportCenter());
+        importPanel.add(Box.createVerticalGlue());
+
+        return importPanel;
+    }
+
+    private JPanel createImportHeader() {
+        final JPanel importHeader = new JPanel(new FlowLayout(FlowLayout.LEFT));
         importHeader.setOpaque(false);
-        JLabel importIcon = new JLabel("⬆");
+        final JLabel importIcon = new JLabel("<>");
         importIcon.setFont(ImportExportViewModel.ICON_FONT);
         importIcon.setForeground(ImportExportViewModel.SUCCESS_COLOUR);
         final JLabel importTitle = new JLabel(ImportExportViewModel.IMPORT_TITLE_LABEL);
@@ -129,51 +215,52 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         importTitle.setForeground(ImportExportViewModel.TEXT_PRIMARY);
         importHeader.add(importIcon);
         importHeader.add(importTitle);
-        importPanel.add(importHeader);
+        return importHeader;
+    }
 
-        importPanel.add(Box.createVerticalGlue());
-
-        // remember to add computer icon later
+    private JPanel createImportCenter() {
         final JPanel importCenter = new JPanel();
         importCenter.setLayout(new BoxLayout(importCenter, BoxLayout.Y_AXIS));
         importCenter.setOpaque(false);
 
         importPortfolioButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        importPortfolioButton.setPreferredSize(new Dimension(280, 50));
-        importPortfolioButton.setMaximumSize(new Dimension(280, 50));
+        importPortfolioButton.setPreferredSize(new Dimension(
+                ImportExportViewModel.IMPORT_BUTTON_WIDTH,
+                ImportExportViewModel.IMPORT_BUTTON_HEIGHT));
+        importPortfolioButton.setMaximumSize(new Dimension(
+                ImportExportViewModel.IMPORT_BUTTON_WIDTH,
+                ImportExportViewModel.IMPORT_BUTTON_HEIGHT));
         importCenter.add(importPortfolioButton);
+        importCenter.add(Box.createVerticalStrut(ImportExportViewModel.FIFTEEN));
+        importCenter.add(createHintLabel());
 
-        importCenter.add(Box.createVerticalStrut(15));
+        return importCenter;
+    }
 
+    private JLabel createHintLabel() {
         final JLabel hint = new JLabel(ImportExportViewModel.IMPORT_HINT);
         hint.setFont(ImportExportViewModel.HINT_FONT);
         hint.setForeground(ImportExportViewModel.TEXT_SECONDARY);
         hint.setAlignmentX(Component.CENTER_ALIGNMENT);
-        importCenter.add(hint);
-
-        importPanel.add(importCenter);
-        importPanel.add(Box.createVerticalGlue());
-
-        gbc.gridx = 1;
-        mainPanel.add(importPanel, gbc);
-
-        add(mainPanel, BorderLayout.CENTER);
-
-        // beeg error text
-        final JPanel errorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        errorPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
-        errorLabel.setFont(ImportExportViewModel.ERROR_FONT);
-        errorLabel.setForeground(new Color(220, 38, 38));
-        errorPanel.add(errorLabel);
-        add(errorPanel, BorderLayout.SOUTH);
-
-        setupListeners();
+        return hint;
     }
 
-    private static JPanel getJpanel() {
+    private JPanel createErrorPanel() {
+        final JPanel errorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        errorPanel.setBorder(new EmptyBorder(ImportExportViewModel.ZERO,
+                ImportExportViewModel.ZERO,
+                ImportExportViewModel.TWENTY,
+                ImportExportViewModel.ZERO));
+        errorLabel.setFont(ImportExportViewModel.ERROR_FONT);
+        errorLabel.setForeground(ImportExportViewModel.PRIMARY_HOVER);
+        errorPanel.add(errorLabel);
+        return errorPanel;
+    }
+
+    private static JPanel createExportHeader() {
         final JPanel exportHeader = new JPanel(new FlowLayout(FlowLayout.LEFT));
         exportHeader.setOpaque(false);
-        final JLabel exportIcon = new JLabel("⬇");
+        final JLabel exportIcon = new JLabel("<>");
         exportIcon.setFont(ImportExportViewModel.ICON_FONT);
         exportIcon.setForeground(ImportExportViewModel.PRIMARY_COLOUR);
         final JLabel exportTitle = new JLabel(ImportExportViewModel.EXPORT_TITLE_LABEL);
@@ -188,8 +275,12 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         final JPanel card = new JPanel();
         card.setBackground(ImportExportViewModel.CARD_COLOUR);
         card.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(ImportExportViewModel.BORDER_COLOUR, 1, true),
-                new EmptyBorder(25, 25, 25, 25)
+                new LineBorder(ImportExportViewModel.BORDER_COLOUR,
+                        ImportExportViewModel.ONE, true),
+                new EmptyBorder(ImportExportViewModel.CARD_PADDING,
+                        ImportExportViewModel.CARD_PADDING,
+                        ImportExportViewModel.CARD_PADDING,
+                        ImportExportViewModel.CARD_PADDING)
         ));
         return card;
     }
@@ -198,19 +289,26 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         final JPanel section = new JPanel();
         section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
         section.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(ImportExportViewModel.BORDER_COLOUR, 1, true),
-                new EmptyBorder(ImportExportViewModel.PADDING, ImportExportViewModel.PADDING,
-                        ImportExportViewModel.PADDING, ImportExportViewModel.PADDING)
+                new LineBorder(ImportExportViewModel.BORDER_COLOUR,
+                        ImportExportViewModel.ONE, true),
+                new EmptyBorder(ImportExportViewModel.PADDING,
+                        ImportExportViewModel.PADDING,
+                        ImportExportViewModel.PADDING,
+                        ImportExportViewModel.PADDING)
         ));
 
+        section.add(createSectionTitle(title));
+        section.add(Box.createVerticalStrut(ImportExportViewModel.EXPORT_VERTICAL_STRUT));
+
+        return section;
+    }
+
+    private JLabel createSectionTitle(String title) {
         final JLabel sectionTitle = new JLabel(title);
         sectionTitle.setFont(ImportExportViewModel.SECTION_TITLE_FONT);
         sectionTitle.setForeground(ImportExportViewModel.TEXT_SECONDARY);
         sectionTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-        section.add(sectionTitle);
-        section.add(Box.createVerticalStrut(ImportExportViewModel.EXPORT_VERTICAL_STRUT));
-
-        return section;
+        return sectionTitle;
     }
 
     private JButton createPrimaryButton(String text) {
@@ -220,21 +318,28 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(250, 45));
-        button.setMaximumSize(new Dimension(Short.MAX_VALUE, 45));
+        button.setPreferredSize(new Dimension(ImportExportViewModel.BUTTON_WIDTH,
+                ImportExportViewModel.PRIMARY_BUTTON_HEIGHT));
+        button.setMaximumSize(new Dimension(Short.MAX_VALUE,
+                ImportExportViewModel.PRIMARY_BUTTON_HEIGHT));
 
+        addPrimaryButtonHoverEffect(button);
+        return button;
+    }
+
+    private void addPrimaryButtonHoverEffect(JButton button) {
         final Color originalColor = button.getBackground();
-
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(ImportExportViewModel.PRIMARY_HOVER);
             }
 
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(originalColor);
             }
         });
-        return button;
     }
 
     private JButton createSecondaryButton(String text) {
@@ -242,23 +347,31 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         button.setFont(ImportExportViewModel.BUTTON_SECONDARY_FONT);
         button.setForeground(ImportExportViewModel.TEXT_PRIMARY);
         button.setFocusPainted(false);
-        button.setBorder(new LineBorder(ImportExportViewModel.BORDER_COLOUR, 1, true));
+        button.setBorder(new LineBorder(ImportExportViewModel.BORDER_COLOUR,
+                ImportExportViewModel.ONE, true));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(250, 38));
-        button.setMaximumSize(new Dimension(Short.MAX_VALUE, 38));
+        button.setPreferredSize(new Dimension(ImportExportViewModel.BUTTON_WIDTH,
+                ImportExportViewModel.SECONDARY_BUTTON_HEIGHT));
+        button.setMaximumSize(new Dimension(Short.MAX_VALUE,
+                ImportExportViewModel.SECONDARY_BUTTON_HEIGHT));
 
+        addSecondaryButtonHoverEffect(button);
+        return button;
+    }
+
+    private void addSecondaryButtonHoverEffect(JButton button) {
         final Color originalColor = button.getBackground();
-
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(ImportExportViewModel.SECONDARY_HOVER);
             }
 
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(originalColor);
             }
         });
-        return button;
     }
 
     private JButton createSuccessButton(String text) {
@@ -269,18 +382,23 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        final Color originalColor = button.getBackground();
+        addSuccessButtonHoverEffect(button);
+        return button;
+    }
 
+    private void addSuccessButtonHoverEffect(JButton button) {
+        final Color originalColor = button.getBackground();
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(ImportExportViewModel.SUCCESS_HOVER);
             }
 
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(originalColor);
             }
         });
-        return button;
     }
 
     private JButton createTextButton(String text) {
@@ -292,95 +410,125 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         button.setContentAreaFilled(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        final Color originalColor = button.getForeground();
+        addTextButtonHoverEffect(button);
+        return button;
+    }
 
+    private void addTextButtonHoverEffect(JButton button) {
+        final Color originalColor = button.getForeground();
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setForeground(ImportExportViewModel.TEXT_SECONDARY);
             }
 
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setForeground(originalColor);
             }
         });
-        return button;
     }
 
     private void styleDropdown(JComboBox<?> dropdown) {
         dropdown.setFont(ImportExportViewModel.DROPDOWN_FONT);
         dropdown.setForeground(ImportExportViewModel.TEXT_PRIMARY);
         dropdown.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(ImportExportViewModel.BORDER_COLOUR, 1, true),
-                new EmptyBorder(8, 12, 8, 12)
+                new LineBorder(ImportExportViewModel.BORDER_COLOUR,
+                        ImportExportViewModel.ONE, true),
+                new EmptyBorder(ImportExportViewModel.DROPDOWN_PADDING_VERTICAL,
+                        ImportExportViewModel.DROPDOWN_PADDING_HORIZONTAL,
+                        ImportExportViewModel.DROPDOWN_PADDING_VERTICAL,
+                        ImportExportViewModel.DROPDOWN_PADDING_HORIZONTAL)
         ));
-        dropdown.setPreferredSize(new Dimension(250, 40));
-        dropdown.setMaximumSize(new Dimension(Short.MAX_VALUE, 40));
+        dropdown.setPreferredSize(new Dimension(ImportExportViewModel.BUTTON_WIDTH,
+                ImportExportViewModel.DROPDOWN_HEIGHT));
+        dropdown.setMaximumSize(new Dimension(Short.MAX_VALUE,
+                ImportExportViewModel.DROPDOWN_HEIGHT));
     }
 
     private void setupListeners() {
-        importPortfolioButton.addActionListener(evt -> {
-            final String path = getCsvFilePath();
-            if (path != null) {
-                this.getController().importPortfolio(path);
-            }
-        });
+        importPortfolioButton.addActionListener(evt -> handleImportPortfolio());
+        currentSessionButton.addActionListener(event -> handleExportCurrentSession());
+        exportPortfolioButton.addActionListener(event -> handleExportPortfolio());
+        selectSimDataButton.addActionListener(event -> handleExportSimData());
+        backButton.addActionListener(evt -> this.getChangeViewController().backView());
+    }
 
-        currentSessionButton.addActionListener(e -> {
-            final String path = getDirectoryPath("ticker_history.csv");
-            if (path == null) {
-                errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
-                return;
-            }
+    private void handleImportPortfolio() {
+        final String path = getCsvFilePath();
+        if (path != null) {
+            this.getController().importPortfolio(path);
+        }
+    }
+
+    private void handleExportCurrentSession() {
+        final String path = getDirectoryPath("ticker_history.csv");
+        if (path == null) {
+            errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
+        }
+        else {
             this.getController().exportCurrentSession(path);
-        });
+        }
 
-        exportPortfolioButton.addActionListener(e -> {
-            final Portfolio selected = (Portfolio) portfolioDropdown.getSelectedItem();
-            PortfolioList portfolioList = new PortfolioList();
-            portfolioList.addPortfolio(selected);
+    }
+
+    private void handleExportPortfolio() {
+        final Portfolio selected = (Portfolio) portfolioDropdown.getSelectedItem();
+        if (selected == null) {
+            errorLabel.setText(ImportExportViewModel.ERROR_NO_PORTFOLIO);
+        }
+        else {
             final String path = getDirectoryPath("portfolios.csv");
             if (path == null) {
                 errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
-                return;
             }
-            if (selected == null) {
-                errorLabel.setText(ImportExportViewModel.ERROR_NO_PORTFOLIO);
-                return;
+            else {
+                final PortfolioList portfolioList = new PortfolioList();
+                portfolioList.addPortfolio(selected);
+                this.getController().exportPortfolio(portfolioList, path);
             }
-            this.getController().exportPortfolio(portfolioList, path);
-        });
 
-        selectSimDataButton.addActionListener(e -> {
-            // Alexfinal Simulation selected = (Simulation) simulationDropdown.getSelectedItem();
-            final String path = getDirectoryPath("simulation.csv");
-            if (path == null) {
-                errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
-                return;
-            }
+        }
+
+    }
+
+    private void handleExportSimData() {
+        final String path = getDirectoryPath("simulations.csv");
+        if (path == null) {
+            errorLabel.setText(ImportExportViewModel.ERROR_INVALID_PATH);
+        }
+        else {
             this.getController().exportSimData(path);
-        });
+        }
 
-        backButton.addActionListener(evt -> {
-            this.getChangeViewController().backView();
-        });
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        System.out.println("Click " + e.getActionCommand());
+    public void actionPerformed(ActionEvent event) {
+        System.out.println("Click " + event.getActionCommand());
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        // Property change handling can be implemented here if needed
     }
 
     private String getCsvFilePath() {
         final JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle(ImportExportViewModel.CSV_DIALOG_TITLE);
-        final FileNameExtensionFilter filter = new FileNameExtensionFilter(ImportExportViewModel.CSV_FILTER_DESC, ImportExportViewModel.CSV_EXTENSION);
+        final FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                ImportExportViewModel.CSV_FILTER_DESC, ImportExportViewModel.CSV_EXTENSION);
         chooser.setFileFilter(filter);
         final int result = chooser.showOpenDialog(this);
-        return result == JFileChooser.APPROVE_OPTION ? chooser.getSelectedFile().getAbsolutePath() : null;
+
+        String abs = "";
+        if (result == JFileChooser.APPROVE_OPTION) {
+            abs = chooser.getSelectedFile().getAbsolutePath();
+        }
+        else {
+            abs = null;
+        }
+        return abs;
     }
 
     private String getDirectoryPath(String defaultFileName) {
@@ -389,6 +537,14 @@ public class ImportExportView extends PaddedView<ImportExportViewModel, ImportEx
         chooser.setSelectedFile(new java.io.File(defaultFileName));
         chooser.setDialogTitle(ImportExportViewModel.FOLDER_DIALOG_TITLE);
         final int result = chooser.showSaveDialog(this);
-        return result == JFileChooser.APPROVE_OPTION ? chooser.getSelectedFile().getAbsolutePath() : null;
+
+        String abs = "";
+        if (result == JFileChooser.APPROVE_OPTION) {
+            abs = chooser.getSelectedFile().getAbsolutePath();
+        }
+        else {
+            abs = null;
+        }
+        return abs;
     }
 }

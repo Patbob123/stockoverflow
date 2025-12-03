@@ -4,7 +4,6 @@ import java.util.List;
 
 import entities.Portfolio.Portfolio;
 import entities.Portfolio.PortfolioList;
-import entities.Simulation;
 import entities.monte_carlo.MonteCarloSimulation;
 
 /**
@@ -13,14 +12,14 @@ import entities.monte_carlo.MonteCarloSimulation;
 public interface ImportExportDataAccessInterface {
 
     /**
-     * Saves all portfolios to file path
+     * Saves all portfolios to file path.
      *
      * @param filePath the file path to save portfolios
      */
     void savePortfolio(String filePath);
 
     /**
-     * Saves all simulation data to file path
+     * Saves all simulation data to file path.
      *
      * @param filePath the file path to save simulations
      */
@@ -42,14 +41,14 @@ public interface ImportExportDataAccessInterface {
     PortfolioList loadPortfolios(String filePath);
 
     /**
-     * Retrieves all portfolios for presenter later
+     * Retrieves all portfolios for presenter later.
      *
      * @return a list of all portfolios
      */
     List<Portfolio> getAllPortfolios();
 
     /**
-     * Retrieves all Monte Carlo simulations for presenter later
+     * Retrieves all Monte Carlo simulations for presenter later.
      *
      * @return a list of all simulations
      */
