@@ -10,14 +10,9 @@ import use_case.InputBoundary;
 public interface ChangeViewInputBoundary extends InputBoundary {
 
     /**
-     * Goes back to a previous view
+     * Switches to the view with the name or goes back
      */
-    void goBack();
-
-    /**
-     * Switches to the view with the name
-     */
-    void changeTo(String viewName);
+    void execute(String viewName);
 
     /**
      * Returns the ViewModel for the given view name

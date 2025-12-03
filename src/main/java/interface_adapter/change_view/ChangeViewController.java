@@ -23,14 +23,14 @@ public class ChangeViewController extends AbsController {
      */
     public void changeView(String viewName) {
         System.out.println(viewName);
-        changeViewInteractor.changeTo(viewName);
+        changeViewInteractor.execute(viewName);
     }
 
     /**
      * Goes back to the previous view
      */
     public void backView() {
-        changeViewInteractor.goBack();
+        changeViewInteractor.execute("");
     }
 
     /**

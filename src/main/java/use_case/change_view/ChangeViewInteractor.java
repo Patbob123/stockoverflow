@@ -20,27 +20,20 @@ public class ChangeViewInteractor implements ChangeViewInputBoundary {
     }
 
     /**
-     * Goes back to a previous view
+     * Switches to the view with the name or goes back
      */
     @Override
-    public void goBack() {
-        if (changeViewState.canGoBack()) {
-            final String previousView = changeViewState.popView();
-            final ChangeViewOutputData outputData = new ChangeViewOutputData(previousView);
-            changeScreenPresenter.prepareView(outputData);
+    public void execute(String viewName) {
+        if (viewName.isEmpty()) {
+            if (changeViewState.canGoBack()) {
+                String prev = changeViewState.popView();
+                changeScreenPresenter.prepareView(new ChangeViewOutputData(prev));
+            }
+        } else {
+            changeViewState.pushView(viewName);
+            changeScreenPresenter.prepareView(new ChangeViewOutputData(viewName));
         }
     }
-
-    /**
-     * Switches to the view with the name
-     */
-    @Override
-    public void changeTo(String viewName) {
-        changeViewState.pushView(viewName);
-        final ChangeViewOutputData outputData = new ChangeViewOutputData(viewName);
-        changeScreenPresenter.prepareView(outputData);
-    }
-
     /**
      * Returns the ViewModel for the given view name
      */
