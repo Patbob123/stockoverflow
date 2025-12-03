@@ -115,7 +115,7 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
                     if (evt.getSource().equals(removeButton)) {
                         for (JCheckBox checkBox : checkBoxTranslator.keySet()) {
                             if (checkBox.getModel().isSelected()) {
-                                this.getViewModel().getState().getPortfolio().removeStock(checkBoxTranslator.get(checkBox));
+                                this.getController().getPortfolio().removeStock(checkBoxTranslator.get(checkBox));
                                 buttonMap.remove(checkBoxTranslator.get(checkBox));
                                 checkBoxTranslator.remove(checkBox);
                                 checkBoxPanel.remove(jPanelMap.get(checkBox));
@@ -129,7 +129,7 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
         simulationButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(simulationButton)) {
-                        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+                        final Portfolio portfolio = this.getController().getPortfolio();
 
                         if (portfolio == null || portfolio.getStockAmount().isEmpty()) {
                             JOptionPane.showMessageDialog(this, "Portfolio is empty!");
@@ -148,9 +148,7 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
                             historyState.setPortfolioStocks(stockData);
                             this.historyViewModel.setState(historyState);
 
-
                             this.historyViewModel.firePropertyChange();
-
 
                             changeViewController.changeView(HistoricalSimulationViewModel.VIEW_NAME);
                         } else {
@@ -181,7 +179,7 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
         savePortfolioJSONButton.addActionListener(
                 evt -> {
                     if (evt.getSource().equals(savePortfolioJSONButton)) {
-                        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+                        final Portfolio portfolio = this.getController().getPortfolio();
                         portfolio.saveStockByJSON();
                     }
                 }
@@ -199,10 +197,12 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
                 evt -> {
                     if (evt.getSource().equals(sortbyComboBox)) {
                         final String method = (String) sortbyComboBox.getSelectedItem();
-                        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+                        final Portfolio portfolio = this.getController().getPortfolio();
                         if (portfolio != null && portfolio.getPortfolioSortMap() != null) {
-                            portfolio.sortStockBy(portfolio.getPortfolioSortMap().get(method));
+                            this.getController().sortPortfolio(portfolio, method);
+                            this.refresh();
                         }
+
                     }
                 }
         );
@@ -211,7 +211,7 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
                 evt -> {
                     if (evt.getSource().equals(changeNameButton)) {
                         final String name = nameField.getText();
-                        final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+                        final Portfolio portfolio = this.getController().getPortfolio();
                         if (portfolio != null) {
                             if (!name.isEmpty()) {
                                 portfolio.setName(name);
@@ -237,7 +237,7 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
     }
 
     private void checkBoxConfigure(Boolean bool) {
-        for(JCheckBox checkBox : checkBoxTranslator.keySet()) {
+        for (JCheckBox checkBox : checkBoxTranslator.keySet()) {
             checkBox.setSelected(bool);
         }
     }
@@ -257,8 +257,7 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
             button.addActionListener(
                     evt -> {
                         if (evt.getSource().equals(button)) {
-                            //TODO: redirect to stock
-                            changeViewController.changeView("");
+                            changeViewController.changeView(SingleStockView.VIEW_NAME);
                         }
                     }
             );
@@ -274,8 +273,8 @@ public class PortfolioMenuView extends PaddedView<PortfolioMenuViewModel, Portfo
     }
 
     public void refresh() {
-        if (this.getViewModel().getState().getPortfolio() != null) {
-            final Portfolio portfolio = this.getViewModel().getState().getPortfolio();
+        if (this.getController().getPortfolio() != null) {
+            final Portfolio portfolio = this.getController().getPortfolio();
             this.getController().getPortfolioMenuInputBoundary().executeUpdatePortfolio(portfolio);
             this.refreshCheckBoxPanel(portfolio);
         }

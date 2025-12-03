@@ -23,6 +23,4 @@ public class MainMenuInteractor implements MainMenuInputBoundary {
         System.exit(0);
     }
 
-
-
 }

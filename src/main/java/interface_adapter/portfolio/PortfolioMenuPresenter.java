@@ -15,8 +15,7 @@ public class PortfolioMenuPresenter implements PortfolioMenuOutputBoundary {
 
     @Override
     public void prepareAddStockView(ViewModel<AddStockMenuState> addStockMenuViewModel) {
-        addStockMenuViewModel.getState().setPortfolio(
-                this.portfolioMenuViewModel.getState().getPortfolio());
+
     }
 
     @Override
