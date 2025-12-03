@@ -7,6 +7,7 @@ import interface_adapter.portfolio.addStock.AddStockMenuViewModel;
 import use_case.InputBoundary;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public interface PortfolioMenuInputBoundary extends InputBoundary {
 
@@ -20,12 +21,12 @@ public interface PortfolioMenuInputBoundary extends InputBoundary {
 
     void executeCompare(Portfolio comparePortfolio);
 
-    void executeSelectAll();
-
-    void executeClearSelection();
-
     void executeSavePortfolio();
 
     void executeExit();
+
+    void sortPortfolio(Portfolio portfolio, String method);
+
+    Portfolio getPortfolio();
 
 }

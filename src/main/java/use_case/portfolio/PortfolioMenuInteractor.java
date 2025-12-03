@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class PortfolioMenuInteractor implements PortfolioMenuInputBoundary {
 
@@ -21,6 +22,7 @@ public class PortfolioMenuInteractor implements PortfolioMenuInputBoundary {
     public static final String STOCK_NOT_IN_PORTFOLIO = "Stock/stocks not found:";
 
     public PortfolioMenuInteractor(PortfolioMenuOutputBoundary output) {
+
         this.portfolioMenuOutputBoundary = output;
     }
 
@@ -50,24 +52,12 @@ public class PortfolioMenuInteractor implements PortfolioMenuInputBoundary {
 
     @Override
     public void executeSimulation() {
-        //TODO:
         this.portfolioMenuOutputBoundary.prepareSimulationView(this.portfolio);
     }
 
     @Override
     public void executeCompare(Portfolio comparePortfolio) {
-       //TODO
         this.portfolioMenuOutputBoundary.prepareCompareView(this.portfolio, comparePortfolio);
-    }
-
-    @Override
-    public void executeSelectAll() {
-
-    }
-
-    @Override
-    public void executeClearSelection() {
-
     }
 
     @Override
@@ -79,4 +69,15 @@ public class PortfolioMenuInteractor implements PortfolioMenuInputBoundary {
     public void executeExit() {
         this.portfolioMenuOutputBoundary.prepareExitView();
     }
+
+    @Override
+    public Portfolio getPortfolio() {
+        return this.portfolio;
+    }
+
+    @Override
+    public void sortPortfolio(Portfolio portfolio, String method) {
+        portfolio.sortStockBy(portfolio.getPortfolioSortMap().get(method));
+    }
+
 }
