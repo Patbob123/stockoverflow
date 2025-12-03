@@ -58,7 +58,7 @@ public class ImportExportInteractor implements ImportExportInputBoundary {
      * @param filePath the path of the file to import
      */
     public void importPortfolio(String filePath) {
-        if (filePath == null || filePath.isEmpty()) {
+        if (filePath.isEmpty()) {
             importExportOutputBoundary.prepareSuccessView("Import cancelled");
             return;
         }

@@ -15,7 +15,6 @@ class ImportExportInteractorTest {
     private TestOutputBoundary output;
     private TestDAO dao;
 
-    // A simple fake output boundary to capture messages
     static class TestOutputBoundary implements ImportExportOutputBoundary {
         String lastMessage;
 
@@ -25,7 +24,6 @@ class ImportExportInteractorTest {
         }
     }
 
-    // A simple fake DAO that does nothing
     static class TestDAO implements ImportExportDataAccessInterface {
 
         String savedPortfolio;
@@ -101,6 +99,12 @@ class ImportExportInteractorTest {
         interactor.execute("export_simulation", "sim.csv");
         assertEquals("Exported simulation to: sim.csv", output.lastMessage);
         assertEquals("sim.csv", dao.savedSim);
+    }
+
+    @Test
+    void testUnknownOperation() {
+        interactor.execute("unknown", "file.csv");
+        assertEquals("???: unknown", output.lastMessage);
     }
 
     @Test
