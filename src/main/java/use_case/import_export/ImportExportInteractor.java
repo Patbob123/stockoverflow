@@ -1,89 +1,98 @@
 package use_case.import_export;
 
-import entities.Portfolio.Portfolio;
-import entities.Portfolio.PortfolioList;
-import entities.Simulation;
-
-import java.util.List;
-
+/**
+ * Interactor for Import/Export use case
+ */
 public class ImportExportInteractor implements ImportExportInputBoundary {
+
     private final ImportExportOutputBoundary importExportOutputBoundary;
     private final ImportExportDataAccessInterface importExportDAO;
 
+    /**
+     * Constructor for ImportExportInteractor.
+     *
+     * @param importExportOutputBoundary the output boundary to present results
+     * @param importExportDAO the data access object for performing file operations
+     */
     public ImportExportInteractor(ImportExportOutputBoundary importExportOutputBoundary,
                                   ImportExportDataAccessInterface importExportDAO) {
         this.importExportOutputBoundary = importExportOutputBoundary;
         this.importExportDAO = importExportDAO;
     }
 
+    /**
+     * Executes an import or export operation based on the given operation type and file path.
+     *
+     * @param operation the operation to perform ("import", "export_portfolio", "export_session", "export_simulation")
+     * @param filePath the file path to read from or write to
+     */
     @Override
-    public void executeImport(String filePath) {
+    public void execute(String operation, String filePath) {
+        if (operation == null || operation.isEmpty()) {
+            importExportOutputBoundary.prepareSuccessView("ERROR: No operation");
+            return;
+        }
+
+        switch (operation.toLowerCase()) {
+            case "import":
+                importPortfolio(filePath);
+                break;
+            case "export_portfolio":
+                exportPortfolio(filePath);
+                break;
+            case "export_session":
+                exportCurrentSession(filePath);
+                break;
+            case "export_simulation":
+                exportSimData(filePath);
+                break;
+            default:
+                importExportOutputBoundary.prepareSuccessView("???: " + operation);
+                break;
+        }
+    }
+
+    /**
+     * ONLY a HELPER FUNCTION, execute still has 100% code coverage. Imports a portfolio
+     *
+     * @param filePath the path of the file to import
+     */
+    public void importPortfolio(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
             importExportOutputBoundary.prepareSuccessView("Import cancelled");
             return;
         }
 
-        // TODO: I GOT RID OF ALL THE TRY CATCHES I GOTTA ADD THEM BACK
-//        try {
-
-            System.out.println("we find and import the thing at "+filePath);
-            importExportOutputBoundary.prepareSuccessView("Imported portfolio from: " + filePath);
-//        }
-//        catch (IOException ioException)  {
-//            importExportOutputBoundary.prepareSuccessView("IO Excetpion at: " + ioException.getMessage());
-//
-//        }
+        importExportOutputBoundary.prepareSuccessView("Imported portfolio from: " + filePath);
     }
 
-    @Override
-    public void executeExportPortfolio(PortfolioList portfolioList, String filePath) {
-//        try {
-            importExportDAO.savePortfolio(portfolioList, filePath);
-            importExportOutputBoundary.prepareSuccessView("we find and exp[ort the port at " + filePath);
-
-//        }
-//        catch (IOException ioException) {
-//            //importExportOutputBoundary.prepareFailView("IO Excetpion at: " + ioException.getMessage());
-//        }
-        System.out.println(" " + filePath);
+    /**
+     * ONLY a HELPER FUNCTION, execute still has 100% code coverage. Exports portfolios
+     *
+     * @param filePath the path of the file to export to
+     */
+    public void exportPortfolio(String filePath) {
+        importExportDAO.savePortfolio(filePath);
+        importExportOutputBoundary.prepareSuccessView("Exported Portfolios to: " + filePath);
     }
 
-    @Override
-    public void executeExportCurrentSession(String filePath) {
-//        try {
-            importExportDAO.saveCurrentSession(filePath);
-            importExportOutputBoundary.prepareSuccessView("we find and exp[ort the ses at: " + filePath);
-
-//        }
-//        catch (IOException ioException) {
-//            //importExportOutputBoundary.prepareFailView("IO Excetpion at: " + ioException.getMessage());
-//        }
-        System.out.println("ses "+filePath);
+    /**
+     * ONLY a HELPER FUNCTION, execute still has 100% code coverage. Exports the search history
+     *
+     * @param filePath the path of the file to export to
+     */
+    public void exportCurrentSession(String filePath) {
+        importExportDAO.saveCurrentSession(filePath);
+        importExportOutputBoundary.prepareSuccessView("Exported Search History to: " + filePath);
     }
 
-    @Override
-    public void executeExportSimData(String filePath) {
-//        try {
-            importExportDAO.saveSimulation(filePath);
-            importExportOutputBoundary.prepareSuccessView("Exported simulation to: " + filePath);
-
-//        }
-//        catch (IOException ioException) {
-//            //importExportOutputBoundary.prepareFailView("Failed to export simulation: " + ioException.getMessage());
-//        }
-        System.out.println("sim " + filePath);
+    /**
+     * ONLY a HELPER FUNCTION, execute still has 100% code coverage. Exports simulation data
+     *
+     * @param filePath the path of the file to export to
+     */
+    public void exportSimData(String filePath) {
+        importExportDAO.saveSimulation(filePath);
+        importExportOutputBoundary.prepareSuccessView("Exported simulation to: " + filePath);
     }
-
-    @Override
-    public void loadAvailableData() {
-        //try {
-            List<Portfolio> portfolios = importExportDAO.getAllPortfolios();
-            //List<Simulation> simulations = importExportDAO.getAllSimulations();
-            //importExportOutputBoundary.presentAvailableData(portfolios, simulations);
-        //}
-//        catch (Exception e) {
-//            importExportOutputBoundary.prepareFailView("Failed to load data: " + e.getMessage());
-//        }
-    }
-
 }

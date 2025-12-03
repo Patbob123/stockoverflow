@@ -11,6 +11,9 @@ import entities.Simulation;
 import interface_adapter.ViewModel;
 import view.ImportExportView;
 
+/**
+ * ViewModel for Import/Export view
+ */
 public class ImportExportViewModel extends ViewModel<ImportExportState> {
 
     // Colours
@@ -99,15 +102,24 @@ public class ImportExportViewModel extends ViewModel<ImportExportState> {
     private PortfolioList portfolioList = new PortfolioList();
     private List<Simulation> simulations = new ArrayList<>();
 
+    /**
+     * Constructor for an ImportExportViewModel and set init state
+     */
     public ImportExportViewModel() {
         super(ImportExportView.VIEW_NAME);
         setState(new ImportExportState());
     }
 
+    /**
+     * Sets the list of portfolios available for import/export
+     */
     public void setPortfolios(PortfolioList portfolioList){
         this.portfolioList = portfolioList;
     }
 
+    /**
+     * Sets the list of simulations available for import/export
+     */
     public void setSimulation(List<Simulation> simulations) {
         this.simulations = simulations;
     }

@@ -39,7 +39,6 @@ public class MainMenuView extends PaddedView<MainMenuViewModel, MainMenuControll
 
     public MainMenuView(MainMenuViewModel viewModel) {
         super(viewModel);
-        //noteName.setAlignmentX(Component.CENTER_ALIGNMENT); ADD DATE HERE TOO
         this.getViewModel().addPropertyChangeListener(this);
 
 

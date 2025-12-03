@@ -33,7 +33,7 @@ public class ImportExportDataAccessObject implements ImportExportDataAccessInter
     }
 
     @Override
-    public void savePortfolio(PortfolioList portfolioList, String filePath) {
+    public void savePortfolio(String filePath) {
         try {
             final FileWriter writer = new FileWriter(filePath);
             writer.append("wow portfoliolist here");
