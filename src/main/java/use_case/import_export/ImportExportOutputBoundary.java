@@ -6,7 +6,13 @@ import entities.Portfolio.Portfolio;
 import entities.Simulation;
 import use_case.OutputBoundary;
 
+/**
+ * Output boundary for Import/Export use case
+ */
 public interface ImportExportOutputBoundary extends OutputBoundary {
-    void prepareSuccessView(String message);
 
+    /**
+     * Prepares the success view to show exported or imported
+     */
+    void prepareSuccessView(String message);
 }
